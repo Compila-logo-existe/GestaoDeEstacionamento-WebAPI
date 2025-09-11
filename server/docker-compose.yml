@@ -1,0 +1,48 @@
+services:
+  gestaodeestacionamento.webapi:
+    image: ${DOCKER_REGISTRY-}gestaodeestacionamentowebapi
+    build:
+      context: .
+      dockerfile: web-api/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gestaoEstacionamento-net
+
+  postgres:
+    image: postgres:16
+    container_name: gestaoEstacionamento.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - gestaoEstacionamento-net
+
+  redis:
+    image: redis:8.2.1
+    container_name: gestaoEstacionamento.redis
+    command: >
+      redis-server
+      --appendonly yes
+      --save 60 1000
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - gestaoEstacionamento-net
+
+networks:
+  gestaoEstacionamento-net:
+    driver: bridge
+
+volumes:
+  dbdata:
+  redisdata:

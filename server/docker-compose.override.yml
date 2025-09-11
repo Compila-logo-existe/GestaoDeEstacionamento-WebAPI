@@ -1,0 +1,38 @@
+services:
+  gestaodeestacionamento.webapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - SQL_CONNECTION_STRING=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - NEWRELIC_LICENSE_KEY=${NEWRELIC_LICENSE_KEY}
+      - AUTOMAPPER_LICENSE_KEY=${AUTOMAPPER_LICENSE_KEY}
+      - JWT_GENERATION_KEY=${JWT_GENERATION_KEY}
+      - JWT_AUDIENCE_DOMAIN=https://localhost:8081
+      - REDIS_CONNECTION_STRING=redis:6379,abortConnect=false
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  postgres:
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+ 
+  redis:
+    environment:
+      name: gestaoEstacionamento-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
