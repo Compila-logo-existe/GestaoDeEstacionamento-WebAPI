@@ -1,9 +1,11 @@
-name: Build - Test
+name: Build - Test -- Server
 
 on:
   push:
     branches:
       - master
+    paths:
+    - 'server/**'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +23,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ./server --configuration Release
   
   test:
     runs-on: ubuntu-latest
@@ -38,7 +40,7 @@ jobs:
           dotnet-version: '8.x'
     
       - name: Run tests
-        run: dotnet test --configuration Release --verbosity normal
+        run: dotnet test ./server --configuration Release --verbosity normal
         env: 
           ASPNET_ENVIRONMENT: "GITHUB_ACTIONS"
           SQL_CONNECTION_STRING: ${{ secrets.SQL_CONNECTION_STRING }}
