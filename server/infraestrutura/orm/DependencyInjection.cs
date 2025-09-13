@@ -1,5 +1,9 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
+using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
+using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloHospede;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloRecepcaoCheckin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +14,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddCamadaInfraestruturaOrm(this IServiceCollection services, IConfiguration configuration)
     {
-        // Area para adicionar os Scopeds, exemplo: services.AddScoped<IRepositorioExemplo, RepositorioExemploORM>();
+        services.AddScoped<IRepositorioHospede, RepositorioHospede>();
+        services.AddScoped<IRepositorioVeiculo, RepositorioVeiculo>();
+        services.AddScoped<IRepositorioRegistroEntrada, RepositorioRegistroEntrada>();
 
         services.AddEntityFrameworkConfig(configuration);
 
