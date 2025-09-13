@@ -26,15 +26,15 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
         Observacoes = observacoes;
     }
 
-    public void DefinirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
 
-    public void DefinirHospede(Hospede hospede) => Hospede = hospede;
+    public void AderirHospede(Hospede hospede) => Hospede = hospede;
 
-    public void DefinirVeiculo(Veiculo veiculo) => Veiculo = veiculo;
+    public void AderirVeiculo(Veiculo veiculo) => Veiculo = veiculo;
 
     public void GerarNovoTicket() => Ticket = new Ticket(this);
 
-    public void DefinirUsuarioTicket(Guid usuarioId) => Ticket.UsuarioId = usuarioId;
+    public void AderirUsuarioAoTicket(Guid usuarioId) => Ticket.UsuarioId = usuarioId;
 
     public void RegistrarSaida() => DataSaidaEmUtc = DateTime.UtcNow;
 

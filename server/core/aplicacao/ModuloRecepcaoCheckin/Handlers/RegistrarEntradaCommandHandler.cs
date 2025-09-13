@@ -11,6 +11,7 @@ using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Handlers;
 
@@ -29,6 +30,10 @@ public class RegistrarEntradaCommandHandler(
     public async Task<Result<RegistrarEntradaResult>> Handle(
         RegistrarEntradaCommand command, CancellationToken cancellationToken)
     {
+        Guid? usuarioId = tenantProvider.UsuarioId;
+        if (usuarioId is null || usuarioId == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+
         ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
         if (!resultValidation.IsValid)
@@ -37,32 +42,55 @@ public class RegistrarEntradaCommandHandler(
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
         }
 
-        Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
-
         try
         {
-            Hospede novoHospede = mapper.Map<Hospede>(command);
-            novoHospede.DefinirUsuario(usuarioId.Value); // Criar cadastro de hospede
+            Hospede? novoHospede;
+            if (command.HospedeId.HasValue && command.HospedeId.Value != Guid.Empty)
+            {
+                novoHospede = await repositorioHospede.SelecionarRegistroPorIdAsync(command.HospedeId.Value);
+                if (novoHospede is null)
+                    return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Hóspede não encontrado."));
+            }
+            else
+            {
+                string cPFPadronizado = Regex.Replace(command.CPF!, "[^0-9]", "");
 
-            Veiculo novoVeiculo = mapper.Map<Veiculo>(command);
-            novoVeiculo.DefinirUsuario(usuarioId.Value);
+                Hospede? hospedeExistente = await repositorioHospede
+                    .SelecionarRegistroPorCPFAsync(cPFPadronizado, cancellationToken);
+
+                if (hospedeExistente is not null)
+                {
+                    novoHospede = hospedeExistente;
+                }
+                else
+                {
+                    novoHospede = mapper.Map<Hospede>(command);
+                    novoHospede.AderirUsuario(usuarioId.Value);
+                    await repositorioHospede.CadastrarRegistroAsync(novoHospede);
+                }
+            }
+
+            Veiculo? novoVeiculo = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, cancellationToken);
+
+            if (novoVeiculo is null)
+            {
+                novoVeiculo = mapper.Map<Veiculo>(command);
+                await repositorioVeiculo.CadastrarRegistroAsync(novoVeiculo);
+            }
 
             novoHospede.AderirVeiculo(novoVeiculo);
-            await repositorioHospede.CadastrarRegistroAsync(novoHospede);
-
-            novoVeiculo.AderirHospede(novoHospede);
-            await repositorioVeiculo.CadastrarRegistroAsync(novoVeiculo);
 
             RegistroEntrada novoRegistro = mapper.Map<RegistroEntrada>(command);
-            novoRegistro.DefinirUsuario(usuarioId.Value);
-            novoRegistro.DefinirHospede(novoHospede);
-            novoRegistro.DefinirVeiculo(novoVeiculo);
+            novoRegistro.AderirUsuario(usuarioId.Value);
+            novoRegistro.AderirHospede(novoHospede);
+            novoRegistro.AderirVeiculo(novoVeiculo);
             novoRegistro.GerarNovoTicket();
-            novoRegistro.DefinirUsuarioTicket(usuarioId.Value);
+            novoRegistro.AderirUsuarioAoTicket(usuarioId.Value);
 
             await repositorioRegistroEntrada.CadastrarRegistroAsync(novoRegistro);
+
+            novoHospede.AderirUsuario(usuarioId.Value);
+            novoVeiculo.AderirUsuario(usuarioId.Value);
 
             await unitOfWork.CommitAsync();
 

@@ -24,12 +24,9 @@ public class MapeadorVeiculo : IEntityTypeConfiguration<Veiculo>
             .IsRequired();
 
         builder.HasOne(v => v.Hospede)
-            .WithOne(h => h.Veiculo)
-            .HasForeignKey<Veiculo>(v => v.HospedeId)
+            .WithMany(h => h.Veiculos)
+            .HasForeignKey(v => v.HospedeId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(v => v.HospedeId)
-            .IsUnique();
 
         builder.HasIndex(v => v.Placa)
             .IsUnique();

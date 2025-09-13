@@ -24,13 +24,13 @@ public class Veiculo : EntidadeBase<Veiculo>
         Hospede = hospede;
     }
 
-    public void DefinirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
 
     public void AderirHospede(Hospede hospede)
     {
         Hospede = hospede;
         HospedeId = hospede.Id;
-        if (hospede.Veiculo is not null && (hospede.Veiculo.Id != Id || hospede.Veiculo != this))
+        if (hospede.Veiculos.Count > 0 && hospede.Veiculos.Any(v => !v.Id.Equals(Id)))
             hospede.AderirVeiculo(this);
     }
 

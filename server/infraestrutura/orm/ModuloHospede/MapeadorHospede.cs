@@ -24,6 +24,16 @@ public class MapeadorHospede : IEntityTypeConfiguration<Hospede>
             .HasMaxLength(20)
             .IsRequired();
 
+        builder.HasMany(h => h.Veiculos)
+               .WithOne(v => v.Hospede)
+               .HasForeignKey(v => v.HospedeId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(h => h.RegistrosEntrada)
+               .WithOne(r => r.Hospede)
+               .HasForeignKey(r => r.HospedeId)
+               .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(h => h.CPF)
             .IsUnique();
     }

@@ -9,7 +9,7 @@ public class Hospede : EntidadeBase<Hospede>
     public string NomeCompleto { get; set; }
     public string CPF { get; set; }
     public string Telefone { get; set; }
-    public Veiculo Veiculo { get; set; }
+    public List<Veiculo> Veiculos { get; set; } = new();
     public List<RegistroEntrada> RegistrosEntrada { get; set; } = new();
 
     [ExcludeFromCodeCoverage]
@@ -21,12 +21,17 @@ public class Hospede : EntidadeBase<Hospede>
         Telefone = telefone;
     }
 
-    public void DefinirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+
+    public bool PossuiVeiculoPorPlaca(string placa)
+        => Veiculos.Any(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
 
     public void AderirVeiculo(Veiculo veiculo)
     {
-        Veiculo = veiculo;
-        if (veiculo.Hospede is not null && (veiculo.HospedeId != Id || veiculo.Hospede != this))
+        if (!PossuiVeiculoPorPlaca(veiculo.Placa))
+            Veiculos.Add(veiculo);
+
+        if (veiculo.Hospede is null || veiculo.HospedeId != Id || veiculo.Hospede != this)
             veiculo.AderirHospede(this);
     }
 

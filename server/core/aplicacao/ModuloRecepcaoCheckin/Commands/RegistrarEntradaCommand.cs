@@ -4,9 +4,10 @@ using MediatR;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Commands;
 
 public record RegistrarEntradaCommand(
-    string NomeCompleto,
-    string CPF,
-    string Telefone,
+    Guid? HospedeId,
+    string? NomeCompleto,
+    string? CPF,
+    string? Telefone,
     string Placa,
     string Modelo,
     string Cor,

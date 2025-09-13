@@ -1,9 +1,10 @@
 namespace GestaoDeEstacionamento.WebAPI.Models.ModuloRecepcaoCheckin;
 
 public record RegistrarEntradaRequest(
-    string NomeCompleto,
-    string CPF,
-    string Telefone,
+    Guid? HospedeId,
+    string? NomeCompleto,
+    string? CPF,
+    string? Telefone,
     string Placa,
     string Modelo,
     string Cor,
