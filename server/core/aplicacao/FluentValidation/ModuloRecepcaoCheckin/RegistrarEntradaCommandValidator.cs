@@ -28,7 +28,7 @@ public class RegistrarEntradaCommandValidator : AbstractValidator<RegistrarEntra
             RuleFor(c => c.NomeCompleto)
                 .NotEmpty().WithMessage("O nome do Hóspede é obrigatório.")
                 .MinimumLength(2).WithMessage("O nome deve ter pelo menos {MinLength} caracteres.")
-                .MaximumLength(150).WithMessage("O nome deve ter pelo menos {MaxLength} caracteres.")
+                .MaximumLength(150).WithMessage("O nome deve ter pelo menos máximo {MaxLength} caracteres.")
                 .Must(NomeEhValido).WithMessage("Por favor, insira um nome válido.");
 
             RuleFor(c => c.CPF)
@@ -36,13 +36,13 @@ public class RegistrarEntradaCommandValidator : AbstractValidator<RegistrarEntra
                 .Must(CPFEhValido).WithMessage("Por favor, insira um C.P.F. válido.");
 
             RuleFor(c => c.Telefone)
-                .NotEmpty().WithMessage("O telefone do Hóspede é obrigatório..")
+                .NotEmpty().WithMessage("O telefone do Hóspede é obrigatório.")
                 .Must(TelefoneEhValido).WithMessage("Por favor, insira um número de telefone válido, ex: (99) 99999-9999 ou (99) 9999-9999.");
-
         });
 
         RuleFor(c => c.Placa)
-            .NotEmpty().WithMessage("A Placa do Veículo é obrigatória.");
+            .NotEmpty().WithMessage("A Placa do Veículo é obrigatória.")
+            .Must(PlacaEhValida).WithMessage("Por favor, insira uma placa válida, ex: ABC1D23 ou ABC1234.");
 
         RuleFor(c => c.Modelo)
             .NotEmpty().WithMessage("O Modelo do Veículo é obrigatório.");
@@ -66,13 +66,18 @@ public class RegistrarEntradaCommandValidator : AbstractValidator<RegistrarEntra
         return Regex.IsMatch(input, "^[a-zA-ZÄäÖöÜüÀàÈèÌìÒòÙùÁáÉéÍíÓóÚúÝýÂâÊêÎîÔôÛûÃãÑñÇç'\\-\\s]+$");
     }
 
-    private static bool CPFEhValido(string input)
+    private static bool CPFEhValido(string? input)
     {
-        return Regex.IsMatch(input, "^[0-9]{3}[\\.]?[0-9]{3}[\\.]?[0-9]{3}[-]?[0-9]{2}$");
+        return Regex.IsMatch(input!, "^[0-9]{3}[\\.]?[0-9]{3}[\\.]?[0-9]{3}[-]?[0-9]{2}$");
     }
 
-    private static bool TelefoneEhValido(string input)
+    private static bool TelefoneEhValido(string? input)
     {
-        return Regex.IsMatch(input, "^\\(?\\d{2}\\)?\\s?(9\\d{4}|\\d{4})-?\\d{4}$");
+        return Regex.IsMatch(input!, "^\\(?\\d{2}\\)?\\s?(9\\d{4}|\\d{4})-?\\d{4}$");
+    }
+
+    private static bool PlacaEhValida(string? input)
+    {
+        return Regex.IsMatch(input!, "^([A-Z]{3}[0-9]{4}|[A-Z]{3}[0-9][A-Z][0-9]{2})$");
     }
 }

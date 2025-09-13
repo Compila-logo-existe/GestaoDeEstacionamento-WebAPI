@@ -9,9 +9,9 @@ using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Handlers;
 
@@ -34,6 +34,12 @@ public class RegistrarEntradaCommandHandler(
         if (usuarioId is null || usuarioId == Guid.Empty)
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
 
+        command = command with
+        {
+            CPF = Padronizador.PadronizarCPF(command.CPF),
+            Placa = Padronizador.PadronizarPlaca(command.Placa)
+        };
+
         ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
         if (!resultValidation.IsValid)
@@ -49,14 +55,11 @@ public class RegistrarEntradaCommandHandler(
             {
                 novoHospede = await repositorioHospede.SelecionarRegistroPorIdAsync(command.HospedeId.Value);
                 if (novoHospede is null)
-                    return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Hóspede não encontrado."));
+                    return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Hóspede não encontrado."));
             }
             else
             {
-                string cPFPadronizado = Regex.Replace(command.CPF!, "[^0-9]", "");
-
-                Hospede? hospedeExistente = await repositorioHospede
-                    .SelecionarRegistroPorCPFAsync(cPFPadronizado, cancellationToken);
+                Hospede? hospedeExistente = await repositorioHospede.SelecionarRegistroPorCPFAsync(command.CPF, usuarioId, cancellationToken);
 
                 if (hospedeExistente is not null)
                 {
@@ -65,20 +68,24 @@ public class RegistrarEntradaCommandHandler(
                 else
                 {
                     novoHospede = mapper.Map<Hospede>(command);
-                    novoHospede.AderirUsuario(usuarioId.Value);
                     await repositorioHospede.CadastrarRegistroAsync(novoHospede);
                 }
             }
 
-            Veiculo? novoVeiculo = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, cancellationToken);
+            Veiculo? novoVeiculo = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
 
             if (novoVeiculo is null)
             {
                 novoVeiculo = mapper.Map<Veiculo>(command);
+                novoVeiculo.AderirUsuario(usuarioId.Value);
                 await repositorioVeiculo.CadastrarRegistroAsync(novoVeiculo);
             }
 
             novoHospede.AderirVeiculo(novoVeiculo);
+            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
+
+            if (possuiEntradaEmAberto)
+                return Result.Fail(ResultadosErro.ConflitoErro("Já existe check-in em aberto para esta placa."));
 
             RegistroEntrada novoRegistro = mapper.Map<RegistroEntrada>(command);
             novoRegistro.AderirUsuario(usuarioId.Value);
@@ -100,6 +107,18 @@ public class RegistrarEntradaCommandHandler(
             RegistrarEntradaResult result = mapper.Map<RegistrarEntradaResult>(novoRegistro);
 
             return Result.Ok(result);
+        }
+        catch (DbUpdateException ex)
+        {
+            await unitOfWork.RollbackAsync();
+
+            logger.LogError(
+                ex,
+                "Ocorreu um erro durante o registro de {@Registro}.",
+                command
+            );
+
+            return Result.Fail(ResultadosErro.ConflitoErro("Conflito de dados: CPF ou Placa já cadastrados neste estabelecimento."));
         }
         catch (Exception ex)
         {
