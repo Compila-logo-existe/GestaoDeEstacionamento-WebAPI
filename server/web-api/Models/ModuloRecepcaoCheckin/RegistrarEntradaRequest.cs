@@ -1,7 +1,6 @@
 namespace GestaoDeEstacionamento.WebAPI.Models.ModuloRecepcaoCheckin;
 
 public record RegistrarEntradaRequest(
-    DateTime DataEntrada,
     string NomeCompleto,
     string CPF,
     string Telefone,

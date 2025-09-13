@@ -4,7 +4,6 @@ using MediatR;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Commands;
 
 public record RegistrarEntradaCommand(
-    DateTime DataEntrada,
     string NomeCompleto,
     string CPF,
     string Telefone,
