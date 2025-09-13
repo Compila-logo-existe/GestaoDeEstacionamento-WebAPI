@@ -28,7 +28,7 @@ public class MapeadorVeiculo : IEntityTypeConfiguration<Veiculo>
             .HasForeignKey(v => v.HospedeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(v => v.Placa)
+        builder.HasIndex(v => new { v.UsuarioId, v.Placa })
             .IsUnique();
     }
 }

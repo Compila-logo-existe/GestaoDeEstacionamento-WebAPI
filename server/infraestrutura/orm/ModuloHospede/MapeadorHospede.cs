@@ -34,7 +34,7 @@ public class MapeadorHospede : IEntityTypeConfiguration<Hospede>
                .HasForeignKey(r => r.HospedeId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(h => h.CPF)
+        builder.HasIndex(h => new { h.UsuarioId, h.CPF })
             .IsUnique();
     }
 }
