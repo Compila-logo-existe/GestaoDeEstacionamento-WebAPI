@@ -1,5 +1,7 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
+using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -9,18 +11,26 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 
 public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvider = null) : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
 {
-    // Area para os DbSets, exemplo: public DbSet<Exemplo> Exemplos { get; set; }
+    public DbSet<Hospede> Hospedes { get; set; }
+    public DbSet<Veiculo> Veiculos { get; set; }
+    public DbSet<RegistroEntrada> RegistrosEntrada { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         if (tenantProvider is not null)
         {
-            /*
-            Area para definir a seleção das queries via UsuarioId, exemplo: 
-
-            modelBuilder.Entity<Contato>()
+            modelBuilder.Entity<Hospede>()
                 .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
-            */
+
+            modelBuilder.Entity<Veiculo>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<RegistroEntrada>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<Ticket>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
         }
 
         Assembly assembly = typeof(AppDbContext).Assembly;
@@ -29,6 +39,7 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
 
         base.OnModelCreating(modelBuilder);
     }
+
     public async Task CommitAsync()
     {
         await SaveChangesAsync();
