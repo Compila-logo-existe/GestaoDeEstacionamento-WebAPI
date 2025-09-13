@@ -4,6 +4,12 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.Compartilhado;
 
 public abstract class ResultadosErro
 {
+    public static Error ConflitoErro(string erro)
+    {
+        return new Error("Conflito")
+            .CausedBy(erro)
+            .WithMetadata("TipoErro", "Conflito");
+    }
     public static Error RequisicaoInvalidaErro(string erro)
     {
         return new Error("Requisição inválida")

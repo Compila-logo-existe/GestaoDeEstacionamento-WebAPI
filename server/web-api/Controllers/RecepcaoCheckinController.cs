@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentResults;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Commands;
+using GestaoDeEstacionamento.WebAPI.Helpers;
 using GestaoDeEstacionamento.WebAPI.Models.ModuloRecepcaoCheckin;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -23,18 +24,7 @@ public class RecepcaoCheckinController(
         Result<RegistrarEntradaResult> result = await mediator.Send(command);
 
         if (result.IsFailed)
-        {
-            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
-            {
-                IEnumerable<string> errosDeValidacao = result.Errors
-                    .SelectMany(e => e.Reasons.OfType<IError>())
-                    .Select(e => e.Message);
-
-                return BadRequest(errosDeValidacao);
-            }
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+            return this.MapearFalha(result.ToResult());
 
         RegistrarEntradaResponse response = mapper.Map<RegistrarEntradaResponse>(result.Value);
 
