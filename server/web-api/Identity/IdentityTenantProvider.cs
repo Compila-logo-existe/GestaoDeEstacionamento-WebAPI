@@ -23,4 +23,3 @@ public class IdentityTenantProvider(IHttpContextAccessor contextAccessor) : ITen
         return contextAccessor.HttpContext?.User?.IsInRole(role) ?? false;
     }
 }
-

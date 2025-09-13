@@ -9,7 +9,7 @@ public static class SwaggerConfig
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "eAgenda API", Version = "v1" });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "GestaoEstacionamento API", Version = "v1" });
 
             options.MapType<TimeSpan>(() => new OpenApiSchema
             {

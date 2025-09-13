@@ -1,4 +1,3 @@
-
 using GestaoDeEstacionamento.Core.Aplicacao;
 using GestaoDeEstacionamento.Infraestrutura.ORM;
 using GestaoDeEstacionamento.WebAPI.AutoMapper;
