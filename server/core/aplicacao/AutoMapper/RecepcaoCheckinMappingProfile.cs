@@ -21,21 +21,9 @@ public class RecepcaoCheckinMappingProfile : Profile
             ));
         #endregion
 
-        #region ObterDetalhesPorId
-        CreateMap<Veiculo, ObterDetalhesVeiculoPorIdResult>()
-            .ConvertUsing(src => new ObterDetalhesVeiculoPorIdResult(
-                src.Id,
-                src.Placa,
-                src.Modelo,
-                src.Cor,
-                src.Observacoes,
-                src.Hospede.NomeCompleto
-            ));
-        #endregion
-
-        #region ObterDetalhesPorPlaca
-        CreateMap<Veiculo, ObterDetalhesVeiculoPorPlacaResult>()
-            .ConvertUsing(src => new ObterDetalhesVeiculoPorPlacaResult(
+        #region ObterDetalhes
+        CreateMap<Veiculo, ObterDetalhesVeiculoResult>()
+            .ConvertUsing(src => new ObterDetalhesVeiculoResult(
                 src.Id,
                 src.Placa,
                 src.Modelo,

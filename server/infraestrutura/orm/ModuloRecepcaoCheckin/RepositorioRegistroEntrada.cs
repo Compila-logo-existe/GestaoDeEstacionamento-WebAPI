@@ -15,6 +15,17 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .Include(r => r.Veiculo)
             .ToListAsync();
     }
+
+    public override async Task<List<RegistroEntrada>> SelecionarRegistrosAsync(int quantidade)
+    {
+        return await registros
+            .Take(quantidade)
+            .Include(r => r.Hospede)
+            .Include(r => r.Ticket)
+            .Include(r => r.Veiculo)
+            .ToListAsync();
+    }
+
     // criar selecao de registros em geral e do veiculo, filtrando por abertos e fechados
     public async Task<List<RegistroEntrada>> SelecionarRegistrosDoVeiculoAsync(Guid veiculoId, CancellationToken ct = default)
     {
@@ -25,6 +36,7 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .Include(r => r.Veiculo)
             .ToListAsync(ct);
     }
+
     public async Task<List<RegistroEntrada>> SelecionarRegistrosDoVeiculoAsync(int quantidade, Guid veiculoId, CancellationToken ct = default)
     {
         return await registros

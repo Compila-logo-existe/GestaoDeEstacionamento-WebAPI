@@ -1,8 +1,11 @@
 namespace GestaoDeEstacionamento.WebAPI.Models.ModuloRecepcaoCheckin;
 
-public record ObterDetalhesVeiculoPorIdRequest(Guid Id);
+public record ObterDetalhesVeiculoRequest(
+    Guid? VeiculoId,
+    string? Placa
+);
 
-public record ObterDetalhesVeiculoPorIdResponse(
+public record ObterDetalhesVeiculoResponse(
     Guid Id,
     string Placa,
     string Modelo,

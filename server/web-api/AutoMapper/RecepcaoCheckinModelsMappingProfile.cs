@@ -14,17 +14,9 @@ public class RecepcaoCheckinModelsMappingProfile : Profile
         CreateMap<RegistrarEntradaResult, RegistrarEntradaResponse>();
         #endregion
 
-
-        #region ObterDetalhesPorId
-        CreateMap<Guid, ObterDetalhesVeiculoPorIdQuery>()
-            .ConvertUsing(src => new ObterDetalhesVeiculoPorIdQuery(src));
-        CreateMap<ObterDetalhesVeiculoPorIdResult, ObterDetalhesVeiculoPorIdResponse>();
-        #endregion
-
-        #region ObterDetalhesPorPlaca
-        CreateMap<string, ObterDetalhesVeiculoPorPlacaQuery>()
-            .ConvertUsing(src => new ObterDetalhesVeiculoPorPlacaQuery(src));
-        CreateMap<ObterDetalhesVeiculoPorPlacaResult, ObterDetalhesVeiculoPorPlacaResponse>();
+        #region ObterDetalhes
+        CreateMap<ObterDetalhesVeiculoRequest, ObterDetalhesVeiculoQuery>();
+        CreateMap<ObterDetalhesVeiculoResult, ObterDetalhesVeiculoResponse>();
         #endregion
 
         #region SeleçãoTodosRegistros

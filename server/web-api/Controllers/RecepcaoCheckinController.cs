@@ -16,7 +16,7 @@ public class RecepcaoCheckinController(
     IMediator mediator
 ) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("registrar")]
     public async Task<ActionResult<RegistrarEntradaResponse>> RegistrarEntrada(RegistrarEntradaRequest request)
     {
         RegistrarEntradaCommand command = mapper.Map<RegistrarEntradaCommand>(request);
@@ -31,7 +31,7 @@ public class RecepcaoCheckinController(
         return Created(string.Empty, response);
     }
 
-    [HttpGet]
+    [HttpGet("registros")]
     public async Task<ActionResult<SelecionarRegistrosEntradaResponse>> SelecionarRegistros(
         [FromQuery] SelecionarRegistrosEntradaRequest? request,
         CancellationToken ct
@@ -60,43 +60,25 @@ public class RecepcaoCheckinController(
         return Ok(response);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ObterDetalhesVeiculoPorIdResponse>> ObterDetalhesVeiculoPorId(
-        Guid id,
+    [HttpGet("detalhes-veiculo/")]
+    public async Task<ActionResult<ObterDetalhesVeiculoResponse>> ObterDetalhesVeiculo(
+        [FromQuery] ObterDetalhesVeiculoRequest request,
         CancellationToken ct
     )
     {
-        ObterDetalhesVeiculoPorIdQuery query = mapper.Map<ObterDetalhesVeiculoPorIdQuery>(id);
+        ObterDetalhesVeiculoQuery query = mapper.Map<ObterDetalhesVeiculoQuery>(request);
 
-        Result<ObterDetalhesVeiculoPorIdResult> result = await mediator.Send(query, ct);
+        Result<ObterDetalhesVeiculoResult> result = await mediator.Send(query, ct);
 
         if (result.IsFailed)
             return this.MapearFalha(result.ToResult());
 
-        ObterDetalhesVeiculoPorIdResponse response = mapper.Map<ObterDetalhesVeiculoPorIdResponse>(result.Value);
+        ObterDetalhesVeiculoResponse response = mapper.Map<ObterDetalhesVeiculoResponse>(result.Value);
 
         return Ok(response);
     }
 
-    [HttpGet("{placa}")]
-    public async Task<ActionResult<ObterDetalhesVeiculoPorPlacaResponse>> ObterDetalhesVeiculoPorPlaca(
-        string placa,
-        CancellationToken ct
-    )
-    {
-        ObterDetalhesVeiculoPorPlacaQuery query = mapper.Map<ObterDetalhesVeiculoPorPlacaQuery>(placa);
-
-        Result<ObterDetalhesVeiculoPorPlacaResult> result = await mediator.Send(query, ct);
-
-        if (result.IsFailed)
-            return this.MapearFalha(result.ToResult());
-
-        ObterDetalhesVeiculoPorPlacaResponse response = mapper.Map<ObterDetalhesVeiculoPorPlacaResponse>(result.Value);
-
-        return Ok(response);
-    }
-
-    [HttpGet("registros")]
+    [HttpGet("registros-veiculo/")]
     public async Task<ActionResult<SelecionarRegistrosDoVeiculoResponse>> SelecionarRegistrosDoVeiculo(
         [FromQuery] SelecionarRegistrosDoVeiculoRequest request,
         CancellationToken ct
