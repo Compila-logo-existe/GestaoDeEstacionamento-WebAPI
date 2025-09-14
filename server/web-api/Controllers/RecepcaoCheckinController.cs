@@ -42,18 +42,7 @@ public class RecepcaoCheckinController(
         Result<SelecionarRegistrosEntradaResult> result = await mediator.Send(query, ct);
 
         if (result.IsFailed)
-        {
-            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
-            {
-                IEnumerable<string> errosDeValidacao = result.Errors
-                    .SelectMany(e => e.Reasons.OfType<IError>())
-                    .Select(e => e.Message);
-
-                return BadRequest(errosDeValidacao);
-            }
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+            return this.MapearFalha(result.ToResult());
 
         SelecionarRegistrosEntradaResponse response = mapper.Map<SelecionarRegistrosEntradaResponse>(result.Value);
 
