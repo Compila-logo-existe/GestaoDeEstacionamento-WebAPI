@@ -30,4 +30,34 @@ public class RecepcaoCheckinController(
 
         return Created(string.Empty, response);
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ObterDetalhesVeiculoPorIdResponse>> ObterDetalhesVeiculoPorId(Guid id)
+    {
+        ObterDetalhesVeiculoPorIdQuery query = mapper.Map<ObterDetalhesVeiculoPorIdQuery>(id);
+
+        Result<ObterDetalhesVeiculoPorIdResult> result = await mediator.Send(query);
+
+        if (result.IsFailed)
+            return this.MapearFalha(result.ToResult());
+
+        ObterDetalhesVeiculoPorIdResponse response = mapper.Map<ObterDetalhesVeiculoPorIdResponse>(result.Value);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<ObterDetalhesVeiculoPorPlacaResponse>> ObterDetalhesVeiculoPorPlaca([FromQuery] string placa)
+    {
+        ObterDetalhesVeiculoPorPlacaQuery query = mapper.Map<ObterDetalhesVeiculoPorPlacaQuery>(placa);
+
+        Result<ObterDetalhesVeiculoPorPlacaResult> result = await mediator.Send(query);
+
+        if (result.IsFailed)
+            return this.MapearFalha(result.ToResult());
+
+        ObterDetalhesVeiculoPorPlacaResponse response = mapper.Map<ObterDetalhesVeiculoPorPlacaResponse>(result.Value);
+
+        return Ok(response);
+    }
 }

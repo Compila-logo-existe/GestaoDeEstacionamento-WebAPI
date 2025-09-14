@@ -10,18 +10,20 @@ public class Veiculo : EntidadeBase<Veiculo>
     public string Modelo { get; set; }
     public string Cor { get; set; }
     public Guid HospedeId { get; set; }
-    public Hospede Hospede { get; set; }
+    public Hospede Hospede { get; set; } = null!;
+    public string? Observacoes { get; set; }
     public List<RegistroEntrada> RegistrosEntrada { get; set; } = new();
 
     [ExcludeFromCodeCoverage]
     public Veiculo() { }
     public Veiculo(string placa, string modelo, string cor,
-        Hospede? hospede) : this()
+        Hospede hospede, string? observacoes) : this()
     {
         Placa = placa;
         Modelo = modelo;
         Cor = cor;
         Hospede = hospede;
+        Observacoes = observacoes;
     }
 
     public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
