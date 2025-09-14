@@ -15,7 +15,7 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
     public Guid VeiculoId { get; set; }
     public Veiculo Veiculo { get; set; }
     public string? Observacoes { get; set; }
-    public bool EstaAberto => DataSaidaEmUtc is null;
+    public StatusRegistroEntrada Status => DataSaidaEmUtc is null ? StatusRegistroEntrada.Livre : StatusRegistroEntrada.Ocupada;
 
     [ExcludeFromCodeCoverage]
     public RegistroEntrada() { }
