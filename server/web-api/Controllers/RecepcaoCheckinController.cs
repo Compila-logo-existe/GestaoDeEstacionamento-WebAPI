@@ -31,6 +31,35 @@ public class RecepcaoCheckinController(
         return Created(string.Empty, response);
     }
 
+    [HttpGet]
+    public async Task<ActionResult<SelecionarRegistrosEntradaResponse>> SelecionarRegistros(
+        [FromQuery] SelecionarRegistrosEntradaRequest? request,
+        CancellationToken cancellationToken
+    )
+    {
+        SelecionarRegistrosEntradaQuery query = mapper.Map<SelecionarRegistrosEntradaQuery>(request);
+
+        Result<SelecionarRegistrosEntradaResult> result = await mediator.Send(query, cancellationToken);
+
+        if (result.IsFailed)
+        {
+            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
+            {
+                IEnumerable<string> errosDeValidacao = result.Errors
+                    .SelectMany(e => e.Reasons.OfType<IError>())
+                    .Select(e => e.Message);
+
+                return BadRequest(errosDeValidacao);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        SelecionarRegistrosEntradaResponse response = mapper.Map<SelecionarRegistrosEntradaResponse>(result.Value);
+
+        return Ok(response);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ObterDetalhesVeiculoPorIdResponse>> ObterDetalhesVeiculoPorId(Guid id)
     {
@@ -46,8 +75,8 @@ public class RecepcaoCheckinController(
         return Ok(response);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<ObterDetalhesVeiculoPorPlacaResponse>> ObterDetalhesVeiculoPorPlaca([FromQuery] string placa)
+    [HttpGet("{placa}")]
+    public async Task<ActionResult<ObterDetalhesVeiculoPorPlacaResponse>> ObterDetalhesVeiculoPorPlaca(string placa)
     {
         ObterDetalhesVeiculoPorPlacaQuery query = mapper.Map<ObterDetalhesVeiculoPorPlacaQuery>(placa);
 
