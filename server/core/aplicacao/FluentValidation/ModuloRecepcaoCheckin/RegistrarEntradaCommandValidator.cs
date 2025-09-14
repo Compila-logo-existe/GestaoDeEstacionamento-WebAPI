@@ -9,7 +9,7 @@ public class RegistrarEntradaCommandValidator : AbstractValidator<RegistrarEntra
     public RegistrarEntradaCommandValidator()
     {
         RuleFor(c => c)
-            .Must(CompoeExatamenteUmCaminhoDeHospede)
+            .Must(CompoeExatamenteUmCaminhoDoRequest)
             .WithMessage("Informe o ID do Hóspede OU os novos dados. Informe apenas um dos caminhos.");
 
         When(c => c.HospedeId.HasValue && c.HospedeId.Value != Guid.Empty, () =>
@@ -54,7 +54,7 @@ public class RegistrarEntradaCommandValidator : AbstractValidator<RegistrarEntra
             .MaximumLength(1000).WithMessage("As observações devem ter no máximo {MaxLength} caracteres.");
     }
 
-    private static bool CompoeExatamenteUmCaminhoDeHospede(RegistrarEntradaCommand command)
+    private static bool CompoeExatamenteUmCaminhoDoRequest(RegistrarEntradaCommand command)
     {
         bool hospedeIdTemValor = command.HospedeId.HasValue && command.HospedeId.Value != Guid.Empty;
         bool dadosHospedeTemValor = !string.IsNullOrWhiteSpace(command.CPF) && !string.IsNullOrWhiteSpace(command.NomeCompleto);

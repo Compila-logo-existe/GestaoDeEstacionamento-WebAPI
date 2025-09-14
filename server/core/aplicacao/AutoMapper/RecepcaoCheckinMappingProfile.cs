@@ -66,5 +66,27 @@ public class RecepcaoCheckinMappingProfile : Profile
              )
          );
         #endregion
+
+        #region SeleçãoTodosRegistrosDoVeiculo
+        CreateMap<RegistroEntrada, SelecionarRegistrosEntradaDto>()
+           .ConvertUsing(src => new SelecionarRegistrosEntradaDto(
+                src.Id,
+                src.DataEntradaEmUtc,
+                src.DataSaidaEmUtc,
+                src.Observacoes,
+                src.Hospede.Id,
+                src.Hospede.NomeCompleto,
+                src.Veiculo.Id,
+                src.Veiculo.Placa
+            ));
+
+        CreateMap<IEnumerable<RegistroEntrada>, SelecionarRegistrosDoVeiculoResult>()
+         .ConvertUsing((src, dest, ctx) =>
+             new SelecionarRegistrosDoVeiculoResult(
+                 src?.Select(c => ctx.Mapper.Map<SelecionarRegistrosEntradaDto>(c)).ToImmutableList() ??
+                 ImmutableList<SelecionarRegistrosEntradaDto>.Empty
+             )
+         );
+        #endregion
     }
 }

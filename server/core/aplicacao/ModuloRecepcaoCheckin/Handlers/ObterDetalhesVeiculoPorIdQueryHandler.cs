@@ -18,12 +18,12 @@ public class ObterDetalhesVeiculoPorIdQueryHandler(
     {
         try
         {
-            Veiculo? veiculo = await repositorioVeiculo.SelecionarRegistroPorIdAsync(query.Id);
+            Veiculo? veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorIdAsync(query.Id);
 
-            if (veiculo is null)
+            if (veiculoSelecionado is null)
                 return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(query.Id));
 
-            ObterDetalhesVeiculoPorIdResult result = mapper.Map<ObterDetalhesVeiculoPorIdResult>(veiculo);
+            ObterDetalhesVeiculoPorIdResult result = mapper.Map<ObterDetalhesVeiculoPorIdResult>(veiculoSelecionado);
 
             return Result.Ok(result);
         }

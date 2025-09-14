@@ -17,6 +17,7 @@ public class RepositorioVeiculo(AppDbContext contexto)
     {
         return await registros.Where(v => v.Placa.Equals(placa) && v.UsuarioId.Equals(usuarioId))
             .Include(v => v.Hospede)
+            .Include(v => v.RegistrosEntrada)
             .FirstOrDefaultAsync(ct);
     }
 }

@@ -37,5 +37,16 @@ public class RecepcaoCheckinModelsMappingProfile : Profile
                 ImmutableList<SelecionarRegistrosEntradaDto>.Empty
             ));
         #endregion
+
+        #region SeleçãoTodosRegistrosDoVeiculo
+        CreateMap<SelecionarRegistrosDoVeiculoRequest, SelecionarRegistrosDoVeiculoQuery>();
+        CreateMap<SelecionarRegistrosDoVeiculoResult, SelecionarRegistrosDoVeiculoResponse>()
+            .ConvertUsing((src, dest, ctx) =>
+            new SelecionarRegistrosDoVeiculoResponse(
+                src.RegistrosEntrada.Count,
+                src?.RegistrosEntrada.Select(c => ctx.Mapper.Map<SelecionarRegistrosEntradaDto>(c)).ToImmutableList() ??
+                ImmutableList<SelecionarRegistrosEntradaDto>.Empty
+            ));
+        #endregion
     }
 }
