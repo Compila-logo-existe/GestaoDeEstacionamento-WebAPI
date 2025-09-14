@@ -49,6 +49,8 @@ public class RecepcaoCheckinMappingProfile : Profile
         CreateMap<RegistroEntrada, SelecionarRegistrosEntradaDto>()
            .ConvertUsing(src => new SelecionarRegistrosEntradaDto(
                 src.Id,
+                src.DataEntradaEmUtc,
+                src.DataSaidaEmUtc,
                 src.Observacoes,
                 src.Hospede.Id,
                 src.Hospede.NomeCompleto,
