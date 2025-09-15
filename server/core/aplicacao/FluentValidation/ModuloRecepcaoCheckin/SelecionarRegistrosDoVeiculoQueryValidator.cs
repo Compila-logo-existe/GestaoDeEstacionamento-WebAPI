@@ -3,9 +3,9 @@ using GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Commands;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.FluentValidation.ModuloRecepcaoCheckin;
 
-public class SelecionarRegistrorDoVeiculoQueryValidator : AbstractValidator<SelecionarRegistrosDoVeiculoQuery>
+public class SelecionarRegistrosDoVeiculoQueryValidator : AbstractValidator<SelecionarRegistrosDoVeiculoQuery>
 {
-    public SelecionarRegistrorDoVeiculoQueryValidator()
+    public SelecionarRegistrosDoVeiculoQueryValidator()
     {
         RuleFor(c => c)
             .Must(CompoeExatamenteUmCaminhoDoRequest)
