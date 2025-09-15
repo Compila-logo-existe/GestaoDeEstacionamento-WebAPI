@@ -1,4 +1,5 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
+using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,6 +12,8 @@ public class Veiculo : EntidadeBase<Veiculo>
     public string Cor { get; set; }
     public Guid HospedeId { get; set; }
     public Hospede Hospede { get; set; } = null!;
+    public Guid VagaId { get; set; }
+    public Vaga Vaga { get; set; } = null!;
     public string? Observacoes { get; set; }
     public List<RegistroEntrada> RegistrosEntrada { get; set; } = new();
 
