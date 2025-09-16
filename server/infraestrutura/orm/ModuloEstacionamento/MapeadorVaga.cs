@@ -19,9 +19,10 @@ public class MapeadorVaga : IEntityTypeConfiguration<Vaga>
         builder.Property(v => v.Zona)
             .IsRequired();
 
-        builder.HasOne(v => v.VeiculoEstacionado)
+        builder.HasOne(v => v.Veiculo)
             .WithOne(v => v.Vaga)
-            .HasForeignKey<Vaga>(v => v.VeiculoId);
+            .HasForeignKey<Vaga>(v => v.VeiculoId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.Ignore(v => v.Status);
 
@@ -29,6 +30,9 @@ public class MapeadorVaga : IEntityTypeConfiguration<Vaga>
             .WithMany(e => e.Vagas)
             .HasForeignKey(v => v.EstacionamentoId)
             .IsRequired();
+
+        builder.HasIndex(v => new { v.UsuarioId, v.VeiculoId })
+            .IsUnique();
 
         builder.HasIndex(v => new { v.EstacionamentoId, v.Zona, v.Numero })
             .IsUnique();
