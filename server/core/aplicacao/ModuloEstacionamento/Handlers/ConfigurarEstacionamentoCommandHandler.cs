@@ -8,6 +8,7 @@ using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
@@ -17,6 +18,7 @@ public class ConfigurarEstacionamentoCommandHandler(
     IValidator<ConfigurarEstacionamentoCommand> validator,
     IMapper mapper,
     IRepositorioEstacionamento repositorioEstacionamento,
+    IRepositorioVaga repositorioVaga,
     ITenantProvider tenantProvider,
     IDistributedCache cache,
     IUnitOfWork unitOfWork,
@@ -38,12 +40,40 @@ public class ConfigurarEstacionamentoCommandHandler(
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
         }
 
+        Result<IReadOnlyList<DistribuidorDeVagas.PosicaoDaVaga>> tentativa = DistribuidorDeVagas.TentarGerarEsquemaDeVagas(
+            command.QuantidadeVagas,
+            command.ZonasTotais,
+            command.VagasPorZona
+        );
+
+        if (tentativa.IsFailed)
+        {
+            IEnumerable<string> mensagens = tentativa.Errors.Select(e => e.Message);
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(mensagens));
+        }
+
+        IReadOnlyList<DistribuidorDeVagas.PosicaoDaVaga> posicoes = tentativa.Value;
+
         try
         {
             Estacionamento novoEstacionamento = mapper.Map<Estacionamento>(command);
             novoEstacionamento.AderirUsuario(usuarioId.Value);
 
             await repositorioEstacionamento.CadastrarRegistroAsync(novoEstacionamento);
+
+            foreach (DistribuidorDeVagas.PosicaoDaVaga p in posicoes)
+            {
+                Vaga vaga = new()
+                {
+                    Id = Guid.NewGuid(),
+                    UsuarioId = usuarioId.Value,
+                    EstacionamentoId = novoEstacionamento.Id,
+                    Zona = p.Zona,
+                    Numero = p.Numero
+                };
+
+                await repositorioVaga.CadastrarRegistroAsync(vaga);
+            }
 
             await unitOfWork.CommitAsync();
 
@@ -55,6 +85,18 @@ public class ConfigurarEstacionamentoCommandHandler(
             ConfigurarEstacionamentoResult result = mapper.Map<ConfigurarEstacionamentoResult>(novoEstacionamento);
 
             return Result.Ok(result);
+        }
+        catch (DbUpdateException ex)
+        {
+            await unitOfWork.RollbackAsync();
+
+            logger.LogError(
+                ex,
+                "Erro de persistência ao configurar estacionamento {@Command}.",
+                command
+            );
+
+            return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
         catch (Exception ex)
         {
