@@ -7,17 +7,25 @@ public class Vaga : EntidadeBase<Vaga>
 {
     public int Numero { get; set; }
     public ZonaEstacionamento Zona { get; set; }
-    public Guid VeiculoId { get; set; }
-    public Veiculo VeiculoEstacionado { get; set; } = null!;
-    public StatusVaga Status => VeiculoEstacionado is null ? StatusVaga.Livre : StatusVaga.Ocupada;
+    public Guid? VeiculoId { get; set; }
+    public Veiculo? Veiculo { get; set; }
+    public StatusVaga Status => Veiculo is null ? StatusVaga.Livre : StatusVaga.Ocupada;
     public Guid EstacionamentoId { get; set; }
     public Estacionamento Estacionamento { get; set; } = null!;
 
     public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
 
-    public void AderirVeiculo(Veiculo veiculo) => VeiculoEstacionado = veiculo;
+    public void Ocupar(Veiculo veiculo)
+    {
+        Veiculo = veiculo;
+        VeiculoId = veiculo.Id;
+    }
 
-    public void AderirEstacionamento(Estacionamento estacionamento) => Estacionamento = estacionamento;
+    public void Liberar()
+    {
+        Veiculo = null;
+        VeiculoId = null;
+    }
 
     public override void AtualizarRegistro(Vaga registroEditado)
     {
