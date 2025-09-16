@@ -16,6 +16,50 @@ public class Estacionamento : EntidadeBase<Estacionamento>
 
     public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
 
+    public (IReadOnlyList<Vaga> Vagas, IReadOnlyList<(ZonaEstacionamento Zona, int Quantidade)> Resumo)
+    GerarVagas(int quantidadeVagas, int zonasTotais, int vagasPorZona)
+    {
+        if (quantidadeVagas <= 0) throw new ArgumentOutOfRangeException(nameof(quantidadeVagas));
+        if (zonasTotais <= 0 || zonasTotais > 26) throw new ArgumentOutOfRangeException(nameof(zonasTotais));
+        if (vagasPorZona <= 0) throw new ArgumentOutOfRangeException(nameof(vagasPorZona));
+        if ((long)zonasTotais * vagasPorZona < quantidadeVagas) throw new InvalidOperationException("Capacidade insuficiente.");
+
+        List<Vaga> lista = new(quantidadeVagas);
+        List<(ZonaEstacionamento, int)> resumo = new(zonasTotais);
+
+        int restante = quantidadeVagas;
+
+        for (int i = 0; i < zonasTotais && restante > 0; i++)
+        {
+            ZonaEstacionamento zona = ObterZona(i);
+            int alocar = Math.Min(vagasPorZona, restante);
+
+            for (int n = 1; n <= alocar; n++)
+            {
+                lista.Add(new Vaga
+                {
+                    Id = Guid.NewGuid(),
+                    UsuarioId = UsuarioId,
+                    EstacionamentoId = Id,
+                    Zona = zona,
+                    Numero = n
+                });
+            }
+            resumo.Add((zona, alocar));
+            restante -= alocar;
+        }
+
+        return (lista, resumo);
+
+        static ZonaEstacionamento ObterZona(int i)
+        {
+            char c = (char)('A' + i);
+            if (!Enum.TryParse<ZonaEstacionamento>(c.ToString(), out ZonaEstacionamento z))
+                throw new InvalidOperationException($"Zona '{c}' não suportada.");
+            return z;
+        }
+    }
+
     public override void AtualizarRegistro(Estacionamento registroEditado)
     {
         Vagas = registroEditado.Vagas;
