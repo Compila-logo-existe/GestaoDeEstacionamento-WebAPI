@@ -39,7 +39,7 @@ public static class DistribuidorDeVagas
         int vagasRestantes = quantidadeDeVagas;
         for (int i = 0; i < quantidadeTotalDeZonas && vagasRestantes > 0; i++)
         {
-            ZonaEstacionamento zona = (ZonaEstacionamento)i; // seu enum: A=0, B=1, ..., Z=25
+            ZonaEstacionamento zona = (ZonaEstacionamento)i;
             int alocar = vagasRestantes >= vagasPorZona ? vagasPorZona : vagasRestantes;
 
             for (int numero = 1; numero <= alocar; numero++)
