@@ -11,6 +11,7 @@ public record RegistrarEntradaCommand(
     string Placa,
     string Modelo,
     string Cor,
+    decimal ValorDiaria,
     List<string> Observacoes
 ) : IRequest<Result<RegistrarEntradaResult>>;
 

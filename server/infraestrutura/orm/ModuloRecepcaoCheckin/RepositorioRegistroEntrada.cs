@@ -59,6 +59,7 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .Include(r => r.Hospede)
             .Include(r => r.Veiculo)
             .Include(r => r.Ticket)
+            .Include(r => r.Faturamento)
             .OrderByDescending(r => r.DataEntradaEmUtc)
             .FirstOrDefaultAsync(ct);
     }
@@ -70,6 +71,7 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .Include(r => r.Hospede)
             .Include(r => r.Veiculo)
             .Include(r => r.Ticket)
+            .Include(r => r.Faturamento)
             .OrderByDescending(r => r.DataEntradaEmUtc)
             .FirstOrDefaultAsync(r => r.Veiculo.Placa == placa, ct);
     }

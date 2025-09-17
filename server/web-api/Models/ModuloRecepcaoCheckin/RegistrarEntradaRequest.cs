@@ -8,6 +8,7 @@ public record RegistrarEntradaRequest(
     string Placa,
     string Modelo,
     string Cor,
+    decimal ValorDiaria,
     List<string> Observacoes
 );
 

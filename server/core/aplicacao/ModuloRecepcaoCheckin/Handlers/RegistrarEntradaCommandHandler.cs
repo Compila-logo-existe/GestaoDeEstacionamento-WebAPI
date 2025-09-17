@@ -92,6 +92,7 @@ public class RegistrarEntradaCommandHandler(
             novoRegistro.AderirHospede(novoHospede);
             novoRegistro.AderirVeiculo(novoVeiculo);
             novoRegistro.GerarNovoTicket();
+            novoRegistro.GerarNovoFaturamento(command.ValorDiaria);
             novoRegistro.AderirUsuarioAoTicket(usuarioId.Value);
 
             await repositorioRegistroEntrada.CadastrarRegistroAsync(novoRegistro);
@@ -119,7 +120,7 @@ public class RegistrarEntradaCommandHandler(
                 command
             );
 
-            return Result.Fail(ResultadosErro.ConflitoErro("Conflito de dados: CPF ou Placa já cadastrados neste estabelecimento."));
+            return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
         catch (Exception ex)
         {
