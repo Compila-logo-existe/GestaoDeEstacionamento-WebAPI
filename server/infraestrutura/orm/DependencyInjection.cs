@@ -1,9 +1,11 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
+using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloEstacionamento;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloFaturamento;
 using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloHospede;
 using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloRecepcaoCheckin;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IRepositorioRegistroEntrada, RepositorioRegistroEntrada>();
         services.AddScoped<IRepositorioTicket, RepositorioTicket>();
         services.AddScoped<IRepositorioRegistroSaida, RepositorioRegistroSaida>();
+        services.AddScoped<IRepositorioFaturamento, RepositorioFaturamento>();
 
         services.AddEntityFrameworkConfig(configuration);
 

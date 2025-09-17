@@ -3,6 +3,7 @@ using System;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250917172033_MappingFaturamentoInRegistroEntrada")]
+    partial class MappingFaturamentoInRegistroEntrada
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -186,7 +189,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Property<Guid>("RegistroEntradaId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("RegistroSaidaId")
+                    b.Property<Guid>("RegistroSaidaId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UsuarioId")
@@ -529,7 +532,8 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasOne("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroSaida", "RegistroSaida")
                         .WithOne("Faturamento")
                         .HasForeignKey("GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento.Faturamento", "RegistroSaidaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("RegistroEntrada");
 

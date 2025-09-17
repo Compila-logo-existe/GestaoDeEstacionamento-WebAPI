@@ -1,6 +1,7 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
+using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -10,7 +11,8 @@ using System.Reflection;
 
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 
-public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvider = null) : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
+public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvider = null)
+    : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
 {
     public DbSet<Hospede> Hospedes { get; set; }
     public DbSet<Veiculo> Veiculos { get; set; }
@@ -19,6 +21,7 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
     public DbSet<Estacionamento> Estacionamentos { get; set; }
     public DbSet<Vaga> Vagas { get; set; }
     public DbSet<RegistroSaida> RegistrosSaida { get; set; }
+    public DbSet<Faturamento> Faturamentos { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +47,9 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
                 .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
 
             modelBuilder.Entity<RegistroSaida>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<Faturamento>()
                 .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
         }
 

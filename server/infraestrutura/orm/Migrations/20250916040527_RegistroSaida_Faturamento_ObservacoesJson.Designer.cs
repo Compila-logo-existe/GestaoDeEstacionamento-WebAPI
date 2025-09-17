@@ -3,6 +3,7 @@ using System;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250916040527_RegistroSaida_Faturamento_ObservacoesJson")]
+    partial class RegistroSaida_Faturamento_ObservacoesJson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,10 +186,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Property<int>("NumeroDeDiarias")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("RegistroEntradaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("RegistroSaidaId")
+                    b.Property<Guid>("RegistroSaidaId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UsuarioId")
@@ -203,9 +203,6 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DataEntradaEmUtc");
-
-                    b.HasIndex("RegistroEntradaId")
-                        .IsUnique();
 
                     b.HasIndex("RegistroSaidaId")
                         .IsUnique();
@@ -520,18 +517,11 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento.Faturamento", b =>
                 {
-                    b.HasOne("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroEntrada", "RegistroEntrada")
-                        .WithOne("Faturamento")
-                        .HasForeignKey("GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento.Faturamento", "RegistroEntradaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroSaida", "RegistroSaida")
                         .WithOne("Faturamento")
                         .HasForeignKey("GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento.Faturamento", "RegistroSaidaId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("RegistroEntrada");
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("RegistroSaida");
                 });
@@ -664,12 +654,6 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Navigation("RegistrosSaida");
 
                     b.Navigation("Veiculos");
-                });
-
-            modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroEntrada", b =>
-                {
-                    b.Navigation("Faturamento")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroSaida", b =>
