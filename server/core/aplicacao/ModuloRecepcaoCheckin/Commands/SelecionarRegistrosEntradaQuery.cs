@@ -16,5 +16,6 @@ public record SelecionarRegistrosEntradaDto(
     Guid HospedeId,
     string NomeCompleto,
     Guid VeiculoId,
-    string Placa
+    string Placa,
+    int NumeroSequencialDoTicket
 );
