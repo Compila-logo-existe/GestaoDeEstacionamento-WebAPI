@@ -59,5 +59,16 @@ public class EstacionamentoMappingProfile : Profile
                 )
             );
         #endregion
+
+        #region OcuparVaga
+        CreateMap<(Estacionamento, Vaga), OcuparVagaResult>()
+            .ConvertUsing(src => new OcuparVagaResult(
+                new OcuparVagaDto(
+                     true,
+                    src.Item1.Nome,
+                    $"{src.Item2.Zona}-{src.Item2.Numero}"
+                )
+            ));
+        #endregion
     }
 }
