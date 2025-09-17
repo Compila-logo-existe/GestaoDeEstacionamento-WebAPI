@@ -70,5 +70,16 @@ public class EstacionamentoMappingProfile : Profile
                 )
             ));
         #endregion
+
+        #region LiberarVaga
+        CreateMap<(Estacionamento, Vaga), LiberarVagaResult>()
+            .ConvertUsing(src => new LiberarVagaResult(
+                new LiberarVagaDto(
+                    true,
+                    src.Item1.Nome,
+                    $"{src.Item2.Zona}-{src.Item2.Numero}"
+                )
+            ));
+        #endregion
     }
 }
