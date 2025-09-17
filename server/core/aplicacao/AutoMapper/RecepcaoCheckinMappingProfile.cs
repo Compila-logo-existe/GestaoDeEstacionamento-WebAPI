@@ -43,7 +43,8 @@ public class RecepcaoCheckinMappingProfile : Profile
                 src.Hospede.Id,
                 src.Hospede.NomeCompleto,
                 src.Veiculo.Id,
-                src.Veiculo.Placa
+                src.Veiculo.Placa,
+                src.Ticket.NumeroSequencial
             ));
 
         CreateMap<IEnumerable<RegistroEntrada>, SelecionarRegistrosEntradaResult>()
@@ -64,7 +65,8 @@ public class RecepcaoCheckinMappingProfile : Profile
                 src.Hospede.Id,
                 src.Hospede.NomeCompleto,
                 src.Veiculo.Id,
-                src.Veiculo.Placa
+                src.Veiculo.Placa,
+                src.Ticket.NumeroSequencial
             ));
 
         CreateMap<IEnumerable<RegistroEntrada>, SelecionarRegistrosDoVeiculoResult>()
