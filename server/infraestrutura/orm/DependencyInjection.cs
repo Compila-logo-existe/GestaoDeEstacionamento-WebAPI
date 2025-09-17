@@ -18,8 +18,11 @@ public static class DependencyInjection
     {
         services.AddScoped<IRepositorioHospede, RepositorioHospede>();
         services.AddScoped<IRepositorioVeiculo, RepositorioVeiculo>();
-        services.AddScoped<IRepositorioRegistroEntrada, RepositorioRegistroEntrada>();
         services.AddScoped<IRepositorioEstacionamento, RepositorioEstacionamento>();
+        services.AddScoped<IRepositorioVaga, RepositorioVaga>();
+        services.AddScoped<IRepositorioRegistroEntrada, RepositorioRegistroEntrada>();
+        services.AddScoped<IRepositorioTicket, RepositorioTicket>();
+        services.AddScoped<IRepositorioRegistroSaida, RepositorioRegistroSaida>();
 
         services.AddEntityFrameworkConfig(configuration);
 

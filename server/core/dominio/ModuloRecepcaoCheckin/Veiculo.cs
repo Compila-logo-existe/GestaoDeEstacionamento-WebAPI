@@ -12,21 +12,24 @@ public class Veiculo : EntidadeBase<Veiculo>
     public string Cor { get; set; }
     public Guid HospedeId { get; set; }
     public Hospede Hospede { get; set; } = null!;
-    public Guid VagaId { get; set; }
     public Vaga Vaga { get; set; } = null!;
-    public string? Observacoes { get; set; }
+    public List<string> Observacoes { get; set; } = new();
     public List<RegistroEntrada> RegistrosEntrada { get; set; } = new();
+    public List<RegistroSaida> RegistrosSaida { get; set; } = new();
 
     [ExcludeFromCodeCoverage]
     public Veiculo() { }
     public Veiculo(string placa, string modelo, string cor,
-        Hospede hospede, string? observacoes) : this()
+        Hospede hospede, List<string>? observacoes) : this()
     {
         Placa = placa;
         Modelo = modelo;
         Cor = cor;
         Hospede = hospede;
-        Observacoes = observacoes;
+        if (observacoes != null)
+        {
+            Observacoes.AddRange(observacoes);
+        }
     }
 
     public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;

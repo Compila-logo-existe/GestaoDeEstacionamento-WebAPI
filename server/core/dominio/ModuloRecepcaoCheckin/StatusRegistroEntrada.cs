@@ -4,8 +4,8 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
 public enum StatusRegistroEntrada
 {
-    [Display(Name = "Livre")]
-    Livre,
-    [Display(Name = "Ocupada")]
-    Ocupada
+    [Display(Name = "Válida")]
+    Valida,
+    [Display(Name = "Expirada")]
+    Expirada
 }

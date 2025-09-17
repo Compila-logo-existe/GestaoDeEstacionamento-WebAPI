@@ -1,28 +1,30 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
+using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using System.Diagnostics.CodeAnalysis;
 
 namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
-public class RegistroEntrada : EntidadeBase<RegistroEntrada>
+public class RegistroSaida : EntidadeBase<RegistroSaida>
 {
-    public DateTime DataEntradaEmUtc { get; set; } = DateTime.UtcNow;
+    public DateTime? DataSaidaEmUtc { get; set; }
     public Guid HospedeId { get; set; }
     public Hospede Hospede { get; set; }
     public Guid TicketId { get; set; }
     public Ticket Ticket { get; set; } = null!;
     public Guid VeiculoId { get; set; }
     public Veiculo Veiculo { get; set; }
+    public Faturamento Faturamento { get; set; }
     public List<string> Observacoes { get; set; } = new();
 
     [ExcludeFromCodeCoverage]
-    public RegistroEntrada() { }
-    public RegistroEntrada(Hospede hospede, Veiculo veiculo,
-        string? observacao, List<string> observacoes) : this()
+    public RegistroSaida() { }
+    public RegistroSaida(Hospede hospede, Veiculo veiculo,
+        List<string> observacoes) : this()
     {
         Hospede = hospede;
         Veiculo = veiculo;
-        if (observacoes != null)
+        if (observacoes is not null)
         {
             Observacoes.AddRange(observacoes);
         }
@@ -34,12 +36,14 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
 
     public void AderirVeiculo(Veiculo veiculo) => Veiculo = veiculo;
 
-    public void GerarNovoTicket() => Ticket = new Ticket(this);
+    public void AderirTicket(Ticket ticket) => Ticket = ticket;
 
-    public void AderirUsuarioAoTicket(Guid usuarioId) => Ticket.UsuarioId = usuarioId;
-
-    public override void AtualizarRegistro(RegistroEntrada registroEditado)
+    public override void AtualizarRegistro(RegistroSaida registroEditado)
     {
+        DataSaidaEmUtc = registroEditado.DataSaidaEmUtc;
         Observacoes = registroEditado.Observacoes;
+        HospedeId = registroEditado.HospedeId;
+        VeiculoId = registroEditado.VeiculoId;
+        TicketId = registroEditado.TicketId;
     }
 }

@@ -8,7 +8,7 @@ public record RegistrarEntradaRequest(
     string Placa,
     string Modelo,
     string Cor,
-    string? Observacoes
+    List<string> Observacoes
 );
 
 public record RegistrarEntradaResponse(Guid Id, int NumeroSequencialDoTicket);

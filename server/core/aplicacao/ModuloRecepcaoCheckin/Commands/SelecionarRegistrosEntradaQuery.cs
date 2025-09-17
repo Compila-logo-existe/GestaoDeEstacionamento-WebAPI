@@ -12,8 +12,7 @@ public record SelecionarRegistrosEntradaResult(ImmutableList<SelecionarRegistros
 public record SelecionarRegistrosEntradaDto(
     Guid Id,
     DateTime DataEntradaEmUtc,
-    DateTime? DataSaidaEmUtc,
-    string? Observacoes,
+    List<string>? Observacoes,
     Guid HospedeId,
     string NomeCompleto,
     Guid VeiculoId,

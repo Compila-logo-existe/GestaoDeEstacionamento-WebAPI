@@ -50,7 +50,7 @@ public class RegistrarEntradaCommandValidator : AbstractValidator<RegistrarEntra
         RuleFor(c => c.Cor)
             .NotEmpty().WithMessage("A Cor do Veículo é obrigatória.");
 
-        RuleFor(c => c.Observacoes)
+        RuleForEach(c => c.Observacoes)
             .MaximumLength(1000).WithMessage("As observações devem ter no máximo {MaxLength} caracteres.");
     }
 

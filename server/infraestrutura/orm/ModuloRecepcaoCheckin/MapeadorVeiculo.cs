@@ -1,6 +1,7 @@
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Text.Json;
 
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.ModuloRecepcaoCheckin;
 
@@ -27,6 +28,15 @@ public class MapeadorVeiculo : IEntityTypeConfiguration<Veiculo>
             .WithMany(h => h.Veiculos)
             .HasForeignKey(v => v.HospedeId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(r => r.Observacoes)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => string.IsNullOrWhiteSpace(v)
+                        ? new List<string>()
+                        : JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>())
+            .HasColumnType("text")
+            .HasDefaultValueSql("'[]'");
 
         builder.HasIndex(v => new { v.UsuarioId, v.Placa })
             .IsUnique();

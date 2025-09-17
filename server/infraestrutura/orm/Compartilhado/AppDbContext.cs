@@ -16,8 +16,10 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
     public DbSet<Veiculo> Veiculos { get; set; }
     public DbSet<RegistroEntrada> RegistrosEntrada { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
-    public DbSet<Vaga> Vagas { get; set; }
     public DbSet<Estacionamento> Estacionamentos { get; set; }
+    public DbSet<Vaga> Vagas { get; set; }
+    public DbSet<RegistroSaida> RegistrosSaida { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,10 +37,13 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
             modelBuilder.Entity<Ticket>()
                 .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
 
+            modelBuilder.Entity<Estacionamento>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
             modelBuilder.Entity<Vaga>()
                 .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
 
-            modelBuilder.Entity<Estacionamento>()
+            modelBuilder.Entity<RegistroSaida>()
                 .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
         }
 

@@ -11,6 +11,7 @@ public class Hospede : EntidadeBase<Hospede>
     public string Telefone { get; set; }
     public List<Veiculo> Veiculos { get; set; } = new();
     public List<RegistroEntrada> RegistrosEntrada { get; set; } = new();
+    public List<RegistroSaida> RegistrosSaida { get; set; } = new();
 
     [ExcludeFromCodeCoverage]
     public Hospede() { }

@@ -5,9 +5,9 @@ using System.Text.Json;
 
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.ModuloRecepcaoCheckin;
 
-public class MapeadorRegistroEntrada : IEntityTypeConfiguration<RegistroEntrada>
+public class MapeadorRegistroSaida : IEntityTypeConfiguration<RegistroSaida>
 {
-    public void Configure(EntityTypeBuilder<RegistroEntrada> builder)
+    public void Configure(EntityTypeBuilder<RegistroSaida> builder)
     {
         builder.HasKey(h => h.Id);
 
@@ -15,22 +15,22 @@ public class MapeadorRegistroEntrada : IEntityTypeConfiguration<RegistroEntrada>
             .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(r => r.DataEntradaEmUtc)
-            .IsRequired();
+        builder.Property(r => r.DataSaidaEmUtc)
+            .IsRequired(false);
 
         builder.HasOne(r => r.Hospede)
-            .WithMany(h => h.RegistrosEntrada)
+            .WithMany(h => h.RegistrosSaida)
             .HasForeignKey(r => r.HospedeId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(r => r.Ticket)
-            .WithOne(t => t.RegistroEntrada)
-            .HasForeignKey<RegistroEntrada>(t => t.TicketId)
+            .WithOne(t => t.RegistroSaida)
+            .HasForeignKey<RegistroSaida>(r => r.TicketId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(r => r.Veiculo)
-            .WithMany(h => h.RegistrosEntrada)
+            .WithMany(v => v.RegistrosSaida)
             .HasForeignKey(r => r.VeiculoId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -43,7 +43,7 @@ public class MapeadorRegistroEntrada : IEntityTypeConfiguration<RegistroEntrada>
             .HasColumnType("text")
             .HasDefaultValueSql("'[]'");
 
-        builder.HasIndex(r => r.DataEntradaEmUtc);
+        builder.HasIndex(r => r.DataSaidaEmUtc);
 
         builder.HasIndex(r => new { r.UsuarioId, r.TicketId }).IsUnique();
     }

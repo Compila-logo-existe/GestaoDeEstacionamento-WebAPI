@@ -38,7 +38,6 @@ public class RecepcaoCheckinMappingProfile : Profile
            .ConvertUsing(src => new SelecionarRegistrosEntradaDto(
                 src.Id,
                 src.DataEntradaEmUtc,
-                src.DataSaidaEmUtc,
                 src.Observacoes,
                 src.Hospede.Id,
                 src.Hospede.NomeCompleto,
@@ -60,7 +59,6 @@ public class RecepcaoCheckinMappingProfile : Profile
            .ConvertUsing(src => new SelecionarRegistrosEntradaDto(
                 src.Id,
                 src.DataEntradaEmUtc,
-                src.DataSaidaEmUtc,
                 src.Observacoes,
                 src.Hospede.Id,
                 src.Hospede.NomeCompleto,
