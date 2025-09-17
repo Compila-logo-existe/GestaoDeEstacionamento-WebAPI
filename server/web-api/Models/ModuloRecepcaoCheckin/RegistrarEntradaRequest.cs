@@ -12,4 +12,8 @@ public record RegistrarEntradaRequest(
     List<string> Observacoes
 );
 
-public record RegistrarEntradaResponse(Guid Id, int NumeroSequencialDoTicket);
+public record RegistrarEntradaResponse(
+    Guid Id,
+    int NumeroSequencialDoTicket,
+    DateTime DataEntradaEmUtc
+);

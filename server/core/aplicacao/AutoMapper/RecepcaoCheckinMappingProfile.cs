@@ -17,7 +17,8 @@ public class RecepcaoCheckinMappingProfile : Profile
         CreateMap<RegistroEntrada, RegistrarEntradaResult>()
             .ConvertUsing(src => new RegistrarEntradaResult(
              src.Id,
-             src.Ticket.NumeroSequencial
+             src.Ticket.NumeroSequencial,
+             src.DataEntradaEmUtc.ToShortDateString()
             ));
         #endregion
 

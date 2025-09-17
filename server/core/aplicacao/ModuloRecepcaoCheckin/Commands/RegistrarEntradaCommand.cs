@@ -15,4 +15,8 @@ public record RegistrarEntradaCommand(
     List<string> Observacoes
 ) : IRequest<Result<RegistrarEntradaResult>>;
 
-public record RegistrarEntradaResult(Guid Id, int NumeroSequencialDoTicket);
+public record RegistrarEntradaResult(
+    Guid Id,
+    int NumeroSequencialDoTicket,
+    string DataEntradaEmUtc
+);

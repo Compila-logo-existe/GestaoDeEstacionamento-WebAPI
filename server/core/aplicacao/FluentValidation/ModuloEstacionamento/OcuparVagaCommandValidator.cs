@@ -31,7 +31,6 @@ public class OcuparVagaCommandValidator : AbstractValidator<OcuparVagaCommand>
             RuleFor(v => v.VagaZona)
             .NotEmpty().MaximumLength(200);
         });
-
     }
 
     private bool CompoeExatamenteUmCaminhoEstacionamentoDoRequest(OcuparVagaCommand command)
