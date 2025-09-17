@@ -46,14 +46,27 @@ public class Faturamento : EntidadeBase<Faturamento>
 
     public void RecalcularTotais()
     {
-        if (RegistroSaida?.DataSaidaEmUtc is null)
-            return;
+        DateTime dataFim = RegistroSaida?.DataSaidaEmUtc ?? DateTime.UtcNow;
 
-        DateTime inicio = DataEntradaEmUtc.Date;
-        DateTime fim = RegistroSaida.DataSaidaEmUtc.Value.Date;
+        TimeSpan tempoDecorrido = dataFim - DataEntradaEmUtc;
+        if (tempoDecorrido <= TimeSpan.Zero)
+        {
+            NumeroDeDiarias = 1;
+        }
+        else
+        {
+            TimeSpan umDia = TimeSpan.FromDays(1);
 
-        int dias = (fim - inicio).Days + 1;
-        NumeroDeDiarias = Math.Max(1, dias);
+            long ticksDecorridos = tempoDecorrido.Ticks;
+            long ticksPorDia = umDia.Ticks;
+
+            long diasInteiros = ticksDecorridos / ticksPorDia;
+            bool possuiRestoDeDia = (ticksDecorridos % ticksPorDia) != 0;
+
+            int diarias = (int)diasInteiros + (possuiRestoDeDia ? 1 : 0);
+
+            NumeroDeDiarias = Math.Max(1, diarias);
+        }
 
         ValorTotal = NumeroDeDiarias * ValorDaDiaria;
     }
