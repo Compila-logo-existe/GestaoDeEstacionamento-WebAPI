@@ -17,7 +17,7 @@ public class EstacionamentoController(
     IMediator mediator
 ) : ControllerBase
 {
-    [HttpPost("configuracao")]
+    [HttpPost("configuracao/")]
     public async Task<ActionResult<ConfigurarEstacionamentoResponse>> ConfigurarEstacionamento(
         ConfigurarEstacionamentoRequest request,
         CancellationToken ct
@@ -39,7 +39,7 @@ public class EstacionamentoController(
     public async Task<ActionResult<ObterStatusVagasResponse>> ObterStatusVagas(
         [FromQuery] ObterStatusVagasRequest request,
         CancellationToken ct
-    ) // terminar de implementar esse endpoint. confirmar a criação das vagas quando configura estacionamenmto
+    )
     {
         ObterStatusVagasQuery query = mapper.Map<ObterStatusVagasQuery>(request);
 
@@ -49,6 +49,24 @@ public class EstacionamentoController(
             return this.MapearFalha(result.ToResult());
 
         ObterStatusVagasResponse response = mapper.Map<ObterStatusVagasResponse>(result.Value);
+
+        return Created(string.Empty, response);
+    }
+
+    [HttpPost("ocupar-vaga/")]
+    public async Task<ActionResult<OcuparVagaResponse>> OcuparVaga(
+        [FromQuery] OcuparVagaRequest request,
+        CancellationToken ct
+    )
+    {
+        OcuparVagaCommand command = mapper.Map<OcuparVagaCommand>(request);
+
+        Result<OcuparVagaResult> result = await mediator.Send(command, ct);
+
+        if (result.IsFailed)
+            return this.MapearFalha(result.ToResult());
+
+        OcuparVagaResponse response = mapper.Map<OcuparVagaResponse>(result.Value);
 
         return Created(string.Empty, response);
     }

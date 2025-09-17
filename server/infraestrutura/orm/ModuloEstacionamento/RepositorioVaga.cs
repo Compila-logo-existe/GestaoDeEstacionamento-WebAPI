@@ -22,6 +22,11 @@ public class RepositorioVaga(AppDbContext contexto)
         return await registros.FirstOrDefaultAsync(v => v.VeiculoId.Equals(veiculoId), ct);
     }
 
+    public async Task<Vaga?> SelecionarRegistroPorDadosAsync(int vagaNumero, ZonaEstacionamento? zona, Guid id, Guid? usuarioId, CancellationToken ct)
+    {
+        return await registros.FirstOrDefaultAsync(v => v.EstacionamentoId.Equals(id) && v.Numero.Equals(vagaNumero) && v.Zona == zona, ct);
+    }
+
     public async Task<List<Vaga>> SelecionarRegistrosDoEstacionamentoAsync(Guid estacionamentoId, ZonaEstacionamento? zona, CancellationToken ct = default)
     {
         List<Vaga> vagasOcupadas = await registros
