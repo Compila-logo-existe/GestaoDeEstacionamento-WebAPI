@@ -18,4 +18,4 @@ public record ConfigurarEstacionamentoResult(
     ImmutableList<ZonaEstacionamentoDto> Zonas
 );
 
-public record ZonaEstacionamentoDto(string Zona, int VagasCriadas);
+public record ZonaEstacionamentoDto(string Zona, int NumeroVaga);

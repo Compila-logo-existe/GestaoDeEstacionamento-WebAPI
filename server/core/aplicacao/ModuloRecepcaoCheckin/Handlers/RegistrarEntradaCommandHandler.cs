@@ -82,10 +82,10 @@ public class RegistrarEntradaCommandHandler(
             }
 
             novoHospede.AderirVeiculo(novoVeiculo);
-            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
 
+            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
             if (possuiEntradaEmAberto)
-                return Result.Fail(ResultadosErro.ConflitoErro("Já existe check-in em aberto para esta placa."));
+                return Result.Fail(ResultadosErro.ConflitoErro("Já existe check-in/ticket em aberto para esta placa."));
 
             RegistroEntrada novoRegistro = mapper.Map<RegistroEntrada>(command);
             novoRegistro.AderirUsuario(usuarioId.Value);
@@ -101,8 +101,9 @@ public class RegistrarEntradaCommandHandler(
 
             await unitOfWork.CommitAsync();
 
-            string cacheKey = $"contatos:u={tenantProvider.UsuarioId.GetValueOrDefault()}:q=all";
-            await cache.RemoveAsync(cacheKey, cancellationToken);
+            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all", cancellationToken);
+            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all:v={command.Placa}", cancellationToken);
+            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all:v={novoVeiculo.Id}", cancellationToken);
 
             RegistrarEntradaResult result = mapper.Map<RegistrarEntradaResult>(novoRegistro);
 

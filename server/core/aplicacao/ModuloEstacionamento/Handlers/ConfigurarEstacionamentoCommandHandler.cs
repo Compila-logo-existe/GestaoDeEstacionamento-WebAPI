@@ -77,10 +77,29 @@ public class ConfigurarEstacionamentoCommandHandler(
 
             await unitOfWork.CommitAsync();
 
-            // Remove o cache de compromissos do usuário
-            string cacheKey = $"contatos:u={tenantProvider.UsuarioId.GetValueOrDefault()}:q=all";
+            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e=all:z=all", cancellationToken);
 
-            await cache.RemoveAsync(cacheKey, cancellationToken);
+            foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
+            {
+                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e=all:z={zona}", cancellationToken);
+            }
+
+            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Id}:z=all", cancellationToken);
+            foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
+            {
+                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Id}:z={zona}", cancellationToken);
+            }
+
+            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Nome}:z=all", cancellationToken);
+            foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
+            {
+                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Nome}:z={zona}", cancellationToken);
+            }
+
+            foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
+            {
+                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all,z={zona}", cancellationToken);
+            }
 
             ConfigurarEstacionamentoResult result = mapper.Map<ConfigurarEstacionamentoResult>(novoEstacionamento);
 

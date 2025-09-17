@@ -38,8 +38,33 @@ public class ObterStatusVagasQueryHandler(
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
         }
 
+        string cacheQueryQuantidade = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
+
+        string cacheQueryEstacionamento;
+
+        if (query.EstacionamentoId.HasValue)
+            cacheQueryEstacionamento = $"e={query.EstacionamentoId.Value}";
+        else if (!string.IsNullOrWhiteSpace(query.EstacionamentoNome))
+            cacheQueryEstacionamento = $"e={query.EstacionamentoNome}";
+        else
+            cacheQueryEstacionamento = $"e=all";
+
+        string cacheQueryZona = !string.IsNullOrWhiteSpace(query.Zona) ? $"z={query.Zona}" : "z=all";
+        string cacheKey = $"estacionamento:u={usuarioId}:{cacheQueryQuantidade}:{cacheQueryEstacionamento}:{cacheQueryZona}";
+
+        string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(jsonString))
+        {
+            ObterStatusVagasResult? resultadoEmCache = JsonSerializer.Deserialize<ObterStatusVagasResult>(jsonString);
+
+            if (resultadoEmCache is not null)
+                return Result.Ok(resultadoEmCache);
+        }
+
         try
         {
+
             Estacionamento? estacionamentoSelecionado = null!;
 
             if (query.EstacionamentoId.HasValue && query.EstacionamentoId.Value != Guid.Empty)
@@ -53,22 +78,6 @@ public class ObterStatusVagasQueryHandler(
                 estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(query.EstacionamentoNome, usuarioId, cancellationToken);
                 if (estacionamentoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Estacionamento não encontrado. Nome: {query.EstacionamentoNome}"));
-            }
-
-            string cacheQueryQuantidade = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
-            string cacheQueryZona = !string.IsNullOrWhiteSpace(query.Zona) ? $"z={query.Zona}" : "z=all";
-            string cacheQuery = $"{cacheQueryQuantidade},{cacheQueryZona}";
-
-            string cacheKey = $"vagas:u={tenantProvider.UsuarioId.GetValueOrDefault()}:{cacheQuery}";
-
-            string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
-
-            if (!string.IsNullOrWhiteSpace(jsonString))
-            {
-                ObterStatusVagasResult? resultadoEmCache = JsonSerializer.Deserialize<ObterStatusVagasResult>(jsonString);
-
-                if (resultadoEmCache is not null)
-                    return Result.Ok(resultadoEmCache);
             }
 
             ZonaEstacionamento? zona = null!;

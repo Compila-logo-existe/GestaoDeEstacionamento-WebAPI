@@ -22,31 +22,32 @@ public class SelecionarRegistrosEntradaQueryHandler(
     public async Task<Result<SelecionarRegistrosEntradaResult>> Handle(
         SelecionarRegistrosEntradaQuery query, CancellationToken cancellationToken)
     {
+        Guid? usuarioId = tenantProvider.UsuarioId;
+        if (usuarioId is null || usuarioId == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+
+        string cacheQuery = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
+        string cacheKey = $"recepcao:u={usuarioId}:{cacheQuery}";
+
+        string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(jsonString))
+        {
+            SelecionarRegistrosEntradaResult? resultadoEmCache = JsonSerializer.Deserialize<SelecionarRegistrosEntradaResult>(jsonString);
+
+            if (resultadoEmCache is not null)
+                return Result.Ok(resultadoEmCache);
+        }
+
         try
         {
-            string cacheQuery = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
 
-            string cacheKey = $"contatos:u={tenantProvider.UsuarioId.GetValueOrDefault()}:{cacheQuery}";
-
-            // Tenta buscar dados no cache
-            string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
-
-            if (!string.IsNullOrWhiteSpace(jsonString))
-            {
-                SelecionarRegistrosEntradaResult? resultadoEmCache = JsonSerializer.Deserialize<SelecionarRegistrosEntradaResult>(jsonString);
-
-                if (resultadoEmCache is not null)
-                    return Result.Ok(resultadoEmCache);
-            }
-
-            // Caso não encontre dados no cache, busca direto no banco de dados
             List<RegistroEntrada> registros = query.Quantidade.HasValue ?
                 await repositorioRegistroEntrada.SelecionarRegistrosAsync(query.Quantidade.Value) :
                 await repositorioRegistroEntrada.SelecionarRegistrosAsync();
 
             SelecionarRegistrosEntradaResult result = mapper.Map<SelecionarRegistrosEntradaResult>(registros);
 
-            // Salva os dados atualizados em um novo cache após busca no banco
             string jsonPayload = JsonSerializer.Serialize(result);
 
             DistributedCacheEntryOptions cacheOptions = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60) };
