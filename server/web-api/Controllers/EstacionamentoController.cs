@@ -70,4 +70,22 @@ public class EstacionamentoController(
 
         return Created(string.Empty, response);
     }
+
+    [HttpPost("liberar-vaga/")]
+    public async Task<ActionResult<LiberarVagaResponse>> LiberarVaga(
+    [FromQuery] LiberarVagaRequest request,
+    CancellationToken ct
+    )
+    {
+        LiberarVagaCommand command = mapper.Map<LiberarVagaCommand>(request);
+
+        Result<LiberarVagaResult> result = await mediator.Send(command, ct);
+
+        if (result.IsFailed)
+            return this.MapearFalha(result.ToResult());
+
+        LiberarVagaResponse response = mapper.Map<LiberarVagaResponse>(result.Value);
+
+        return Created(string.Empty, response);
+    }
 }
