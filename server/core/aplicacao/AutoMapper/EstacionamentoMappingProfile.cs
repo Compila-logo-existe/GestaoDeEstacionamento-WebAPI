@@ -60,6 +60,18 @@ public class EstacionamentoMappingProfile : Profile
             );
         #endregion
 
+        #region ObterVagaPorId
+        CreateMap<Vaga, ObterVagaPorIdResult>()
+           .ConvertUsing(src => new(new ObterStatusVagasDto(
+                    src.Id,
+                    src.Numero,
+                    src.Zona,
+                    src.Status,
+                    src.Veiculo == null ? string.Empty : src.Veiculo.Placa
+                ))
+           );
+        #endregion
+
         #region OcuparVaga
         CreateMap<(Estacionamento, Vaga), OcuparVagaResult>()
             .ConvertUsing(src => new OcuparVagaResult(

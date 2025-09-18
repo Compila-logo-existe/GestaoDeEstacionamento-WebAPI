@@ -12,17 +12,24 @@ public class Vaga : EntidadeBase<Vaga>
     public StatusVaga Status => Veiculo is null ? StatusVaga.Livre : StatusVaga.Ocupada;
     public Guid EstacionamentoId { get; set; }
     public Estacionamento Estacionamento { get; set; } = null!;
+    public bool EstaOcupada => Veiculo is not null;
 
     public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
 
     public void Ocupar(Veiculo veiculo)
     {
+        if (Veiculo is not null)
+            return;
+
         Veiculo = veiculo;
         VeiculoId = veiculo.Id;
     }
 
     public void Liberar()
     {
+        if (Veiculo is null)
+            return;
+
         Veiculo = null;
         VeiculoId = null;
     }

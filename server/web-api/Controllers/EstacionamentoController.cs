@@ -55,16 +55,16 @@ public class EstacionamentoController(
 
     [HttpGet("vaga/")]
     public async Task<ActionResult<ObterVagaPorIdResponse>> ObterVagaPorId(
-        [FromQuery] Guid vagaId,
+        [FromQuery] ObterVagaPorIdRequest request,
         CancellationToken ct
     )
     {
-        ObterVagaPorIdQuery query = new(vagaId);
+        ObterVagaPorIdQuery query = mapper.Map<ObterVagaPorIdQuery>(request);
 
         Result<ObterVagaPorIdResult> result = await mediator.Send(query, ct);
 
         if (result.IsFailed)
-            return this.MapearFalha(result.ToResult()); // mantém seu mapeamento 404/400/500 etc.
+            return this.MapearFalha(result.ToResult());
 
         ObterVagaPorIdResponse response = mapper.Map<ObterVagaPorIdResponse>(result.Value);
         return Ok(response);

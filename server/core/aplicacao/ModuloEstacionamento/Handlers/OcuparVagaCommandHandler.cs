@@ -100,10 +100,16 @@ public class OcuparVagaCommandHandler(
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Veículo não encontrado. Placa: {command.Placa}"));
             }
 
+            if (!vagaSelecionada.Estacionamento.Equals(estacionamentoSelecionado))
+                return Result.Fail(ResultadosErro.ConflitoErro("A vaga escolhida não pertence a este estacionaento."));
+
             bool possuiEntradaEmAberto = await repositorioRegistroEntrada
                 .ExisteAberturaPorPlacaAsync(veiculoSelecionado.Placa, usuarioId, cancellationToken);
             if (!possuiEntradaEmAberto)
                 return Result.Fail(ResultadosErro.ConflitoErro("Não existe check-in/ticket aberto para este veículo."));
+
+            if (vagaSelecionada.EstaOcupada)
+                return Result.Fail(ResultadosErro.ConflitoErro("A vaga já está ocupada."));
 
             vagaSelecionada.Ocupar(veiculoSelecionado);
             vagaSelecionada.AderirUsuario(usuarioId.Value);

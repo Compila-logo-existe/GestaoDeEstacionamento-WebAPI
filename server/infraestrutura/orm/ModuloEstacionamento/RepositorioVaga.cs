@@ -15,19 +15,24 @@ public class RepositorioVaga(AppDbContext contexto)
     public override async Task<List<Vaga>> SelecionarRegistrosAsync(int quantidade)
     {
         return await registros.Include(v => v.Estacionamento)
+            .Include(v => v.Veiculo)
             .OrderBy(v => v.Zona).ThenBy(v => v.Numero)
             .Take(quantidade).ToListAsync();
     }
 
     public async Task<Vaga?> SelecionarPorVeiculoIdAsync(Guid veiculoId, CancellationToken ct = default)
     {
-        return await registros.Include(v => v.Estacionamento)
+        return await registros
+            .Include(v => v.Estacionamento)
+            .Include(v => v.Veiculo)
             .FirstOrDefaultAsync(v => v.VeiculoId.Equals(veiculoId), ct);
     }
 
     public async Task<Vaga?> SelecionarRegistroPorDadosAsync(int vagaNumero, ZonaEstacionamento? zona, Guid id, Guid? usuarioId, CancellationToken ct = default)
     {
-        return await registros.Include(v => v.Estacionamento)
+        return await registros
+            .Include(v => v.Estacionamento)
+            .Include(v => v.Veiculo)
             .FirstOrDefaultAsync(v => v.EstacionamentoId.Equals(id) && v.Numero.Equals(vagaNumero) && v.Zona == zona, ct);
     }
 
