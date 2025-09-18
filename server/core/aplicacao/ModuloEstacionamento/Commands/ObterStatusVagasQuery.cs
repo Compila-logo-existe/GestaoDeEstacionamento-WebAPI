@@ -9,7 +9,8 @@ public record ObterStatusVagasQuery(
     int? Quantidade,
     Guid? EstacionamentoId,
     string? EstacionamentoNome,
-    string? Zona
+    string? Zona,
+    string? Placa
 ) : IRequest<Result<ObterStatusVagasResult>>;
 
 public record ObterStatusVagasResult(ImmutableList<ObterStatusVagasDto> Vagas);

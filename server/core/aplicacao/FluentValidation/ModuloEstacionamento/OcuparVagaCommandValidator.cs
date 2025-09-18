@@ -29,7 +29,7 @@ public class OcuparVagaCommandValidator : AbstractValidator<OcuparVagaCommand>
             .GreaterThan(0);
 
             RuleFor(v => v.VagaZona)
-            .NotEmpty().MaximumLength(200);
+            .NotEmpty().MaximumLength(1);
         });
     }
 

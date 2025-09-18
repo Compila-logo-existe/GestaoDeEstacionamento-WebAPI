@@ -7,7 +7,8 @@ public record ObterStatusVagasRequest(
     int? Quantidade,
     Guid? EstacionamentoId,
     string? EstacionamentoNome,
-    string? Zona
+    string? Zona,
+    string? Placa
 );
 
 public record ObterStatusVagasResponse(

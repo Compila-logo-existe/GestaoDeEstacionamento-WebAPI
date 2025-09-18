@@ -50,7 +50,7 @@ public class EstacionamentoController(
 
         ObterStatusVagasResponse response = mapper.Map<ObterStatusVagasResponse>(result.Value);
 
-        return Created(string.Empty, response);
+        return Ok(response);
     }
 
     [HttpPost("ocupar-vaga/")]
@@ -68,7 +68,7 @@ public class EstacionamentoController(
 
         OcuparVagaResponse response = mapper.Map<OcuparVagaResponse>(result.Value);
 
-        return Created(string.Empty, response);
+        return Ok(response);
     }
 
     [HttpPost("liberar-vaga/")]
@@ -86,6 +86,6 @@ public class EstacionamentoController(
 
         LiberarVagaResponse response = mapper.Map<LiberarVagaResponse>(result.Value);
 
-        return Created(string.Empty, response);
+        return Ok(response);
     }
 }

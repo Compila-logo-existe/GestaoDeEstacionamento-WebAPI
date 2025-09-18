@@ -38,6 +38,11 @@ public class ObterStatusVagasQueryHandler(
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
         }
 
+        query = query with
+        {
+            Placa = Padronizador.PadronizarPlaca(query.Placa)
+        };
+
         string cacheQueryQuantidade = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
 
         string cacheQueryEstacionamento;
@@ -88,17 +93,32 @@ public class ObterStatusVagasQueryHandler(
                 zona = zonaConvertida;
             }
 
+            bool deveAplicarFiltroPorPlaca = !string.IsNullOrWhiteSpace(query.Placa);
+
             List<Vaga> vagas = query.Quantidade.HasValue ?
                 await repositorioVaga.SelecionarRegistrosDoEstacionamentoAsync(query.Quantidade.Value, estacionamentoSelecionado.Id, zona, cancellationToken) :
                 await repositorioVaga.SelecionarRegistrosDoEstacionamentoAsync(estacionamentoSelecionado.Id, zona, cancellationToken);
 
+            if (deveAplicarFiltroPorPlaca)
+            {
+                vagas = vagas
+                    .Where(vaga => vaga.Veiculo is not null &&
+                        (vaga.Veiculo.Placa ?? string.Empty)
+                        .ToUpperInvariant()
+                        .Contains(query.Placa)
+                    ).ToList();
+            }
+
             ObterStatusVagasResult result = mapper.Map<ObterStatusVagasResult>(vagas);
 
-            string jsonPayload = JsonSerializer.Serialize(result);
+            if (!deveAplicarFiltroPorPlaca)
+            {
+                string jsonPayload = JsonSerializer.Serialize(result);
 
-            DistributedCacheEntryOptions cacheOptions = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60) };
+                DistributedCacheEntryOptions cacheOptions = new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60) };
 
-            await cache.SetStringAsync(cacheKey, jsonPayload, cacheOptions, cancellationToken);
+                await cache.SetStringAsync(cacheKey, jsonPayload, cacheOptions, cancellationToken);
+            }
 
             return Result.Ok(result);
         }
