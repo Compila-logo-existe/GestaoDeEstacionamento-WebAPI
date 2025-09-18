@@ -25,7 +25,7 @@ public class RepositorioVaga(AppDbContext contexto)
             .FirstOrDefaultAsync(v => v.VeiculoId.Equals(veiculoId), ct);
     }
 
-    public async Task<Vaga?> SelecionarRegistroPorDadosAsync(int vagaNumero, ZonaEstacionamento? zona, Guid id, Guid? usuarioId, CancellationToken ct)
+    public async Task<Vaga?> SelecionarRegistroPorDadosAsync(int vagaNumero, ZonaEstacionamento? zona, Guid id, Guid? usuarioId, CancellationToken ct = default)
     {
         return await registros.Include(v => v.Estacionamento)
             .FirstOrDefaultAsync(v => v.EstacionamentoId.Equals(id) && v.Numero.Equals(vagaNumero) && v.Zona == zona, ct);

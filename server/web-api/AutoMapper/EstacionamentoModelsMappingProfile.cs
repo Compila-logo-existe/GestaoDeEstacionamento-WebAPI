@@ -35,6 +35,11 @@ public class EstacionamentoModelsMappingProfile : Profile
             );
         #endregion
 
+        #region ObterVagaPorId
+        CreateMap<ObterVagaPorIdRequest, ObterVagaPorIdQuery>();
+        CreateMap<ObterVagaPorIdResult, ObterVagaPorIdResponse>();
+        #endregion
+
         #region OcuparVaga
         CreateMap<OcuparVagaRequest, OcuparVagaCommand>();
         CreateMap<OcuparVagaResult, OcuparVagaResponse>();

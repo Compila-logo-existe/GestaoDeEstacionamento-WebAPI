@@ -12,9 +12,11 @@ public class ObterStatusVagasQueryValidator : AbstractValidator<ObterStatusVagas
             .Must(CompoeExatamenteUmCaminhoDoRequest)
             .WithMessage("Informe o ID ou o Nome do estacionamento. Informe apenas um dos caminhos.");
 
-        RuleFor(c => c.Placa)
-            .NotEmpty().WithMessage("A Placa do Veículo é obrigatória.")
-            .Must(PlacaEhValida).WithMessage("Por favor, insira uma placa válida, ex: ABC1D23 ou ABC1234.");
+        When(c => !string.IsNullOrWhiteSpace(c.Placa), () =>
+        {
+            RuleFor(c => c.Placa)
+                .Must(PlacaEhValida).WithMessage("Por favor, insira uma placa válida, ex: ABC1D23 ou ABC1234.");
+        });
     }
 
     private bool CompoeExatamenteUmCaminhoDoRequest(ObterStatusVagasQuery query)
