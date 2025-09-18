@@ -96,6 +96,9 @@ public class RegistrarUsuarioCommandHandlerTestes
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
         Assert.AreEqual(accessTokenEsperado.Chave, resultado.Value.Chave);
+        Assert.AreEqual(accessTokenEsperado.Expiracao, resultado.Value.Expiracao);
+        Assert.AreEqual(accessTokenEsperado.UsuarioAutenticado.Id, resultado.Value.UsuarioAutenticado.Id);
+        Assert.AreEqual(accessTokenEsperado.UsuarioAutenticado.NomeCompleto, resultado.Value.UsuarioAutenticado.NomeCompleto);
         Assert.AreEqual(accessTokenEsperado.UsuarioAutenticado.Email, resultado.Value.UsuarioAutenticado.Email);
     }
 
