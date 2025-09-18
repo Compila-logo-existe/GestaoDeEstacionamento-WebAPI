@@ -90,6 +90,9 @@ public class LiberarVagaCommandHandler(
                     return Result.Fail(ResultadosErro.ConflitoErro("Não existe check-in/ticket aberto para esta placa."));
             }
 
+            if (!vagaSelecionada.EstaOcupada)
+                return Result.Fail(ResultadosErro.ConflitoErro("A vaga não está ocupada."));
+
             vagaSelecionada.Liberar();
             vagaSelecionada.AderirUsuario(usuarioId.Value);
 
