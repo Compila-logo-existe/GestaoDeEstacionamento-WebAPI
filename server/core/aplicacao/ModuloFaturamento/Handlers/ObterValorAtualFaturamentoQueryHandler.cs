@@ -1,3 +1,4 @@
+using AutoMapper;
 using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
@@ -13,6 +14,7 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloFaturamento.Handlers;
 
 public class ObterValorAtualFaturamentoQueryHandler(
     IValidator<ObterValorAtualFaturamentoQuery> validator,
+    IMapper mapper,
     IRepositorioRegistroEntrada repositorioRegistroEntrada,
     IRepositorioEstacionamento repositorioEstacionamento,
     IRepositorioVaga repositorioVaga,
@@ -51,25 +53,17 @@ public class ObterValorAtualFaturamentoQueryHandler(
                 : await repositorioEstacionamento.SelecionarRegistroPorNome(
                     query.EstacionamentoNome!, usuarioId, cancellationToken);
 
-            Vaga? vagaOcupada = await repositorioVaga.SelecionarPorVeiculoIdAsync(registroEntrada.VeiculoId, cancellationToken);
-            if (vagaOcupada is null)
-                return Result.Fail(ResultadosErro.ConflitoErro("O veículo não está ocupando nenhuma vaga no momento."));
-
-            if (!vagaOcupada.Estacionamento.Equals(estacionamento))
-                return Result.Fail(ResultadosErro.ConflitoErro("A vaga selecionada não pertence ao estacionamento escolhido."));
+            //if (!registroEntrada.Veiculo.Vaga.Estacionamento.Equals(estacionamento))
+            //    return Result.Fail(ResultadosErro.ConflitoErro("A vaga selecionada não pertence ao estacionamento escolhido."));
 
             registroEntrada.Faturamento.RecalcularTotais();
             int numeroDeDiarias = registroEntrada.Faturamento.NumeroDeDiarias;
             decimal valorDaDiaria = registroEntrada.Faturamento.ValorDaDiaria;
             decimal valorTotalAtual = numeroDeDiarias * valorDaDiaria;
 
-            ObterValorAtualFaturamentoResult response = new(
-                numeroDeDiarias,
-                valorDaDiaria,
-                valorTotalAtual
-            );
+            ObterValorAtualFaturamentoResult result = mapper.Map<ObterValorAtualFaturamentoResult>((numeroDeDiarias, valorDaDiaria, valorTotalAtual));
 
-            return Result.Ok(response);
+            return Result.Ok(result);
         }
         catch (Exception ex)
         {
