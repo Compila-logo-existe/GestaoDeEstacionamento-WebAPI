@@ -12,5 +12,10 @@ public class FaturamentoModelsMappingProfile : Profile
         CreateMap<ObterValorAtualFaturamentoRequest, ObterValorAtualFaturamentoQuery>();
         CreateMap<ObterValorAtualFaturamentoResult, ObterValorAtualFaturamentoResponse>();
         #endregion
+
+        #region GerarRelatorio
+        CreateMap<GerarRelatorioFinanceiroRequest, GerarRelatorioFinanceiroQuery>();
+        CreateMap<GerarRelatorioFinanceiroResult, GerarRelatorioFinanceiroResponse>();
+        #endregion
     }
 }

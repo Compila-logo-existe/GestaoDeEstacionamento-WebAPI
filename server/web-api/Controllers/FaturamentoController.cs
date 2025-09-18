@@ -32,4 +32,20 @@ public class FaturamentoController(
 
         return Ok(response);
     }
+
+    [HttpGet("gerar-relatorio-financeiro")]
+    public async Task<ActionResult<GerarRelatorioFinanceiroResponse>> GerarRelatorioFinanceiro(
+        [FromQuery] GerarRelatorioFinanceiroRequest request, CancellationToken ct)
+    {
+        GerarRelatorioFinanceiroQuery query = mapper.Map<GerarRelatorioFinanceiroQuery>(request);
+
+        Result<GerarRelatorioFinanceiroResult> result = await mediator.Send(query, ct);
+
+        if (result.IsFailed)
+            return this.MapearFalha(result.ToResult());
+
+        GerarRelatorioFinanceiroResponse response = mapper.Map<GerarRelatorioFinanceiroResponse>(result.Value);
+
+        return Ok(response);
+    }
 }

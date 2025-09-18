@@ -14,6 +14,7 @@ public class RepositorioFaturamento(AppDbContext contexto)
             .Where(f => f.UsuarioId.Equals(usuarioId)
                      && f.DataEntradaEmUtc >= dataInicialEmUtc
                      && f.DataEntradaEmUtc <= dataFinalEmUtc)
+            .Include(f => f.RegistroEntrada)
             .Include(f => f.RegistroSaida)
                 .ThenInclude(r => r.Ticket)
                 .ThenInclude(t => t.RegistroEntrada)
