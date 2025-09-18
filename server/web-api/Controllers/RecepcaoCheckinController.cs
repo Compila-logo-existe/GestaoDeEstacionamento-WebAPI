@@ -16,7 +16,7 @@ public class RecepcaoCheckinController(
     IMediator mediator
 ) : ControllerBase
 {
-    [HttpPost("registrar")]
+    [HttpPost("registrar-entrada")]
     public async Task<ActionResult<RegistrarEntradaResponse>> RegistrarEntrada(RegistrarEntradaRequest request)
     {
         RegistrarEntradaCommand command = mapper.Map<RegistrarEntradaCommand>(request);
@@ -27,6 +27,21 @@ public class RecepcaoCheckinController(
             return this.MapearFalha(result.ToResult());
 
         RegistrarEntradaResponse response = mapper.Map<RegistrarEntradaResponse>(result.Value);
+
+        return Created(string.Empty, response);
+    }
+
+    [HttpPost("registrar-saida")]
+    public async Task<ActionResult<RegistrarSaidaResponse>> RegistrarSaida(RegistrarSaidaRequest request)
+    {
+        RegistrarSaidaCommand command = mapper.Map<RegistrarSaidaCommand>(request);
+
+        Result<RegistrarSaidaResult> result = await mediator.Send(command);
+
+        if (result.IsFailed)
+            return this.MapearFalha(result.ToResult());
+
+        RegistrarSaidaResponse response = mapper.Map<RegistrarSaidaResponse>(result.Value);
 
         return Created(string.Empty, response);
     }

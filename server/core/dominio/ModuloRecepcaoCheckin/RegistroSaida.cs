@@ -7,7 +7,7 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
 public class RegistroSaida : EntidadeBase<RegistroSaida>
 {
-    public DateTime? DataSaidaEmUtc { get; set; }
+    public DateTime DataSaidaEmUtc { get; set; }
     public Guid HospedeId { get; set; }
     public Hospede Hospede { get; set; }
     public Guid TicketId { get; set; }
@@ -36,7 +36,11 @@ public class RegistroSaida : EntidadeBase<RegistroSaida>
 
     public void AderirVeiculo(Veiculo veiculo) => Veiculo = veiculo;
 
-    public void AderirTicket(Ticket ticket) => Ticket = ticket;
+    public void AderirTicket(Ticket ticket)
+    {
+        Ticket = ticket;
+        ticket.AderirRegistroSaida(this);
+    }
 
     public override void AtualizarRegistro(RegistroSaida registroEditado)
     {

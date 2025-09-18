@@ -16,7 +16,7 @@ public class MapeadorRegistroSaida : IEntityTypeConfiguration<RegistroSaida>
             .IsRequired();
 
         builder.Property(r => r.DataSaidaEmUtc)
-            .IsRequired(false);
+            .IsRequired();
 
         builder.HasOne(r => r.Hospede)
             .WithMany(h => h.RegistrosSaida)

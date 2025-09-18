@@ -9,9 +9,14 @@ public class RecepcaoCheckinModelsMappingProfile : Profile
 {
     public RecepcaoCheckinModelsMappingProfile()
     {
-        #region Registrar
+        #region RegistrarEntrada
         CreateMap<RegistrarEntradaRequest, RegistrarEntradaCommand>();
         CreateMap<RegistrarEntradaResult, RegistrarEntradaResponse>();
+        #endregion
+
+        #region RegistrarSaida
+        CreateMap<RegistrarSaidaRequest, RegistrarSaidaCommand>();
+        CreateMap<RegistrarSaidaResult, RegistrarSaidaResponse>();
         #endregion
 
         #region ObterDetalhes

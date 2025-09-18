@@ -8,7 +8,7 @@ public class Ticket : EntidadeBase<Ticket>
     public Guid UsuarioId { get; set; }
     public DateTime EmissaoEmUtc { get; init; } = DateTime.UtcNow;
     public int NumeroSequencial { get; set; }
-    public StatusTicket Status => RegistroSaida.DataSaidaEmUtc is null ? StatusTicket.Valido : StatusTicket.Expirado;
+    public StatusTicket Status => RegistroSaida is null ? StatusTicket.Valido : StatusTicket.Expirado;
     public RegistroEntrada RegistroEntrada { get; set; } = null!;
     public RegistroSaida RegistroSaida { get; set; } = null!;
 

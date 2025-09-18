@@ -10,7 +10,7 @@ public class RecepcaoCheckinMappingProfile : Profile
 {
     public RecepcaoCheckinMappingProfile()
     {
-        #region Registrar
+        #region RegistrarEntrada
         CreateMap<RegistrarEntradaCommand, Hospede>();
         CreateMap<RegistrarEntradaCommand, Veiculo>();
         CreateMap<RegistrarEntradaCommand, RegistroEntrada>();
@@ -19,6 +19,16 @@ public class RecepcaoCheckinMappingProfile : Profile
              src.Id,
              src.Ticket.NumeroSequencial,
              src.DataEntradaEmUtc.ToShortDateString()
+            ));
+        #endregion
+
+        #region RegistrarSaida
+        CreateMap<RegistrarSaidaCommand, Hospede>();
+        CreateMap<RegistrarSaidaCommand, Veiculo>();
+        CreateMap<RegistrarSaidaCommand, RegistroSaida>();
+        CreateMap<RegistroSaida, RegistrarSaidaResult>()
+            .ConvertUsing(src => new RegistrarSaidaResult(
+             src.DataSaidaEmUtc.ToShortDateString()
             ));
         #endregion
 

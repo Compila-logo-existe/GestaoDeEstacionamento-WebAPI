@@ -8,6 +8,7 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 public class RegistroEntrada : EntidadeBase<RegistroEntrada>
 {
     public DateTime DataEntradaEmUtc { get; set; } = DateTime.UtcNow;
+    public DateTime? DataSaidaEmUtc { get; set; }
     public Guid HospedeId { get; set; }
     public Hospede Hospede { get; set; }
     public Guid TicketId { get; set; }
@@ -37,6 +38,8 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
     public void AderirVeiculo(Veiculo veiculo) => Veiculo = veiculo;
 
     public void GerarNovoTicket() => Ticket = new Ticket(this);
+
+    public void AderirDataSaida(DateTime dataSaidaEmUtc) => DataSaidaEmUtc = dataSaidaEmUtc;
 
     public void GerarNovoFaturamento(decimal valorDaDiaria)
     {
