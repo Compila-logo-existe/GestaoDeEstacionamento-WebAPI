@@ -44,6 +44,7 @@ public class AutenticarUsuarioCommandHandlerTestes
                 );
     }
 
+    #region Testes Login
     [TestMethod]
     public async Task Handle_Deve_Retornar_Sucesso_Quando_Autenticar_Usuario()
     {
@@ -307,4 +308,5 @@ public class AutenticarUsuarioCommandHandlerTestes
         Assert.AreEqual(1, mensagensDoResult.Count);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
+    #endregion
 }

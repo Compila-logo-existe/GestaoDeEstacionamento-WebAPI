@@ -278,6 +278,7 @@ public class RegistrarUsuarioCommandHandlerTestes
         Assert.AreEqual(1, mensagensDoResult.Count);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
+
     [TestMethod]
     public async Task Handle_Deve_Retornar_Falha_Quando_Registrar_Usuario_E_Não_Gerar_Token()
     {
