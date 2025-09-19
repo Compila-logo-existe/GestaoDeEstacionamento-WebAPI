@@ -1,9 +1,6 @@
-using FluentResults;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 
 namespace GestaoDeEstacionamento.Testes.Unidades.ModuloAutenticacao;
 
@@ -19,25 +16,21 @@ public class RegistrarUsuarioCommandHandlerTestes
 
     private Mock<UserManager<Usuario>> userManagerMock;
     private Mock<ITokenProvider> tokenProviderMock;
-    private Mock<ILogger<UserManager<Usuario>>> loggerMock;
-
 
     [TestInitialize]
     public void Setup()
     {
-        loggerMock = new Mock<ILogger<UserManager<Usuario>>>();
-
         userManagerMock = new Mock<UserManager<Usuario>>(
-            new Mock<IUserStore<Usuario>>().Object, null!, null!, null!,
-            null!, null!, null!, null!, loggerMock.Object
+            new Mock<IUserStore<Usuario>>().Object,
+            null!, null!, null!, null!, null!, null!, null!, null!
         );
 
         tokenProviderMock = new Mock<ITokenProvider>();
 
         handler = new RegistrarUsuarioCommandHandler(
-                userManagerMock.Object,
-                tokenProviderMock.Object
-                );
+            userManagerMock.Object,
+            tokenProviderMock.Object
+        );
     }
 
     #region Testes Registro
@@ -284,7 +277,7 @@ public class RegistrarUsuarioCommandHandlerTestes
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
     [TestMethod]
-    public async Task Handle_Deve_Retornar_Falha_Quando_Registrar_Usuario_E_Gerar_Não_Token()
+    public async Task Handle_Deve_Retornar_Falha_Quando_Registrar_Usuario_E_Não_Gerar_Token()
     {
         // Arrange
         RegistrarUsuarioCommand registrarUsuarioCommand =
