@@ -1,6 +1,7 @@
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using System.Collections.Immutable;
 
 namespace GestaoDeEstacionamento.Testes.Unidades.ModuloAutenticacao;
 
@@ -119,11 +120,11 @@ public class RegistrarUsuarioCommandHandlerTestes
         userManagerMock.Verify(u => u.CreateAsync(It.IsAny<Usuario>(), senhaPadrao), Times.Once);
         tokenProviderMock.Verify(t => t.GerarAccessToken(It.IsAny<Usuario>()), Times.Never);
 
-        string mensagemEsperada = MensagensErroAutenticacao.UsuarioJaExiste;
-        List<string> mensagensDoResult = resultado.Errors
+        const string mensagemEsperada = MensagensErroAutenticacao.UsuarioJaExiste;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
-            .ToList();
+            .ToImmutableList();
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
@@ -156,11 +157,11 @@ public class RegistrarUsuarioCommandHandlerTestes
         userManagerMock.Verify(u => u.CreateAsync(It.IsAny<Usuario>(), senhaPadrao), Times.Once);
         tokenProviderMock.Verify(t => t.GerarAccessToken(It.IsAny<Usuario>()), Times.Never);
 
-        string mensagemEsperada = MensagensErroAutenticacao.EmailJaExiste;
-        List<string> mensagensDoResult = resultado.Errors
+        const string mensagemEsperada = MensagensErroAutenticacao.EmailJaExiste;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
-            .ToList();
+            .ToImmutableList();
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
@@ -196,18 +197,19 @@ public class RegistrarUsuarioCommandHandlerTestes
         userManagerMock.Verify(u => u.CreateAsync(It.IsAny<Usuario>(), senhaPadrao), Times.Once);
         tokenProviderMock.Verify(t => t.GerarAccessToken(It.IsAny<Usuario>()), Times.Never);
 
-        string[] mensagensEsperadas =
-        {
+        ImmutableList<string> mensagensEsperadas =
+        [
             MensagensErroAutenticacao.SenhaMuitoCurta,
             MensagensErroAutenticacao.SenhaRequerCaracterEspecial,
             MensagensErroAutenticacao.SenhaRequerNumero,
             MensagensErroAutenticacao.SenhaRequerMaiuscula,
             MensagensErroAutenticacao.SenhaRequerMinuscula
-        };
-        List<string> mensagensDoResult = resultado.Errors
+,
+        ];
+        ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
-            .ToList();
+            .ToImmutableList();
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
@@ -239,11 +241,11 @@ public class RegistrarUsuarioCommandHandlerTestes
         userManagerMock.Verify(u => u.CreateAsync(It.IsAny<Usuario>(), senhaPadrao), Times.Once);
         tokenProviderMock.Verify(t => t.GerarAccessToken(It.IsAny<Usuario>()), Times.Never);
 
-        string mensagemEsperada = "Erro inesperado no cadastro.";
-        List<string> mensagensDoResult = resultado.Errors
+        const string mensagemEsperada = MensagensErroAutenticacao.ErroInesperadoCadastro;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
-            .ToList();
+            .ToImmutableList();
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
@@ -265,11 +267,11 @@ public class RegistrarUsuarioCommandHandlerTestes
         userManagerMock.Verify(u => u.CreateAsync(It.IsAny<Usuario>(), senhaPadrao), Times.Never);
         tokenProviderMock.Verify(t => t.GerarAccessToken(It.IsAny<Usuario>()), Times.Never);
 
-        string mensagemEsperada = "A confirmação de senha falhou.";
-        List<string> mensagensDoResult = resultado.Errors
+        const string mensagemEsperada = MensagensErroAutenticacao.ConfirmarSenha;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
-            .ToList();
+            .ToImmutableList();
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
@@ -327,11 +329,11 @@ public class RegistrarUsuarioCommandHandlerTestes
             It.Is<Usuario>(usr =>
                 usr.FullName == registrarUsuarioCommand.NomeCompleto && usr.Email == registrarUsuarioCommand.Email)), Times.Once);
 
-        string mensagemEsperada = "Falha ao gerar token de acesso.";
-        List<string> mensagensDoResult = resultado.Errors
+        const string mensagemEsperada = MensagensErroAutenticacao.FalhaGerarToken;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
-            .ToList();
+            .ToImmutableList();
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
