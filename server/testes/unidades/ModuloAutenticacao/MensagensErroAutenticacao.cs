@@ -16,5 +16,5 @@ public static class MensagensErroAutenticacao
     public const string DadosInvalidos = "Login ou senha incorretos.";
     public const string FalhaGerarToken = "Falha ao gerar token de acesso.";
     public const string ErroInesperadoCadastro = "Erro inesperado no cadastro.";
-    public const string UsuarioInexistente = "Não foi possível encontrar o usuário requisitado.";
+    public const string UsuarioInexistente = "Não foi possível obter o registro: Não foi possível encontrar o usuário requisitado.";
 }
