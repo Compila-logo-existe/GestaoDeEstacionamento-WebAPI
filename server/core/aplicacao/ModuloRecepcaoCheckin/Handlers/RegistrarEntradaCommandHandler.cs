@@ -12,6 +12,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Handlers;
 
@@ -106,8 +108,13 @@ public class RegistrarEntradaCommandHandler(
 
             await unitOfWork.CommitAsync();
 
+            string placaPadronizadaParaCache = Padronizador.PadronizarPlaca(command.Placa);
+            string placaHash = Convert.ToHexString(
+                SHA256.HashData(Encoding.UTF8.GetBytes(placaPadronizadaParaCache))
+            );
+
             await cache.RemoveAsync($"recepcao:t={tenantId}:q=all", cancellationToken);
-            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:p={command.Placa}", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:v={placaHash}", cancellationToken);
             await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:v={novoVeiculo.Id}", cancellationToken);
 
             RegistrarEntradaResult result = mapper.Map<RegistrarEntradaResult>(novoRegistro);

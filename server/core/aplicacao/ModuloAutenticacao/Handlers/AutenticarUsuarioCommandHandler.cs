@@ -35,8 +35,8 @@ public class AutenticarUsuarioCommandHandler(
             bool pertenceViaTenant = await usuarioTenantRepositorio.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.TenantId!.Value, cancellationToken);
             bool pertenceViaSlug = await usuarioTenantRepositorio.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.Slug!, cancellationToken);
 
-            if (!pertenceViaTenant && !pertenceViaSlug)
-                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Você não pertence a esta empresa. Confira o Tenant ou Slug."));
+            if (!pertenceViaTenant || !pertenceViaSlug)
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Você não pertence a esta empresa. Confira o Tenant e o Slug."));
         }
 
         SignInResult resultadoLogin = await signInManager.PasswordSignInAsync(

@@ -9,6 +9,8 @@ using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Handlers;
@@ -44,7 +46,11 @@ public class SelecionarRegistrosDoVeiculoQueryHandler(
         else if (!string.IsNullOrWhiteSpace(query.Placa))
         {
             string placaPadronizadaParaCache = Padronizador.PadronizarPlaca(query.Placa);
-            cacheQueryVeiculo = $"v={placaPadronizadaParaCache}";
+            string placaHash = Convert.ToHexString(
+                SHA256.HashData(Encoding.UTF8.GetBytes(placaPadronizadaParaCache))
+            );
+
+            cacheQueryVeiculo = $"v={placaHash}";
         }
         else
         {
