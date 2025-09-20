@@ -17,7 +17,6 @@ public class ObterValorAtualFaturamentoQueryHandler(
     IMapper mapper,
     IRepositorioRegistroEntrada repositorioRegistroEntrada,
     IRepositorioEstacionamento repositorioEstacionamento,
-    IRepositorioVaga repositorioVaga,
     ITenantProvider tenantProvider,
     ILogger<ObterValorAtualFaturamentoQueryHandler> logger
 ) : IRequestHandler<ObterValorAtualFaturamentoQuery, Result<ObterValorAtualFaturamentoResult>>
@@ -25,9 +24,13 @@ public class ObterValorAtualFaturamentoQueryHandler(
     public async Task<Result<ObterValorAtualFaturamentoResult>> Handle(
         ObterValorAtualFaturamentoQuery query, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult resultValidation = await validator.ValidateAsync(query, cancellationToken);
 
@@ -41,9 +44,9 @@ public class ObterValorAtualFaturamentoQueryHandler(
         {
             RegistroEntrada? registroEntrada = query.NumeroSequencialDoTicket.HasValue
                 ? await repositorioRegistroEntrada.SelecionarAberturaPorNumeroDoTicketAsync(
-                    query.NumeroSequencialDoTicket.Value, usuarioId, cancellationToken)
+                    query.NumeroSequencialDoTicket.Value, tenantId, cancellationToken)
                 : await repositorioRegistroEntrada.SelecionarAberturaPorPlacaAsync(
-                    query.Placa!, usuarioId, cancellationToken);
+                    query.Placa!, tenantId, cancellationToken);
 
             if (registroEntrada is null)
                 return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Registro de entrada não encontrado ou já encerrado."));
@@ -51,7 +54,7 @@ public class ObterValorAtualFaturamentoQueryHandler(
             Estacionamento? estacionamento = query.EstacionamentoId.HasValue
                 ? await repositorioEstacionamento.SelecionarRegistroPorIdAsync(query.EstacionamentoId.Value)
                 : await repositorioEstacionamento.SelecionarRegistroPorNome(
-                    query.EstacionamentoNome!, usuarioId, cancellationToken);
+                    query.EstacionamentoNome!, tenantId, cancellationToken);
 
             //if (!registroEntrada.Veiculo.Vaga.Estacionamento.Equals(estacionamento))
             //    return Result.Fail(ResultadosErro.ConflitoErro("A vaga selecionada não pertence ao estacionamento escolhido."));

@@ -22,9 +22,13 @@ public class GerarRelatorioFinanceiroQueryHandler(
     public async Task<Result<GerarRelatorioFinanceiroResult>> Handle(
         GerarRelatorioFinanceiroQuery query, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult resultValidation = await validator.ValidateAsync(query, cancellationToken);
 
@@ -37,7 +41,7 @@ public class GerarRelatorioFinanceiroQueryHandler(
         try
         {
             List<Faturamento> faturamentos = await repositorioFaturamento
-                .SelecionarPorPeriodoAsync(query.DataInicial, query.DataFinal, usuarioId.Value, cancellationToken);
+                .SelecionarPorPeriodoAsync(query.DataInicial, query.DataFinal, tenantId.Value, cancellationToken);
 
             if (faturamentos.Count == 0)
                 return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Nenhum faturamento encontrado no período especificado."));
