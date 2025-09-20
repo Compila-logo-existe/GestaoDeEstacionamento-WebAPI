@@ -1,4 +1,5 @@
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,41 +10,54 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao;
 
 public class JwtProvider : ITokenProvider
 {
+    private readonly UserManager<Usuario> userManager;
     private readonly string audienciaValida;
     private readonly string chaveAssinaturaJwt;
-    private readonly DateTime expiracaoJwt;
 
-    public JwtProvider(IConfiguration config)
+    public JwtProvider(IConfiguration config, UserManager<Usuario> userManager)
     {
         if (string.IsNullOrEmpty(config["JWT_GENERATION_KEY"]))
-            throw new ArgumentException("Cifra de geração de tokens não configurada");
+            throw new ArgumentException("JWT_GENERATION_KEY não configurada");
 
         chaveAssinaturaJwt = config["JWT_GENERATION_KEY"]!;
 
         if (string.IsNullOrEmpty(config["JWT_AUDIENCE_DOMAIN"]))
-            throw new ArgumentException("Audiência válida para transmissão de tokens não configurada");
+            throw new ArgumentException("JWT_AUDIENCE_DOMAIN não configurada");
 
         audienciaValida = config["JWT_AUDIENCE_DOMAIN"]!;
 
-        expiracaoJwt = DateTime.UtcNow.AddMinutes(15);
+        this.userManager = userManager;
     }
 
-    public AccessToken GerarAccessToken(Usuario usuario)
+    public async Task<AccessToken> GerarAccessToken(
+        Usuario usuario,
+        Guid tenantId
+    )
     {
+        DateTime expiracaoJwt = DateTime.UtcNow.AddMinutes(15);
+
         JwtSecurityTokenHandler tokenHandler = new();
 
-        byte[] chaveEmBytes = Encoding.ASCII.GetBytes(chaveAssinaturaJwt!);
+        byte[] chaveEmBytes = Encoding.UTF8.GetBytes(chaveAssinaturaJwt!);
+
+        IList<string> userRoles = await userManager.GetRolesAsync(usuario);
+
+        List<Claim> claims = new()
+        {
+            new("sub", usuario.Id.ToString()),
+            new("unique_name", usuario.UserName ?? usuario.Email ?? usuario.Id.ToString()),
+            new("email", usuario.Email ?? string.Empty),
+            new("tenant_id", tenantId.ToString() ?? string.Empty)
+        };
+
+        foreach (string role in userRoles)
+            claims.Add(new Claim("roles", role));
 
         SecurityTokenDescriptor tokenDescriptor = new()
         {
             Issuer = "GestaoEstacionamento",
             Audience = audienciaValida,
-            Subject = new ClaimsIdentity(
-            [
-                new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.UniqueName, usuario.UserName!),
-                new Claim(JwtRegisteredClaimNames.Email, usuario.Email!)
-            ]),
+            Subject = new ClaimsIdentity(claims),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(chaveEmBytes),
                 SecurityAlgorithms.HmacSha256Signature

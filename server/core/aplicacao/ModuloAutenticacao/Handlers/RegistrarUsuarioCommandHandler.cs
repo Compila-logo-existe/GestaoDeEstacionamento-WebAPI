@@ -1,6 +1,7 @@
 using FluentResults;
 using GestaoDeEstacionamento.Core.Aplicacao.Compartilhado;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
+using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -8,12 +9,20 @@ using Microsoft.AspNetCore.Identity;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 public class RegistrarUsuarioCommandHandler(
     UserManager<Usuario> userManager,
-    ITokenProvider tokenProvider
+    IUsuarioTenantRepositorio usuarioTenantRepositorio,
+    ITenantRepositorio tenantRepositorio,
+    ITenantProvider tenantProvider,
+    ITokenProvider tokenProvider,
+    IUnitOfWork unitOfWork
 ) : IRequestHandler<RegistrarUsuarioCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(
         RegistrarUsuarioCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         if (!command.Senha.Equals(command.ConfirmarSenha))
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("A confirmação de senha falhou."));
 
@@ -46,7 +55,36 @@ public class RegistrarUsuarioCommandHandler(
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
         }
 
-        AccessToken? tokenAcesso = tokenProvider.GerarAccessToken(usuario);
+        await userManager.AddToRoleAsync(usuario, "User");
+
+        if (!string.IsNullOrWhiteSpace(command.Slug))
+        {
+            command = command with
+            {
+                TenantId = tenantRepositorio.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken).Result
+            };
+        }
+
+        Tenant? tenant = await tenantRepositorio.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
+
+        if (tenant is null)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Empresa (tenant) não encontrada."));
+
+        VinculoUsuarioTenant vinculo = new(
+            usuario.Id,
+            tenantId!.Value,
+            "User",
+            tenant.SlugSubdominio!
+        );
+
+        await usuarioTenantRepositorio.CadastrarRegistroAsync(vinculo);
+
+        await unitOfWork.CommitAsync();
+
+        AccessToken? tokenAcesso = await tokenProvider.GerarAccessToken(
+            usuario,
+            tenant.Id
+        );
 
         if (tokenAcesso is null)
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(new Exception("Falha ao gerar token de acesso.")));

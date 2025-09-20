@@ -10,16 +10,34 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 public class AutenticarUsuarioCommandHandler(
     SignInManager<Usuario> signInManager,
     UserManager<Usuario> userManager,
+    IUsuarioTenantRepositorio usuarioTenantRepositorio,
+    ITenantProvider tenantProvider,
     ITokenProvider tokenProvider
 ) : IRequestHandler<AutenticarUsuarioCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(
         AutenticarUsuarioCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Usuario? usuarioEncontrado = await userManager.FindByEmailAsync(command.Email);
 
         if (usuarioEncontrado is null)
             return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Não foi possível encontrar o usuário requisitado."));
+
+        IList<string> rolesDoUsuario = await userManager.GetRolesAsync(usuarioEncontrado);
+        bool isPlatformAdmin = rolesDoUsuario.Contains("PlataformaAdmin");
+
+        if (!isPlatformAdmin)
+        {
+            bool pertenceViaTenant = await usuarioTenantRepositorio.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.TenantId!.Value, cancellationToken);
+            bool pertenceViaSlug = await usuarioTenantRepositorio.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.Slug!, cancellationToken);
+
+            if (!pertenceViaTenant && !pertenceViaSlug)
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Você não pertence a esta empresa. Confira o Tenant ou Slug."));
+        }
 
         SignInResult resultadoLogin = await signInManager.PasswordSignInAsync(
             usuarioEncontrado.UserName!,
@@ -30,7 +48,10 @@ public class AutenticarUsuarioCommandHandler(
 
         if (resultadoLogin.Succeeded)
         {
-            AccessToken tokenAcesso = tokenProvider.GerarAccessToken(usuarioEncontrado);
+            AccessToken tokenAcesso = await tokenProvider.GerarAccessToken(
+                usuarioEncontrado,
+                command.TenantId!.Value
+            );
 
             return Result.Ok(tokenAcesso);
         }

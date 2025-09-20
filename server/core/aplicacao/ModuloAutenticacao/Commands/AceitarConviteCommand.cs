@@ -4,11 +4,9 @@ using MediatR;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 
-public record RegistrarUsuarioCommand(
+public record AceitarConviteCommand(
+    string TokenConvite,
     string NomeCompleto,
-    string Email,
     string Senha,
-    string ConfirmarSenha,
-    Guid? TenantId,
-    string? Slug
+    string ConfirmarSenha
 ) : IRequest<Result<AccessToken>>;
