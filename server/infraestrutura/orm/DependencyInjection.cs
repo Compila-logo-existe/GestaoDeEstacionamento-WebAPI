@@ -1,9 +1,11 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
+using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloAutenticacao;
 using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloEstacionamento;
 using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloFaturamento;
 using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloHospede;
@@ -26,6 +28,9 @@ public static class DependencyInjection
         services.AddScoped<IRepositorioTicket, RepositorioTicket>();
         services.AddScoped<IRepositorioRegistroSaida, RepositorioRegistroSaida>();
         services.AddScoped<IRepositorioFaturamento, RepositorioFaturamento>();
+        services.AddScoped<ITenantRepositorio, RepositorioTenant>();
+        services.AddScoped<IUsuarioTenantRepositorio, RepositorioUsuarioTenant>();
+        services.AddScoped<IConviteRepositorio, RepositorioConviteRegistro>();
 
         services.AddEntityFrameworkConfig(configuration);
 

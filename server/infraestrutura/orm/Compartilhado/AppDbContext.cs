@@ -22,6 +22,9 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
     public DbSet<Vaga> Vagas { get; set; }
     public DbSet<RegistroSaida> RegistrosSaida { get; set; }
     public DbSet<Faturamento> Faturamentos { get; set; }
+    public DbSet<Tenant> Tenants { get; set; }
+    public DbSet<VinculoUsuarioTenant> VinculosUsuarioTenant { get; set; }
+    public DbSet<ConviteRegistro> ConvitesRegistro { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,28 +32,28 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
         if (tenantProvider is not null)
         {
             modelBuilder.Entity<Hospede>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Veiculo>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<RegistroEntrada>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Ticket>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Estacionamento>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Vaga>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<RegistroSaida>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Faturamento>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
         }
 
         Assembly assembly = typeof(AppDbContext).Assembly;
