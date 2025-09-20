@@ -30,7 +30,7 @@ public class RegistroSaida : EntidadeBase<RegistroSaida>
         }
     }
 
-    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
 
     public void AderirHospede(Hospede hospede) => Hospede = hospede;
 

@@ -14,7 +14,7 @@ public class Vaga : EntidadeBase<Vaga>
     public Estacionamento Estacionamento { get; set; } = null!;
     public bool EstaOcupada => Veiculo is not null;
 
-    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
 
     public void Ocupar(Veiculo veiculo)
     {

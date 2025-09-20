@@ -32,7 +32,7 @@ public class Veiculo : EntidadeBase<Veiculo>
         }
     }
 
-    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
 
     public void AderirHospede(Hospede hospede)
     {

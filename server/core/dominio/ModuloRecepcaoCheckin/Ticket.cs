@@ -4,8 +4,6 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
 public class Ticket : EntidadeBase<Ticket>
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
-    public Guid UsuarioId { get; set; }
     public DateTime EmissaoEmUtc { get; init; } = DateTime.UtcNow;
     public int NumeroSequencial { get; set; }
     public StatusTicket Status => RegistroSaida is null ? StatusTicket.Valido : StatusTicket.Expirado;
@@ -18,9 +16,12 @@ public class Ticket : EntidadeBase<Ticket>
         RegistroEntrada = registroEntrada;
     }
 
+    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
+
     public void AderirRegistroSaida(RegistroSaida registroSaida) => RegistroSaida = registroSaida;
 
     public DateTime ObterDataEntrada() => RegistroEntrada.DataEntradaEmUtc;
+
     public DateTime? ObterDataSaida() => RegistroSaida.DataSaidaEmUtc;
 
     public override void AtualizarRegistro(Ticket registroEditado)

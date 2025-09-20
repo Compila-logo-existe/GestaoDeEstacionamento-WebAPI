@@ -18,7 +18,7 @@ public class Faturamento : EntidadeBase<Faturamento>
     [ExcludeFromCodeCoverage]
     public Faturamento() { }
 
-    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
 
     public void DefinirValorDiaria(decimal valor)
     {

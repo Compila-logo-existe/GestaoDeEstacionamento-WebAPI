@@ -22,7 +22,7 @@ public class Hospede : EntidadeBase<Hospede>
         Telefone = telefone;
     }
 
-    public void AderirUsuario(Guid usuarioId) => UsuarioId = usuarioId;
+    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
 
     public bool PossuiVeiculoPorPlaca(string placa)
         => Veiculos.Any(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
