@@ -25,7 +25,7 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<VinculoUsuarioTenant> VinculosUsuarioTenant { get; set; }
     public DbSet<ConviteRegistro> ConvitesRegistro { get; set; }
-
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 
 public class CriarConviteCommandHandler(
-    IConviteRepositorio conviteRepositorio,
+    IRepositorioConvite repositorioConvite,
     ITenantProvider tenantProvider,
     IUnitOfWork unitOfWork,
     ILogger<CriarConviteCommand> logger
@@ -41,7 +41,7 @@ public class CriarConviteCommandHandler(
                 DataExpiracaoUtc = expira
             };
 
-            await conviteRepositorio.CriarAsync(convite, ct);
+            await repositorioConvite.CriarAsync(convite, ct);
 
             await unitOfWork.CommitAsync();
 

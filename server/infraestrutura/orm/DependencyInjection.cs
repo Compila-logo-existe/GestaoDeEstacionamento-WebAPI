@@ -28,9 +28,9 @@ public static class DependencyInjection
         services.AddScoped<IRepositorioTicket, RepositorioTicket>();
         services.AddScoped<IRepositorioRegistroSaida, RepositorioRegistroSaida>();
         services.AddScoped<IRepositorioFaturamento, RepositorioFaturamento>();
-        services.AddScoped<ITenantRepositorio, RepositorioTenant>();
-        services.AddScoped<IUsuarioTenantRepositorio, RepositorioUsuarioTenant>();
-        services.AddScoped<IConviteRepositorio, RepositorioConviteRegistro>();
+        services.AddScoped<IRepositorioTenant, RepositorioTenant>();
+        services.AddScoped<IRepositorioUsuarioTenant, RepositorioUsuarioTenant>();
+        services.AddScoped<IRepositorioConvite, RepositorioConviteRegistro>();
 
         services.AddEntityFrameworkConfig(configuration);
 

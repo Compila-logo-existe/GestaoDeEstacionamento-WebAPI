@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 
 public class CriarTenantCommandHandler(
-    ITenantRepositorio tenantRepositorio,
+    IRepositorioTenant repositorioTenant,
     ITenantProvider tenantProvider,
     IUnitOfWork unitOfWork,
     ILogger<CriarTenantCommand> logger
@@ -30,7 +30,7 @@ public class CriarTenantCommandHandler(
                 DateTime.UtcNow
             );
 
-            await tenantRepositorio.CriarAsync(tenant, ct);
+            await repositorioTenant.CriarAsync(tenant, ct);
             await unitOfWork.CommitAsync();
 
             return Result.Ok(tenant.Id);

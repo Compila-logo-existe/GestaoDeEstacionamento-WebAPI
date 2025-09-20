@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Identity;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 public class RegistrarUsuarioCommandHandler(
     UserManager<Usuario> userManager,
-    IUsuarioTenantRepositorio usuarioTenantRepositorio,
-    ITenantRepositorio tenantRepositorio,
+    IRepositorioUsuarioTenant repositorioUsuarioTenant,
+    IRepositorioTenant repositorioTenant,
     ITenantProvider tenantProvider,
     ITokenProvider tokenProvider,
     IUnitOfWork unitOfWork
@@ -61,11 +61,11 @@ public class RegistrarUsuarioCommandHandler(
         {
             command = command with
             {
-                TenantId = tenantRepositorio.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken).Result
+                TenantId = repositorioTenant.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken).Result
             };
         }
 
-        Tenant? tenant = await tenantRepositorio.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
+        Tenant? tenant = await repositorioTenant.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
 
         if (tenant is null)
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Empresa (tenant) não encontrada."));
@@ -77,7 +77,7 @@ public class RegistrarUsuarioCommandHandler(
             tenant.SlugSubdominio!
         );
 
-        await usuarioTenantRepositorio.CadastrarRegistroAsync(vinculo);
+        await repositorioUsuarioTenant.CadastrarRegistroAsync(vinculo);
 
         await unitOfWork.CommitAsync();
 

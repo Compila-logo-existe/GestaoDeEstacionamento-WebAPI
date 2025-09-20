@@ -10,10 +10,10 @@ using Microsoft.Extensions.Logging;
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 
 public class AceitarConviteCommandHandler(
-    IConviteRepositorio conviteRepositorio,
+    IRepositorioConvite repositorioConvite,
     ITenantProvider tenantProvider,
-    ITenantRepositorio tenantRepositorio,
-    IUsuarioTenantRepositorio usuarioTenantRepositorio,
+    IRepositorioTenant repositorioTenant,
+    IRepositorioUsuarioTenant repositorioUsuarioTenant,
     UserManager<Usuario> userManager,
     ITokenProvider tokenProvider,
     IUnitOfWork unitOfWork,
@@ -23,7 +23,7 @@ public class AceitarConviteCommandHandler(
     public async Task<Result<AccessToken>> Handle(
         AceitarConviteCommand command, CancellationToken cancellationToken)
     {
-        ConviteRegistro? convite = await conviteRepositorio.ObterAtivoPorTokenAsync(command.TokenConvite, cancellationToken);
+        ConviteRegistro? convite = await repositorioConvite.ObterAtivoPorTokenAsync(command.TokenConvite, cancellationToken);
         if (convite?.EstaValidoAgora() != true)
             return Result.Fail("Convite inválido ou expirado.");
 
@@ -45,7 +45,7 @@ public class AceitarConviteCommandHandler(
 
             await userManager.AddToRoleAsync(usuario, convite.NomeCargo);
 
-            Tenant? tenant = await tenantRepositorio.ObterPorIdAsync(convite.TenantId, cancellationToken);
+            Tenant? tenant = await repositorioTenant.ObterPorIdAsync(convite.TenantId, cancellationToken);
 
             if (tenant is null)
                 return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Empresa (tenant) não encontrada."));
@@ -57,9 +57,9 @@ public class AceitarConviteCommandHandler(
                 tenant.SlugSubdominio
             );
 
-            await usuarioTenantRepositorio.CadastrarRegistroAsync(vinculo);
+            await repositorioUsuarioTenant.CadastrarRegistroAsync(vinculo);
 
-            await conviteRepositorio.MarcarComoUtilizadoAsync(convite.Id, cancellationToken);
+            await repositorioConvite.MarcarComoUtilizadoAsync(convite.Id, cancellationToken);
 
             await unitOfWork.CommitAsync();
 

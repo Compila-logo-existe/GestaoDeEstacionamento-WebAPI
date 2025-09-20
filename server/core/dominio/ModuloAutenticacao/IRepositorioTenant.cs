@@ -2,7 +2,7 @@ using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 
 namespace GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 
-public interface ITenantRepositorio : IRepositorio<Tenant>
+public interface IRepositorioTenant : IRepositorio<Tenant>
 {
     public Task CriarAsync(Tenant tenant, CancellationToken ct);
     public Task<Tenant?> ObterPorIdAsync(Guid tenantId, CancellationToken ct);

@@ -10,7 +10,7 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 public class AutenticarUsuarioCommandHandler(
     SignInManager<Usuario> signInManager,
     UserManager<Usuario> userManager,
-    IUsuarioTenantRepositorio usuarioTenantRepositorio,
+    IRepositorioUsuarioTenant repositorioUsuarioTenant,
     ITenantProvider tenantProvider,
     ITokenProvider tokenProvider
 ) : IRequestHandler<AutenticarUsuarioCommand, Result<AccessToken>>
@@ -32,8 +32,8 @@ public class AutenticarUsuarioCommandHandler(
 
         if (!isPlatformAdmin)
         {
-            bool pertenceViaTenant = await usuarioTenantRepositorio.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.TenantId!.Value, cancellationToken);
-            bool pertenceViaSlug = await usuarioTenantRepositorio.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.Slug!, cancellationToken);
+            bool pertenceViaTenant = await repositorioUsuarioTenant.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.TenantId!.Value, cancellationToken);
+            bool pertenceViaSlug = await repositorioUsuarioTenant.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.Slug!, cancellationToken);
 
             if (!pertenceViaTenant || !pertenceViaSlug)
                 return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Você não pertence a esta empresa. Confira o Tenant e o Slug."));

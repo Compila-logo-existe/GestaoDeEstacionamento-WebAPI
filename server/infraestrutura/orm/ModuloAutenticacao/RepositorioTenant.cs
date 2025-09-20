@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.ModuloAutenticacao;
 
 public class RepositorioTenant(AppDbContext contexto)
-    : RepositorioBaseORM<Tenant>(contexto), ITenantRepositorio
+    : RepositorioBaseORM<Tenant>(contexto), IRepositorioTenant
 {
     public override async Task<Tenant?> SelecionarRegistroPorIdAsync(Guid idRegistro)
     {

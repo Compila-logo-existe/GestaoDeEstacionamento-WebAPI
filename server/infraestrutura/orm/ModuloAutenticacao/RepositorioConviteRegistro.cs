@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.ModuloAutenticacao;
 
 public class RepositorioConviteRegistro(AppDbContext contexto)
-    : RepositorioBaseORM<ConviteRegistro>(contexto), IConviteRepositorio
+    : RepositorioBaseORM<ConviteRegistro>(contexto), IRepositorioConvite
 {
     public override async Task<ConviteRegistro?> SelecionarRegistroPorIdAsync(Guid idRegistro)
     {

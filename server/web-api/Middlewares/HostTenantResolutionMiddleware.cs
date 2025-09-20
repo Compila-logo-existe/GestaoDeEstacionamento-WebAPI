@@ -11,7 +11,7 @@ public sealed class HostTenantResolutionMiddleware
     }
 
     // ITenantRepositorio e IConfiguration são resolvidos POR REQUEST (scoped/any)
-    public async Task Invoke(HttpContext ctx, ITenantRepositorio repo, IConfiguration cfg)
+    public async Task Invoke(HttpContext ctx, IRepositorioTenant repo, IConfiguration cfg)
     {
         // Se já resolvido (ou autenticado com claim), segue
         if (ctx.Items.ContainsKey("ResolvedTenantId") ||
