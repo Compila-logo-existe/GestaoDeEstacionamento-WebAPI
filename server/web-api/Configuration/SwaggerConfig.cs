@@ -1,6 +1,6 @@
 using Microsoft.OpenApi.Models;
 
-namespace GestaoDeEstacionamento.WebAPI.Swagger;
+namespace GestaoDeEstacionamento.WebAPI.Configuration;
 
 public static class SwaggerConfig
 {
@@ -46,9 +46,11 @@ public static class SwaggerConfig
                             Id = "Bearer"
                         }
                     },
-                    []
+                    Array.Empty<string>()
                 }
             });
+
+            options.OperationFilter<TenantHeaderOperationFilter>();
         });
     }
 }
