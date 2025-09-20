@@ -2,5 +2,8 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 
 public interface ITokenProvider
 {
-    AccessToken GerarAccessToken(Usuario usuario);
+    Task<AccessToken> GerarAccessToken(
+        Usuario usuario,
+        Guid tenantId
+    );
 }
