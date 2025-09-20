@@ -30,9 +30,13 @@ public class OcuparVagaCommandHandler(
     public async Task<Result<OcuparVagaResult>> Handle(
         OcuparVagaCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
@@ -53,7 +57,7 @@ public class OcuparVagaCommandHandler(
             }
             else if (!string.IsNullOrWhiteSpace(command.EstacionamentoNome))
             {
-                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(command.EstacionamentoNome, usuarioId, cancellationToken);
+                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(command.EstacionamentoNome, tenantId, cancellationToken);
                 if (estacionamentoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Estacionamento não encontrado. Nome: {command.EstacionamentoNome}"));
             }
@@ -76,7 +80,7 @@ public class OcuparVagaCommandHandler(
                     zona = zonaConvertida;
                 }
 
-                vagaSelecionada = await repositorioVaga.SelecionarRegistroPorDadosAsync(command.VagaNumero.Value, zona, estacionamentoSelecionado.Id, usuarioId, cancellationToken);
+                vagaSelecionada = await repositorioVaga.SelecionarRegistroPorDadosAsync(command.VagaNumero.Value, zona, estacionamentoSelecionado.Id, tenantId, cancellationToken);
                 if (vagaSelecionada is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Vaga não encontrada. Dados: {command.VagaZona}-{command.VagaNumero}"));
             }
@@ -95,7 +99,7 @@ public class OcuparVagaCommandHandler(
                     Placa = Padronizador.PadronizarPlaca(command.Placa)
                 };
 
-                veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
+                veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, tenantId, cancellationToken);
                 if (veiculoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Veículo não encontrado. Placa: {command.Placa}"));
             }
@@ -104,7 +108,7 @@ public class OcuparVagaCommandHandler(
                 return Result.Fail(ResultadosErro.ConflitoErro("A vaga escolhida não pertence a este estacionaento."));
 
             bool possuiEntradaEmAberto = await repositorioRegistroEntrada
-                .ExisteAberturaPorPlacaAsync(veiculoSelecionado.Placa, usuarioId, cancellationToken);
+                .ExisteAberturaPorPlacaAsync(veiculoSelecionado.Placa, tenantId, cancellationToken);
             if (!possuiEntradaEmAberto)
                 return Result.Fail(ResultadosErro.ConflitoErro("Não existe check-in/ticket aberto para este veículo."));
 
@@ -112,17 +116,17 @@ public class OcuparVagaCommandHandler(
                 return Result.Fail(ResultadosErro.ConflitoErro("A vaga já está ocupada."));
 
             vagaSelecionada.Ocupar(veiculoSelecionado);
-            vagaSelecionada.AderirUsuario(usuarioId.Value);
+            vagaSelecionada.VincularTenant(tenantId.Value);
 
             await unitOfWork.CommitAsync();
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Id}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Id}:z=all", cancellationToken);
             if (!string.IsNullOrWhiteSpace(command.VagaZona))
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Id}:z={command.VagaZona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Id}:z={command.VagaZona}", cancellationToken);
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Nome}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Nome}:z=all", cancellationToken);
             if (!string.IsNullOrWhiteSpace(command.VagaZona))
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Nome}:z={command.VagaZona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Nome}:z={command.VagaZona}", cancellationToken);
 
             OcuparVagaResult result = mapper.Map<(Estacionamento, Vaga), OcuparVagaResult>(
                 (estacionamentoSelecionado, vagaSelecionada));

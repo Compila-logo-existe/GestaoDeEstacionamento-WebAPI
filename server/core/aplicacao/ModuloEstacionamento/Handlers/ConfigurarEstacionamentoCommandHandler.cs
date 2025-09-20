@@ -28,9 +28,13 @@ public class ConfigurarEstacionamentoCommandHandler(
     public async Task<Result<ConfigurarEstacionamentoResult>> Handle(
         ConfigurarEstacionamentoCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
@@ -57,7 +61,7 @@ public class ConfigurarEstacionamentoCommandHandler(
         try
         {
             Estacionamento novoEstacionamento = mapper.Map<Estacionamento>(command);
-            novoEstacionamento.AderirUsuario(usuarioId.Value);
+            novoEstacionamento.VincularTenant(tenantId.Value);
 
             await repositorioEstacionamento.CadastrarRegistroAsync(novoEstacionamento);
 
@@ -65,40 +69,39 @@ public class ConfigurarEstacionamentoCommandHandler(
             {
                 Vaga vaga = new()
                 {
-                    Id = Guid.NewGuid(),
-                    UsuarioId = usuarioId.Value,
                     EstacionamentoId = novoEstacionamento.Id,
                     Zona = p.Zona,
                     Numero = p.Numero
                 };
+                vaga.VincularTenant(tenantId.Value);
 
                 await repositorioVaga.CadastrarRegistroAsync(vaga);
             }
 
             await unitOfWork.CommitAsync();
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e=all:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e=all:z=all", cancellationToken);
 
             foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
             {
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e=all:z={zona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e=all:z={zona}", cancellationToken);
             }
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Id}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={novoEstacionamento.Id}:z=all", cancellationToken);
             foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
             {
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Id}:z={zona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={novoEstacionamento.Id}:z={zona}", cancellationToken);
             }
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Nome}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={novoEstacionamento.Nome}:z=all", cancellationToken);
             foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
             {
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={novoEstacionamento.Nome}:z={zona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={novoEstacionamento.Nome}:z={zona}", cancellationToken);
             }
 
             foreach (ZonaEstacionamento zona in Enum.GetValues<ZonaEstacionamento>())
             {
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all,z={zona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all,z={zona}", cancellationToken);
             }
 
             ConfigurarEstacionamentoResult result = mapper.Map<ConfigurarEstacionamentoResult>(novoEstacionamento);

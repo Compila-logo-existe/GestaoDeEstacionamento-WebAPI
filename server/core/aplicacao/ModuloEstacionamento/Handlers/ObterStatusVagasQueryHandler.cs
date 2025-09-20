@@ -26,9 +26,13 @@ public class ObterStatusVagasQueryHandler(
     public async Task<Result<ObterStatusVagasResult>> Handle(
         ObterStatusVagasQuery query, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult resultValidation = await validator.ValidateAsync(query, cancellationToken);
 
@@ -55,7 +59,7 @@ public class ObterStatusVagasQueryHandler(
             cacheQueryEstacionamento = $"e=all";
 
         string cacheQueryZona = !string.IsNullOrWhiteSpace(query.Zona) ? $"z={query.Zona}" : "z=all";
-        string cacheKey = $"estacionamento:u={usuarioId}:{cacheQueryQuantidade}:{cacheQueryEstacionamento}:{cacheQueryZona}";
+        string cacheKey = $"estacionamento:t={tenantId}:{cacheQueryQuantidade}:{cacheQueryEstacionamento}:{cacheQueryZona}";
 
         string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
 
@@ -80,7 +84,7 @@ public class ObterStatusVagasQueryHandler(
             }
             else if (!string.IsNullOrWhiteSpace(query.EstacionamentoNome))
             {
-                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(query.EstacionamentoNome, usuarioId, cancellationToken);
+                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(query.EstacionamentoNome, tenantId, cancellationToken);
                 if (estacionamentoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Estacionamento não encontrado. Nome: {query.EstacionamentoNome}"));
             }

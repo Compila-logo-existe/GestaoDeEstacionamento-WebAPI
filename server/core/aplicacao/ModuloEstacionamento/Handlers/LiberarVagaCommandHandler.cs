@@ -29,9 +29,13 @@ public class LiberarVagaCommandHandler(
     public async Task<Result<LiberarVagaResult>> Handle(
         LiberarVagaCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
@@ -52,7 +56,7 @@ public class LiberarVagaCommandHandler(
             }
             else if (!string.IsNullOrWhiteSpace(command.EstacionamentoNome))
             {
-                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(command.EstacionamentoNome, usuarioId, cancellationToken);
+                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(command.EstacionamentoNome, tenantId, cancellationToken);
                 if (estacionamentoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Estacionamento não encontrado. Nome: {command.EstacionamentoNome}"));
             }
@@ -75,7 +79,7 @@ public class LiberarVagaCommandHandler(
                     zona = zonaConvertida;
                 }
 
-                vagaSelecionada = await repositorioVaga.SelecionarRegistroPorDadosAsync(command.VagaNumero.Value, zona, estacionamentoSelecionado.Id, usuarioId, cancellationToken);
+                vagaSelecionada = await repositorioVaga.SelecionarRegistroPorDadosAsync(command.VagaNumero.Value, zona, estacionamentoSelecionado.Id, tenantId, cancellationToken);
                 if (vagaSelecionada is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Vaga não encontrada. Dados: {command.VagaZona}-{command.VagaNumero}"));
             }
@@ -84,7 +88,7 @@ public class LiberarVagaCommandHandler(
             {
                 string placaPadronizada = Padronizador.PadronizarPlaca(command.Placa);
                 bool possuiEntradaEmAberto = await repositorioRegistroEntrada
-                    .ExisteAberturaPorPlacaAsync(placaPadronizada, usuarioId, cancellationToken);
+                    .ExisteAberturaPorPlacaAsync(placaPadronizada, tenantId, cancellationToken);
 
                 if (!possuiEntradaEmAberto)
                     return Result.Fail(ResultadosErro.ConflitoErro("Não existe check-in/ticket aberto para esta placa."));
@@ -94,17 +98,17 @@ public class LiberarVagaCommandHandler(
                 return Result.Fail(ResultadosErro.ConflitoErro("A vaga não está ocupada."));
 
             vagaSelecionada.Liberar();
-            vagaSelecionada.AderirUsuario(usuarioId.Value);
+            vagaSelecionada.VincularTenant(tenantId.Value);
 
             await unitOfWork.CommitAsync();
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Id}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Id}:z=all", cancellationToken);
             if (!string.IsNullOrWhiteSpace(command.VagaZona))
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Id}:z={command.VagaZona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Id}:z={command.VagaZona}", cancellationToken);
 
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Nome}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Nome}:z=all", cancellationToken);
             if (!string.IsNullOrWhiteSpace(command.VagaZona))
-                await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoSelecionado.Nome}:z={command.VagaZona}", cancellationToken);
+                await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoSelecionado.Nome}:z={command.VagaZona}", cancellationToken);
 
             LiberarVagaResult result = mapper.Map<(Estacionamento, Vaga), LiberarVagaResult>(
                 (estacionamentoSelecionado, vagaSelecionada));

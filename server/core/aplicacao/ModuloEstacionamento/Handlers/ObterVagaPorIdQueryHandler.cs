@@ -23,9 +23,13 @@ public class ObterVagaPorIdQueryHandler(
     public async Task<Result<ObterVagaPorIdResult>> Handle(
         ObterVagaPorIdQuery query, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         ValidationResult valid = await validator.ValidateAsync(query, cancellationToken);
 
@@ -47,7 +51,7 @@ public class ObterVagaPorIdQueryHandler(
             }
             else if (!string.IsNullOrWhiteSpace(query.EstacionamentoNome))
             {
-                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(query.EstacionamentoNome, usuarioId, cancellationToken);
+                estacionamentoSelecionado = await repositorioEstacionamento.SelecionarRegistroPorNome(query.EstacionamentoNome, tenantId, cancellationToken);
                 if (estacionamentoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Estacionamento não encontrado. Nome: {query.EstacionamentoNome}"));
             }
@@ -70,7 +74,7 @@ public class ObterVagaPorIdQueryHandler(
                     zona = zonaConvertida;
                 }
 
-                vagaSelecionada = await repositorioVaga.SelecionarRegistroPorDadosAsync(query.VagaNumero.Value, zona, estacionamentoSelecionado.Id, usuarioId, cancellationToken);
+                vagaSelecionada = await repositorioVaga.SelecionarRegistroPorDadosAsync(query.VagaNumero.Value, zona, estacionamentoSelecionado.Id, tenantId, cancellationToken);
                 if (vagaSelecionada is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Vaga não encontrada. Dados: {query.VagaZona}-{query.VagaNumero}"));
             }
