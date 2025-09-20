@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentResults;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using GestaoDeEstacionamento.WebAPI.Helpers;
 using GestaoDeEstacionamento.WebAPI.Models.ModuloAutenticacao;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,49 +15,33 @@ namespace GestaoDeEstacionamento.WebAPI.Controllers;
 public class AutenticacaoController(IMediator mediator, IMapper mapper) : Controller
 {
     [HttpPost("registrar")]
-    public async Task<ActionResult<AccessToken>> Registrar(RegistrarUsuarioRequest request)
+    [AllowAnonymous]
+    public async Task<ActionResult<AccessToken>> Registrar(
+        [FromBody] RegistrarUsuarioRequest request,
+        [FromServices] ITenantProvider tenantProvider)
     {
-        RegistrarUsuarioCommand command = mapper.Map<RegistrarUsuarioCommand>(request);
+        RegistrarUsuarioCommand command = mapper.Map<RegistrarUsuarioCommand>((request, tenantProvider));
 
         Result<AccessToken> result = await mediator.Send(command);
 
         if (result.IsFailed)
-        {
-            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
-            {
-                IEnumerable<string> errosDeValidacao = result.Errors
-                    .SelectMany(e => e.Reasons.OfType<IError>())
-                    .Select(e => e.Message);
-
-                return BadRequest(errosDeValidacao);
-            }
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+            return this.MapearFalha(result.ToResult());
 
         return Ok(result.Value);
     }
 
     [HttpPost("autenticar")]
-    public async Task<ActionResult<AccessToken>> Autenticar(AutenticarUsuarioRequest request)
+    [AllowAnonymous]
+    public async Task<ActionResult<AccessToken>> Autenticar(
+        [FromBody] AutenticarUsuarioRequest request,
+        [FromServices] ITenantProvider tenantProvider)
     {
-        AutenticarUsuarioCommand command = mapper.Map<AutenticarUsuarioCommand>(request);
+        AutenticarUsuarioCommand command = mapper.Map<AutenticarUsuarioCommand>((request, tenantProvider));
 
         Result<AccessToken> result = await mediator.Send(command);
 
         if (result.IsFailed)
-        {
-            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
-            {
-                IEnumerable<string> errosDeValidacao = result.Errors
-                    .SelectMany(e => e.Reasons.OfType<IError>())
-                    .Select(e => e.Message);
-
-                return BadRequest(errosDeValidacao);
-            }
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+            return this.MapearFalha(result.ToResult());
 
         return Ok(result.Value);
     }
@@ -68,7 +53,7 @@ public class AutenticacaoController(IMediator mediator, IMapper mapper) : Contro
         Result result = await mediator.Send(new SairCommand());
 
         if (result.IsFailed)
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return this.MapearFalha(result);
 
         return NoContent();
     }
