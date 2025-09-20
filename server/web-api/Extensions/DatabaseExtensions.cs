@@ -1,9 +1,9 @@
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 using Microsoft.EntityFrameworkCore;
 
-namespace GestaoDeEstacionamento.WebAPI.ORM;
+namespace GestaoDeEstacionamento.WebAPI.Extensions;
 
-public static class DatabaseOperations
+public static class DatabaseExtensions
 {
     public static void ApplyMigrations(this IHost app)
     {

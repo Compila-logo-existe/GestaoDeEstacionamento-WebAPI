@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GestaoDeEstacionamento.WebAPI.Helpers;
 
-public static class ControllerHelper
+public static class ControllerExtensions
 {
     public static ActionResult MapearFalha(this ControllerBase controller, Result result)
     {
