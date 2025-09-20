@@ -22,12 +22,16 @@ public class SelecionarRegistrosEntradaQueryHandler(
     public async Task<Result<SelecionarRegistrosEntradaResult>> Handle(
         SelecionarRegistrosEntradaQuery query, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         string cacheQuery = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
-        string cacheKey = $"recepcao:u={usuarioId}:{cacheQuery}";
+        string cacheKey = $"recepcao:t={tenantId}:{cacheQuery}";
 
         string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
 

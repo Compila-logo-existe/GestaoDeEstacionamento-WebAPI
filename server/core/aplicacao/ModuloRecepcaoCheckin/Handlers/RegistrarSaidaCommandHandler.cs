@@ -31,9 +31,13 @@ public class RegistrarSaidaCommandHandler(
     public async Task<Result<RegistrarSaidaResult>> Handle(
         RegistrarSaidaCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         command = command with
         {
@@ -53,26 +57,26 @@ public class RegistrarSaidaCommandHandler(
         {
             Hospede? hospedeSelecionado = (command.HospedeId.HasValue && command.HospedeId.Value != Guid.Empty)
                 ? await repositorioHospede.SelecionarRegistroPorIdAsync(command.HospedeId.Value)
-                : await repositorioHospede.SelecionarRegistroPorCPFAsync(command.CPF, usuarioId, cancellationToken);
+                : await repositorioHospede.SelecionarRegistroPorCPFAsync(command.CPF, tenantId, cancellationToken);
 
             if (hospedeSelecionado is null)
                 return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Hóspede não encontrado."));
 
             Veiculo? veiculoSelecionado = (command.VeiculoId.HasValue && command.VeiculoId.Value != Guid.Empty)
                 ? await repositorioVeiculo.SelecionarRegistroPorIdAsync(command.VeiculoId.Value)
-                : await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
+                : await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, tenantId, cancellationToken);
 
             if (veiculoSelecionado is null)
                 return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Veículo não encontrado."));
 
             hospedeSelecionado.AderirVeiculo(veiculoSelecionado);
 
-            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
+            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, tenantId, cancellationToken);
             if (!possuiEntradaEmAberto)
                 return Result.Fail(ResultadosErro.ConflitoErro("Não existe check-in/ticket em aberto para esta placa."));
 
-            RegistroEntrada? registroEntrada = await repositorioRegistroEntrada.SelecionarAberturaPorNumeroDoTicketAsync(command.NumeroSequencialDoTicket, usuarioId, cancellationToken)
-                                ?? await repositorioRegistroEntrada.SelecionarAberturaPorPlacaAsync(command.Placa!, usuarioId, cancellationToken);
+            RegistroEntrada? registroEntrada = await repositorioRegistroEntrada.SelecionarAberturaPorNumeroDoTicketAsync(command.NumeroSequencialDoTicket, tenantId, cancellationToken)
+                                ?? await repositorioRegistroEntrada.SelecionarAberturaPorPlacaAsync(command.Placa!, tenantId, cancellationToken);
 
             if (registroEntrada is null)
                 return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Registro de entrada não encontrado ou já encerrado."));
@@ -84,7 +88,7 @@ public class RegistrarSaidaCommandHandler(
             veiculoSelecionado.Vaga?.Liberar();
 
             RegistroSaida novoRegistroSaida = mapper.Map<RegistroSaida>(command);
-            novoRegistroSaida.AderirUsuario(usuarioId.Value);
+            novoRegistroSaida.VincularTenant(tenantId.Value);
             novoRegistroSaida.AderirHospede(hospedeSelecionado);
             novoRegistroSaida.AderirVeiculo(veiculoSelecionado);
             novoRegistroSaida.AderirTicket(registroEntrada.Ticket);
@@ -96,13 +100,13 @@ public class RegistrarSaidaCommandHandler(
 
             await unitOfWork.CommitAsync();
 
-            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all", cancellationToken);
-            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all:v={command.Placa}", cancellationToken);
-            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all:v={veiculoSelecionado.Id}", cancellationToken);
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoId}:z=all", cancellationToken);
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoId}:z={vagaZona}", cancellationToken);
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoNome}:z=all", cancellationToken);
-            await cache.RemoveAsync($"estacionamento:u={usuarioId}:q=all:e={estacionamentoNome}:z={vagaZona}", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:p={command.Placa}", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:v={veiculoSelecionado.Id}", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoId}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoId}:z={vagaZona}", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoNome}:z=all", cancellationToken);
+            await cache.RemoveAsync($"estacionamento:t={tenantId}:q=all:e={estacionamentoNome}:z={vagaZona}", cancellationToken);
 
             RegistrarSaidaResult result = mapper.Map<RegistrarSaidaResult>(novoRegistroSaida);
 

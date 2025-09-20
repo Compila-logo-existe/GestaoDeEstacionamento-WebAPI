@@ -26,9 +26,13 @@ public class SelecionarRegistrosDoVeiculoQueryHandler(
     public async Task<Result<SelecionarRegistrosDoVeiculoResult>> Handle(
         SelecionarRegistrosDoVeiculoQuery query, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         string cacheQueryQuantidade = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
 
@@ -47,7 +51,7 @@ public class SelecionarRegistrosDoVeiculoQueryHandler(
             cacheQueryVeiculo = "v=all";
         }
 
-        string cacheKey = $"recepcao:u={usuarioId}:{cacheQueryQuantidade}:{cacheQueryVeiculo}";
+        string cacheKey = $"recepcao:t={tenantId}:{cacheQueryQuantidade}:{cacheQueryVeiculo}";
 
         string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
 
@@ -85,7 +89,7 @@ public class SelecionarRegistrosDoVeiculoQueryHandler(
                     Placa = Padronizador.PadronizarPlaca(query.Placa)
                 };
 
-                veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(query.Placa, usuarioId, cancellationToken);
+                veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(query.Placa, tenantId, cancellationToken);
                 if (veiculoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Veículo não encontrado. Placa: {query.Placa}"));
             }

@@ -30,9 +30,13 @@ public class RegistrarEntradaCommandHandler(
     public async Task<Result<RegistrarEntradaResult>> Handle(
         RegistrarEntradaCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         Guid? usuarioId = tenantProvider.UsuarioId;
-        if (usuarioId is null || usuarioId == Guid.Empty)
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+        if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
         command = command with
         {
@@ -59,7 +63,7 @@ public class RegistrarEntradaCommandHandler(
             }
             else
             {
-                Hospede? hospedeExistente = await repositorioHospede.SelecionarRegistroPorCPFAsync(command.CPF, usuarioId, cancellationToken);
+                Hospede? hospedeExistente = await repositorioHospede.SelecionarRegistroPorCPFAsync(command.CPF, tenantId, cancellationToken);
 
                 if (hospedeExistente is not null)
                 {
@@ -72,39 +76,39 @@ public class RegistrarEntradaCommandHandler(
                 }
             }
 
-            Veiculo? novoVeiculo = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
+            Veiculo? novoVeiculo = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(command.Placa, tenantId, cancellationToken);
 
             if (novoVeiculo is null)
             {
                 novoVeiculo = mapper.Map<Veiculo>(command);
-                novoVeiculo.AderirUsuario(usuarioId.Value);
+                novoVeiculo.VincularTenant(tenantId.Value);
                 await repositorioVeiculo.CadastrarRegistroAsync(novoVeiculo);
             }
 
             novoHospede.AderirVeiculo(novoVeiculo);
 
-            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, usuarioId, cancellationToken);
+            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, tenantId, cancellationToken);
             if (possuiEntradaEmAberto)
                 return Result.Fail(ResultadosErro.ConflitoErro("Já existe check-in/ticket em aberto para esta placa."));
 
             RegistroEntrada novoRegistro = mapper.Map<RegistroEntrada>(command);
-            novoRegistro.AderirUsuario(usuarioId.Value);
+            novoRegistro.VincularTenant(tenantId.Value);
             novoRegistro.AderirHospede(novoHospede);
             novoRegistro.AderirVeiculo(novoVeiculo);
             novoRegistro.GerarNovoTicket();
             novoRegistro.GerarNovoFaturamento(command.ValorDiaria);
-            novoRegistro.AderirUsuarioAoTicket(usuarioId.Value);
+            novoRegistro.VincularTenantAoTicket(tenantId.Value);
 
             await repositorioRegistroEntrada.CadastrarRegistroAsync(novoRegistro);
 
-            novoHospede.AderirUsuario(usuarioId.Value);
-            novoVeiculo.AderirUsuario(usuarioId.Value);
+            novoHospede.VincularTenant(tenantId.Value);
+            novoVeiculo.VincularTenant(tenantId.Value);
 
             await unitOfWork.CommitAsync();
 
-            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all", cancellationToken);
-            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all:v={command.Placa}", cancellationToken);
-            await cache.RemoveAsync($"recepcao:u={usuarioId}:q=all:v={novoVeiculo.Id}", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:p={command.Placa}", cancellationToken);
+            await cache.RemoveAsync($"recepcao:t={tenantId}:q=all:v={novoVeiculo.Id}", cancellationToken);
 
             RegistrarEntradaResult result = mapper.Map<RegistrarEntradaResult>(novoRegistro);
 

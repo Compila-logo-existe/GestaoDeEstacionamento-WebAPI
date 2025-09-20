@@ -24,9 +24,13 @@ public class ObterDetalhesVeiculoQueryHandler(
     {
         try
         {
+            Guid? tenantId = tenantProvider.TenantId;
+            if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
             Guid? usuarioId = tenantProvider.UsuarioId;
-            if (usuarioId is null || usuarioId == Guid.Empty)
-                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário não identificado no tenant."));
+            if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
             ValidationResult resultValidation = await validator.ValidateAsync(query, cancellationToken);
 
@@ -51,7 +55,7 @@ public class ObterDetalhesVeiculoQueryHandler(
                     Placa = Padronizador.PadronizarPlaca(query.Placa)
                 };
 
-                veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(query.Placa, usuarioId, cancellationToken);
+                veiculoSelecionado = await repositorioVeiculo.SelecionarRegistroPorPlacaAsync(query.Placa, tenantId, cancellationToken);
                 if (veiculoSelecionado is null)
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Veículo não encontrado. Placa: {query.Placa}"));
             }
