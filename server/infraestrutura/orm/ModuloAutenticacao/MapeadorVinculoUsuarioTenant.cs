@@ -8,22 +8,26 @@ public class MapeadorVinculoUsuarioTenant : IEntityTypeConfiguration<VinculoUsua
 {
     public void Configure(EntityTypeBuilder<VinculoUsuarioTenant> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.HasKey(v => v.Id);
 
-        builder.Property(x => x.UsuarioId)
+        builder.Property(v => v.Id)
+            .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(x => x.TenantId)
+        builder.Property(v => v.TenantId)
             .IsRequired();
 
-        builder.Property(x => x.Slug)
+        builder.Property(v => v.UsuarioVinculadoId)
             .IsRequired();
 
-        builder.Property(x => x.NomeCargo)
+        builder.Property(v => v.Slug)
+            .IsRequired();
+
+        builder.Property(v => v.NomeCargo)
             .HasMaxLength(64)
             .IsRequired();
 
-        builder.HasIndex(x => new { x.UsuarioId, x.TenantId })
+        builder.HasIndex(v => new { v.UsuarioVinculadoId, v.TenantId })
             .IsUnique();
     }
 }

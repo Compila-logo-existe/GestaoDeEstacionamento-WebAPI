@@ -18,8 +18,6 @@ public class Faturamento : EntidadeBase<Faturamento>
     [ExcludeFromCodeCoverage]
     public Faturamento() { }
 
-    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
-
     public void DefinirValorDiaria(decimal valor)
     {
         ValorDaDiaria = valor;

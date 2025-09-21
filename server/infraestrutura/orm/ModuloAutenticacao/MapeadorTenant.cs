@@ -8,33 +8,39 @@ public class MapeadorTenant : IEntityTypeConfiguration<Tenant>
 {
     public void Configure(EntityTypeBuilder<Tenant> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.HasKey(t => t.Id);
 
-        builder.Property(x => x.UsuarioId)
+        builder.Property(t => t.Id)
+            .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(x => x.Nome)
+        builder.Property(t => t.UsuarioCriadorId)
+            .IsRequired();
+
+        builder.Ignore(x => x.TenantId);
+
+        builder.Property(t => t.Nome)
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.Property(x => x.CNPJ)
+        builder.Property(t => t.CNPJ)
             .HasMaxLength(32);
 
-        builder.Property(x => x.CriadoEmUtc)
+        builder.Property(t => t.CriadoEmUtc)
             .IsRequired();
 
-        builder.Property(x => x.Ativo)
+        builder.Property(t => t.Ativo)
             .IsRequired();
 
-        builder.Property(x => x.SlugSubdominio).IsRequired().HasMaxLength(63);
-        builder.Property(x => x.DominioPersonalizado).HasMaxLength(253);
+        builder.Property(t => t.SlugSubdominio).IsRequired().HasMaxLength(63);
+        builder.Property(t => t.DominioPersonalizado).HasMaxLength(253);
 
-        builder.HasIndex(x => x.SlugSubdominio)
+        builder.HasIndex(t => t.SlugSubdominio)
             .IsUnique();
 
-        builder.HasIndex(x => x.DominioPersonalizado)
+        builder.HasIndex(t => t.DominioPersonalizado)
             .IsUnique();
 
-        builder.HasIndex(x => x.Nome);
+        builder.HasIndex(t => t.Nome);
     }
 }

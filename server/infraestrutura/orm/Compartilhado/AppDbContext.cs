@@ -32,28 +32,28 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
         if (tenantProvider is not null)
         {
             modelBuilder.Entity<Hospede>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Veiculo>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<RegistroEntrada>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Ticket>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Estacionamento>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Vaga>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<RegistroSaida>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
             modelBuilder.Entity<Faturamento>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.TenantId));
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
         }
 
         Assembly assembly = typeof(AppDbContext).Assembly;

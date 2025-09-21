@@ -15,7 +15,7 @@ public class RefreshToken : EntidadeBase<RefreshToken>
 
     public bool EstaAtivo => RevogadoEmUtc is null && DateTime.UtcNow <= ExpiraEmUtc;
 
-    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
+    public void VincularTenant(Guid tenantId) => TenantId = tenantId;
 
     public override void AtualizarRegistro(RefreshToken registroEditado)
     {

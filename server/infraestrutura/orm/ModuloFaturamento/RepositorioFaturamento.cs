@@ -8,10 +8,10 @@ public class RepositorioFaturamento(AppDbContext contexto)
     : RepositorioBaseORM<Faturamento>(contexto), IRepositorioFaturamento
 {
     public async Task<List<Faturamento>> SelecionarPorPeriodoAsync(
-        DateTime dataInicialEmUtc, DateTime dataFinalEmUtc, Guid? usuarioId, CancellationToken ct = default)
+        DateTime dataInicialEmUtc, DateTime dataFinalEmUtc, Guid? tenantId, CancellationToken ct = default)
     {
         return await registros
-            .Where(f => f.UsuarioId.Equals(usuarioId)
+            .Where(f => f.TenantId.Equals(tenantId)
                      && f.DataEntradaEmUtc >= dataInicialEmUtc
                      && f.DataEntradaEmUtc <= dataFinalEmUtc)
             .Include(f => f.RegistroEntrada)

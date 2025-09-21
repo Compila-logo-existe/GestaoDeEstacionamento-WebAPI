@@ -16,8 +16,6 @@ public class Ticket : EntidadeBase<Ticket>
         RegistroEntrada = registroEntrada;
     }
 
-    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
-
     public void AderirRegistroSaida(RegistroSaida registroSaida) => RegistroSaida = registroSaida;
 
     public DateTime ObterDataEntrada() => RegistroEntrada.DataEntradaEmUtc;

@@ -4,6 +4,7 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 
 public class Tenant : EntidadeBase<Tenant>
 {
+    public Guid UsuarioCriadorId { get; set; }
     public string Nome { get; set; }
     public string? CNPJ { get; set; }
     public string SlugSubdominio { get; private set; } = null!;
@@ -15,7 +16,7 @@ public class Tenant : EntidadeBase<Tenant>
     public Tenant(Guid usuarioCriadorId, string nome, string? cNPJ,
         string slugSubdominio, string? dominioPersonalizado, DateTime criadoEmUtc) : this()
     {
-        UsuarioId = usuarioCriadorId;
+        UsuarioCriadorId = usuarioCriadorId;
         Nome = nome;
         CNPJ = cNPJ;
         SlugSubdominio = slugSubdominio;

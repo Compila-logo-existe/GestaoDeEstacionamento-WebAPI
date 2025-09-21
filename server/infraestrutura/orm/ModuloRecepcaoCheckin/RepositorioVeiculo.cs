@@ -15,9 +15,9 @@ public class RepositorioVeiculo(AppDbContext contexto)
             .ThenInclude(v => v.Estacionamento)
             .FirstOrDefaultAsync();
     }
-    public async Task<Veiculo?> SelecionarRegistroPorPlacaAsync(string placa, Guid? usuarioId, CancellationToken ct = default)
+    public async Task<Veiculo?> SelecionarRegistroPorPlacaAsync(string placa, Guid? tenantId, CancellationToken ct = default)
     {
-        return await registros.Where(v => v.Placa.Equals(placa) && v.UsuarioId.Equals(usuarioId))
+        return await registros.Where(v => v.Placa.Equals(placa) && v.TenantId.Equals(tenantId))
             .Include(v => v.Hospede)
             .Include(v => v.RegistrosEntrada)
             .Include(v => v.Vaga)

@@ -56,8 +56,8 @@ public class ObterValorAtualFaturamentoQueryHandler(
                 : await repositorioEstacionamento.SelecionarRegistroPorNome(
                     query.EstacionamentoNome!, tenantId, cancellationToken);
 
-            //if (!registroEntrada.Veiculo.Vaga.Estacionamento.Equals(estacionamento))
-            //    return Result.Fail(ResultadosErro.ConflitoErro("A vaga selecionada não pertence ao estacionamento escolhido."));
+            if (!registroEntrada.Veiculo.Vaga.Estacionamento.Equals(estacionamento))
+                return Result.Fail(ResultadosErro.ConflitoErro("A vaga selecionada não pertence ao estacionamento escolhido."));
 
             registroEntrada.Faturamento.RecalcularTotais();
             int numeroDeDiarias = registroEntrada.Faturamento.NumeroDeDiarias;

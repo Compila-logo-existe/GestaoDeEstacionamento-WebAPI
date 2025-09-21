@@ -8,13 +8,16 @@ public class MapeadorFaturamento : IEntityTypeConfiguration<Faturamento>
 {
     public void Configure(EntityTypeBuilder<Faturamento> builder)
     {
-        builder.HasKey(h => h.Id);
+        builder.HasKey(f => f.Id);
 
         builder.Property(f => f.Id)
             .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(f => f.UsuarioId)
+        builder.Property(f => f.TenantId)
+            .IsRequired();
+
+        builder.Property(f => f.TenantId)
             .IsRequired();
 
         builder.Property(f => f.ValorDaDiaria)
@@ -45,6 +48,6 @@ public class MapeadorFaturamento : IEntityTypeConfiguration<Faturamento>
 
         builder.HasIndex(f => f.DataEntradaEmUtc);
 
-        builder.HasIndex(f => new { f.UsuarioId, f.RegistroSaidaId }).IsUnique();
+        builder.HasIndex(f => new { f.TenantId, f.RegistroSaidaId }).IsUnique();
     }
 }

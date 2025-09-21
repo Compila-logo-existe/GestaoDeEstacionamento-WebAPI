@@ -9,10 +9,13 @@ public class MapeadorRegistroSaida : IEntityTypeConfiguration<RegistroSaida>
 {
     public void Configure(EntityTypeBuilder<RegistroSaida> builder)
     {
-        builder.HasKey(h => h.Id);
+        builder.HasKey(r => r.Id);
 
         builder.Property(r => r.Id)
             .ValueGeneratedNever()
+            .IsRequired();
+
+        builder.Property(r => r.TenantId)
             .IsRequired();
 
         builder.Property(r => r.DataSaidaEmUtc)
@@ -45,6 +48,6 @@ public class MapeadorRegistroSaida : IEntityTypeConfiguration<RegistroSaida>
 
         builder.HasIndex(r => r.DataSaidaEmUtc);
 
-        builder.HasIndex(r => new { r.UsuarioId, r.TicketId }).IsUnique();
+        builder.HasIndex(r => new { r.TenantId, r.TicketId }).IsUnique();
     }
 }

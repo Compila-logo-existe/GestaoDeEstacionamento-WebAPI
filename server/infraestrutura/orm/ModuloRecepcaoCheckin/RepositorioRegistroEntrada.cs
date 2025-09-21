@@ -54,10 +54,10 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .ToListAsync(ct);
     }
 
-    public async Task<RegistroEntrada?> SelecionarAberturaPorNumeroDoTicketAsync(int numeroSequencial, Guid? usuarioId, CancellationToken ct = default)
+    public async Task<RegistroEntrada?> SelecionarAberturaPorNumeroDoTicketAsync(int numeroSequencial, Guid? tenantId, CancellationToken ct = default)
     {
         return await registros
-            .Where(r => r.UsuarioId.Equals(usuarioId) && r.Ticket.RegistroSaida == null && r.Ticket.NumeroSequencial.Equals(numeroSequencial))
+            .Where(r => r.TenantId.Equals(tenantId) && r.Ticket.RegistroSaida == null && r.Ticket.NumeroSequencial.Equals(numeroSequencial))
             .Include(r => r.Hospede)
             .Include(r => r.Veiculo)
             .ThenInclude(v => v.Vaga)
@@ -67,10 +67,10 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<RegistroEntrada?> SelecionarAberturaPorPlacaAsync(string placa, Guid? usuarioId, CancellationToken ct = default)
+    public async Task<RegistroEntrada?> SelecionarAberturaPorPlacaAsync(string placa, Guid? tenantId, CancellationToken ct = default)
     {
         return await registros
-            .Where(r => r.UsuarioId.Equals(usuarioId) && r.Ticket.RegistroSaida == null)
+            .Where(r => r.TenantId.Equals(tenantId) && r.Ticket.RegistroSaida == null)
             .Include(r => r.Hospede)
             .Include(r => r.Veiculo)
             .ThenInclude(v => v.Vaga)
@@ -80,18 +80,18 @@ public class RepositorioRegistroEntrada(AppDbContext contexto)
             .FirstOrDefaultAsync(r => r.Veiculo.Placa == placa, ct);
     }
 
-    public async Task<bool> ExisteAberturaPorPlacaAsync(string placa, Guid? usuarioId, CancellationToken ct = default)
+    public async Task<bool> ExisteAberturaPorPlacaAsync(string placa, Guid? tenantId, CancellationToken ct = default)
     {
         return await registros
-            .Where(r => r.UsuarioId.Equals(usuarioId) && r.Ticket.RegistroSaida == null)
+            .Where(r => r.TenantId.Equals(tenantId) && r.Ticket.RegistroSaida == null)
             .Include(r => r.Veiculo)
             .AnyAsync(r => r.Veiculo.Placa.Equals(placa), ct);
     }
 
-    public async Task<bool> ExisteAberturaPorNumeroDoTicketAsync(int numeroSequencial, Guid? usuarioId, CancellationToken ct = default)
+    public async Task<bool> ExisteAberturaPorNumeroDoTicketAsync(int numeroSequencial, Guid? tenantId, CancellationToken ct = default)
     {
         return await registros
-            .Where(r => r.UsuarioId.Equals(usuarioId) && r.Ticket.RegistroSaida == null)
+            .Where(r => r.TenantId.Equals(tenantId) && r.Ticket.RegistroSaida == null)
             .Include(r => r.Ticket)
             .AnyAsync(r => r.Ticket.NumeroSequencial.Equals(numeroSequencial), ct);
     }

@@ -33,13 +33,12 @@ public class CriarConviteCommandHandler(
 
             ConviteRegistro convite = new()
             {
-                UsuarioId = usuarioId.Value,
-                TenantId = command.TenantId,
                 EmailConvidado = command.EmailConvidado,
                 NomeCargo = command.NomeCargo,
                 TokenConvite = tokenConvite,
                 DataExpiracaoUtc = expira
             };
+            convite.VincularTenant(tenantId);
 
             await repositorioConvite.CriarAsync(convite, ct);
 

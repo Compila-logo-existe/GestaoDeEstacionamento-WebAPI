@@ -13,18 +13,18 @@ public class RepositorioTenant(AppDbContext contexto)
             .FirstOrDefaultAsync();
     }
 
-    public async Task CriarAsync(Tenant tenant, CancellationToken ct)
+    public async Task CriarAsync(Tenant tenant, CancellationToken ct = default)
     {
         await registros.AddAsync(tenant, ct);
     }
 
-    public async Task<Tenant?> ObterPorIdAsync(Guid tenantId, CancellationToken ct)
+    public async Task<Tenant?> ObterPorIdAsync(Guid tenantId, CancellationToken ct = default)
     {
         return await registros.AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id.Equals(tenantId), ct);
     }
 
-    public async Task<Guid?> ObterTenantIdPorSubdominioAsync(string slug, CancellationToken ct)
+    public async Task<Guid?> ObterTenantIdPorSubdominioAsync(string slug, CancellationToken ct = default)
     {
         return await registros.AsNoTracking()
              .Where(t => t.SlugSubdominio == slug)
@@ -32,7 +32,7 @@ public class RepositorioTenant(AppDbContext contexto)
              .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<Guid?> ObterTenantIdPorDominioAsync(string host, CancellationToken ct)
+    public async Task<Guid?> ObterTenantIdPorDominioAsync(string host, CancellationToken ct = default)
     {
         return await registros.AsNoTracking()
               .Where(t => t.DominioPersonalizado == host)

@@ -8,27 +8,31 @@ public sealed class MapeadorRefreshToken : IEntityTypeConfiguration<RefreshToken
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.HasKey(r => r.Id);
 
-        builder.Property(x => x.UsuarioId)
+        builder.Property(r => r.Id)
+            .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(x => x.UsuarioAutenticadoId)
+        builder.Property(r => r.TenantId)
             .IsRequired();
 
-        builder.Property(x => x.HashDoToken)
+        builder.Property(r => r.UsuarioAutenticadoId)
+            .IsRequired();
+
+        builder.Property(r => r.HashDoToken)
             .HasMaxLength(128)
             .IsRequired();
 
-        builder.HasIndex(x => x.HashDoToken)
+        builder.HasIndex(r => r.HashDoToken)
             .IsUnique();
 
-        builder.Property(x => x.CriadoEmUtc)
+        builder.Property(r => r.CriadoEmUtc)
             .IsRequired();
 
-        builder.Property(x => x.ExpiraEmUtc)
+        builder.Property(r => r.ExpiraEmUtc)
             .IsRequired();
 
-        builder.HasIndex(x => new { x.UsuarioAutenticadoId, x.UsuarioId });
+        builder.HasIndex(r => new { r.UsuarioAutenticadoId, r.TenantId });
     }
 }

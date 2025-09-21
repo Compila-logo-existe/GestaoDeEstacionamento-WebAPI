@@ -8,32 +8,36 @@ public class MapeadorConviteRegistro : IEntityTypeConfiguration<ConviteRegistro>
 {
     public void Configure(EntityTypeBuilder<ConviteRegistro> b)
     {
-        b.HasKey(x => x.Id);
+        b.HasKey(c => c.Id);
 
-        b.Property(x => x.UsuarioId)
+        b.Property(c => c.Id)
+            .ValueGeneratedNever()
             .IsRequired();
 
-        b.Property(x => x.TenantId)
+        b.Property(x => x.UsuarioEmissorId)
             .IsRequired();
 
-        b.Property(x => x.EmailConvidado)
+        b.Property(c => c.TenantId)
+            .IsRequired();
+
+        b.Property(c => c.EmailConvidado)
             .HasMaxLength(256)
             .IsRequired();
 
-        b.Property(x => x.NomeCargo)
+        b.Property(c => c.NomeCargo)
             .HasMaxLength(64)
             .IsRequired();
 
-        b.Property(x => x.TokenConvite)
+        b.Property(c => c.TokenConvite)
             .HasMaxLength(128)
             .IsRequired();
 
-        b.Property(x => x.DataExpiracaoUtc)
+        b.Property(c => c.DataExpiracaoUtc)
             .IsRequired();
 
-        b.HasIndex(x => x.TokenConvite)
+        b.HasIndex(c => c.TokenConvite)
             .IsUnique();
 
-        b.HasIndex(x => new { x.EmailConvidado, x.TenantId });
+        b.HasIndex(c => new { c.EmailConvidado, c.TenantId });
     }
 }

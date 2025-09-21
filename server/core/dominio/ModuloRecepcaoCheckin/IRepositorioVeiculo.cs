@@ -4,5 +4,5 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
 public interface IRepositorioVeiculo : IRepositorio<Veiculo>
 {
-    public Task<Veiculo?> SelecionarRegistroPorPlacaAsync(string placa, Guid? usuarioId, CancellationToken ct = default);
+    public Task<Veiculo?> SelecionarRegistroPorPlacaAsync(string placa, Guid? tenantId, CancellationToken ct = default);
 }

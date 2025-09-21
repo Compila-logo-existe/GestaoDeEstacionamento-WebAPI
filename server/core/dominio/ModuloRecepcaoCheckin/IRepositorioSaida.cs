@@ -4,5 +4,5 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
 public interface IRepositorioRegistroSaida : IRepositorio<RegistroSaida>
 {
-    Task<RegistroSaida?> SelecionarPorTicketNumeroAsync(int numeroSequencial, Guid? usuarioId, CancellationToken ct = default);
+    public Task<RegistroSaida?> SelecionarPorTicketNumeroAsync(int numeroSequencial, Guid? tenantId, CancellationToken ct = default);
 }

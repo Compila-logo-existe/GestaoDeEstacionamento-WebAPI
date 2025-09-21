@@ -28,12 +28,12 @@ public class RepositorioVaga(AppDbContext contexto)
             .FirstOrDefaultAsync(v => v.VeiculoId.Equals(veiculoId), ct);
     }
 
-    public async Task<Vaga?> SelecionarRegistroPorDadosAsync(int vagaNumero, ZonaEstacionamento? zona, Guid id, Guid? usuarioId, CancellationToken ct = default)
+    public async Task<Vaga?> SelecionarRegistroPorDadosAsync(int vagaNumero, ZonaEstacionamento? zona, Guid estacionamentoId, Guid? usuarioId, CancellationToken ct = default)
     {
         return await registros
             .Include(v => v.Estacionamento)
             .Include(v => v.Veiculo)
-            .FirstOrDefaultAsync(v => v.EstacionamentoId.Equals(id) && v.Numero.Equals(vagaNumero) && v.Zona == zona, ct);
+            .FirstOrDefaultAsync(v => v.EstacionamentoId.Equals(estacionamentoId) && v.Numero.Equals(vagaNumero) && v.Zona == zona, ct);
     }
 
     public async Task<List<Vaga>> SelecionarRegistrosDoEstacionamentoAsync(Guid estacionamentoId, ZonaEstacionamento? zona, CancellationToken ct = default)

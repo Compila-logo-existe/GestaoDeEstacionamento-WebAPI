@@ -14,9 +14,9 @@ public class RepositorioEstacionamento(AppDbContext contexto)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<Estacionamento?> SelecionarRegistroPorNome(string estacionamentoNome, Guid? usuarioId, CancellationToken ct)
+    public async Task<Estacionamento?> SelecionarRegistroPorNome(string estacionamentoNome, Guid? tenantId, CancellationToken ct = default)
     {
-        return await registros.Where(e => e.Nome.Equals(estacionamentoNome) && e.UsuarioId.Equals(usuarioId))
+        return await registros.Where(e => e.Nome.Equals(estacionamentoNome) && e.TenantId.Equals(tenantId))
             .Include(e => e.Vagas)
             .FirstOrDefaultAsync(ct);
     }

@@ -11,9 +11,13 @@ public class MapeadorEstacionamento : IEntityTypeConfiguration<Estacionamento>
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.Id)
-            .ValueGeneratedNever();
+            .ValueGeneratedNever()
+            .IsRequired();
 
-        builder.Property(h => h.Nome)
+        builder.Property(e => e.TenantId)
+            .IsRequired();
+
+        builder.Property(e => e.Nome)
             .IsRequired();
 
         builder.HasMany(e => e.Vagas)
@@ -21,7 +25,7 @@ public class MapeadorEstacionamento : IEntityTypeConfiguration<Estacionamento>
             .HasForeignKey(v => v.EstacionamentoId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(e => new { e.UsuarioId, e.Nome })
+        builder.HasIndex(e => new { e.TenantId, e.Nome })
             .IsUnique();
     }
 }

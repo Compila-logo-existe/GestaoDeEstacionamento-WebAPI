@@ -14,8 +14,6 @@ public class Estacionamento : EntidadeBase<Estacionamento>
         Vagas = new(quantidadeVagas);
     }
 
-    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
-
     public (IReadOnlyList<Vaga> Vagas, IReadOnlyList<(ZonaEstacionamento Zona, int Quantidade)> Resumo)
     GerarVagas(int quantidadeVagas, int zonasTotais, int vagasPorZona)
     {
@@ -39,7 +37,7 @@ public class Estacionamento : EntidadeBase<Estacionamento>
                 lista.Add(new Vaga
                 {
                     Id = Guid.NewGuid(),
-                    UsuarioId = UsuarioId,
+                    TenantId = TenantId,
                     EstacionamentoId = Id,
                     Zona = zona,
                     Numero = n

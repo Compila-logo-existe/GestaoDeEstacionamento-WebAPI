@@ -9,10 +9,13 @@ public class MapeadorVeiculo : IEntityTypeConfiguration<Veiculo>
 {
     public void Configure(EntityTypeBuilder<Veiculo> builder)
     {
-        builder.HasKey(h => h.Id);
+        builder.HasKey(v => v.Id);
 
         builder.Property(v => v.Id)
             .ValueGeneratedNever()
+            .IsRequired();
+
+        builder.Property(v => v.TenantId)
             .IsRequired();
 
         builder.Property(v => v.Placa)
@@ -38,7 +41,7 @@ public class MapeadorVeiculo : IEntityTypeConfiguration<Veiculo>
             .HasColumnType("text")
             .HasDefaultValueSql("'[]'");
 
-        builder.HasIndex(v => new { v.UsuarioId, v.Placa })
+        builder.HasIndex(v => new { v.TenantId, v.Placa })
             .IsUnique();
     }
 }

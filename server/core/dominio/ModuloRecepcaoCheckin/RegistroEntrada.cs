@@ -31,8 +31,6 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
         }
     }
 
-    public void VincularTenant(Guid tenantId) => UsuarioId = tenantId;
-
     public void VincularTenantAoTicket(Guid tenantId) => Ticket.VincularTenant(tenantId);
 
     public void AderirHospede(Hospede hospede) => Hospede = hospede;
@@ -46,7 +44,7 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
     public void GerarNovoFaturamento(decimal valorDaDiaria)
     {
         Faturamento = new Faturamento();
-        Faturamento.VincularTenant(UsuarioId);
+        Faturamento.VincularTenant(TenantId);
         Faturamento.AderirRegistroEntrada(this);
         Faturamento.DefinirValorDiaria(valorDaDiaria);
     }

@@ -4,14 +4,14 @@ namespace GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 
 public class VinculoUsuarioTenant : EntidadeBase<VinculoUsuarioTenant>
 {
-    public Guid TenantId { get; set; }
-    public string NomeCargo { get; set; } = null!;
-    public string Slug { get; set; } = null!;
+    public Guid UsuarioVinculadoId { get; set; }
+    public string NomeCargo { get; set; } = default!;
+    public string Slug { get; set; } = default!;
 
     public VinculoUsuarioTenant() { }
     public VinculoUsuarioTenant(Guid usuarioVinculadoId, Guid tenantId, string nomeCargo, string slug) : this()
     {
-        UsuarioId = usuarioVinculadoId;
+        UsuarioVinculadoId = usuarioVinculadoId;
         TenantId = tenantId;
         NomeCargo = nomeCargo;
         Slug = slug;

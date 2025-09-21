@@ -11,7 +11,11 @@ public class MapeadorHospede : IEntityTypeConfiguration<Hospede>
         builder.HasKey(h => h.Id);
 
         builder.Property(h => h.Id)
-            .ValueGeneratedNever();
+            .ValueGeneratedNever()
+            .IsRequired();
+
+        builder.Property(h => h.TenantId)
+            .IsRequired();
 
         builder.Property(h => h.NomeCompleto)
             .IsRequired();
@@ -39,7 +43,7 @@ public class MapeadorHospede : IEntityTypeConfiguration<Hospede>
                .HasForeignKey(r => r.HospedeId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(h => new { h.UsuarioId, h.CPF })
+        builder.HasIndex(h => new { h.TenantId, h.CPF })
             .IsUnique();
     }
 }

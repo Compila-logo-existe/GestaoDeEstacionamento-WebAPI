@@ -8,10 +8,13 @@ public class MapeadorTicket : IEntityTypeConfiguration<Ticket>
 {
     public void Configure(EntityTypeBuilder<Ticket> builder)
     {
-        builder.HasKey(h => h.Id);
+        builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Id)
             .ValueGeneratedNever()
+            .IsRequired();
+
+        builder.Property(t => t.TenantId)
             .IsRequired();
 
         builder.Property(t => t.EmissaoEmUtc)

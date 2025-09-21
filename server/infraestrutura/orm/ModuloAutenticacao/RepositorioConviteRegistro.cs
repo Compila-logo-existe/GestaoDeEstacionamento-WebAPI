@@ -14,12 +14,12 @@ public class RepositorioConviteRegistro(AppDbContext contexto)
             .FirstOrDefaultAsync();
     }
 
-    public async Task CriarAsync(ConviteRegistro convite, CancellationToken cancellationToken)
+    public async Task CriarAsync(ConviteRegistro convite, CancellationToken ct = default)
     {
-        await registros.AddAsync(convite, cancellationToken);
+        await registros.AddAsync(convite, ct);
     }
 
-    public async Task<ConviteRegistro?> ObterAtivoPorTokenAsync(string tokenConvite, CancellationToken cancellationToken)
+    public async Task<ConviteRegistro?> ObterAtivoPorTokenAsync(string tokenConvite, CancellationToken ct = default)
     {
         DateTime agoraUtc = DateTime.UtcNow;
 
@@ -29,14 +29,14 @@ public class RepositorioConviteRegistro(AppDbContext contexto)
                 c.TokenConvite == tokenConvite &&
                 c.UtilizadoEmUtc == null &&
                 c.DataExpiracaoUtc >= agoraUtc,
-                cancellationToken
+                ct
             );
     }
 
-    public async Task MarcarComoUtilizadoAsync(Guid conviteId, CancellationToken cancellationToken)
+    public async Task MarcarComoUtilizadoAsync(Guid conviteId, CancellationToken ct = default)
     {
         ConviteRegistro? convite = await registros
-            .FirstOrDefaultAsync(c => c.Id.Equals(conviteId), cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id.Equals(conviteId), ct);
 
         if (convite is null)
             return;

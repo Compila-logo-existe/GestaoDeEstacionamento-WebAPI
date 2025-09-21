@@ -14,21 +14,21 @@ public class RepositorioUsuarioTenant(AppDbContext contexto)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<bool> UsuarioPertenceAoTenantAsync(Guid usuarioId, Guid tenantId, CancellationToken cancellationToken)
+    public async Task<bool> UsuarioPertenceAoTenantAsync(Guid usuarioId, Guid tenantId, CancellationToken ct = default)
     {
         return await registros
             .AsNoTracking()
-            .AnyAsync(v => v.UsuarioId.Equals(usuarioId) && v.TenantId.Equals(tenantId), cancellationToken);
+            .AnyAsync(v => v.UsuarioVinculadoId.Equals(usuarioId) && v.TenantId.Equals(tenantId), ct);
     }
 
-    public async Task<bool> UsuarioPertenceAoTenantAsync(Guid usuarioId, string slug, CancellationToken cancellationToken)
+    public async Task<bool> UsuarioPertenceAoTenantAsync(Guid usuarioId, string slug, CancellationToken ct = default)
     {
         return await registros
             .AsNoTracking()
-            .AnyAsync(v => v.UsuarioId.Equals(usuarioId) && v.Slug.Equals(slug), cancellationToken);
+            .AnyAsync(v => v.UsuarioVinculadoId.Equals(usuarioId) && v.Slug.Equals(slug), ct);
     }
 
-    public async Task CriarVinculoAsync(Guid usuarioId, Guid? tenantId, string? slug, string nomeCargo, CancellationToken cancellationToken)
+    public async Task CriarVinculoAsync(Guid usuarioId, Guid? tenantId, string? slug, string nomeCargo, CancellationToken ct = default)
     {
         VinculoUsuarioTenant vinculo = new(
             usuarioId,
@@ -37,6 +37,6 @@ public class RepositorioUsuarioTenant(AppDbContext contexto)
             slug!
         );
 
-        await registros.AddAsync(vinculo, cancellationToken);
+        await registros.AddAsync(vinculo, ct);
     }
 }

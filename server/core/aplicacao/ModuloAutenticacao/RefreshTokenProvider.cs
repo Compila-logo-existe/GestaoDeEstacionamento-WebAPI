@@ -82,7 +82,7 @@ public class RefreshTokenProvider : IRefreshTokenProvider
             CriadoEmUtc = DateTime.UtcNow,
             ExpiraEmUtc = DateTime.UtcNow.AddDays(opcoes.QuantidadeDiasDeValidade)
         };
-        novo.VincularTenant(atual.UsuarioId);
+        novo.VincularTenant(atual.TenantId);
 
         await repositorio.CadastrarRegistroAsync(novo);
         await unitOfWork.CommitAsync();
@@ -90,7 +90,7 @@ public class RefreshTokenProvider : IRefreshTokenProvider
         Usuario? usuario = await userManager.FindByIdAsync(atual.UsuarioAutenticadoId.ToString());
         if (usuario is null) return Result.Fail("Usuário do token não encontrado.");
 
-        return Result.Ok((usuario, atual.UsuarioId, novoPlain));
+        return Result.Ok((usuario, atual.TenantId, novoPlain));
     }
 
     public async Task<Result> RevogarTokensUsuarioAsync(Guid usuarioAutenticadoId, CancellationToken ct)

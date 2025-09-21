@@ -8,10 +8,14 @@ public class MapeadorVaga : IEntityTypeConfiguration<Vaga>
 {
     public void Configure(EntityTypeBuilder<Vaga> builder)
     {
-        builder.HasKey(e => e.Id);
+        builder.HasKey(v => v.Id);
 
-        builder.Property(e => e.Id)
-            .ValueGeneratedNever();
+        builder.Property(v => v.Id)
+            .ValueGeneratedNever()
+            .IsRequired();
+
+        builder.Property(v => v.TenantId)
+            .IsRequired();
 
         builder.Property(v => v.Numero)
             .IsRequired();
@@ -31,7 +35,7 @@ public class MapeadorVaga : IEntityTypeConfiguration<Vaga>
             .HasForeignKey(v => v.EstacionamentoId)
             .IsRequired();
 
-        builder.HasIndex(v => new { v.UsuarioId, v.VeiculoId })
+        builder.HasIndex(v => new { v.TenantId, v.VeiculoId })
             .IsUnique();
 
         builder.HasIndex(v => new { v.EstacionamentoId, v.Zona, v.Numero })

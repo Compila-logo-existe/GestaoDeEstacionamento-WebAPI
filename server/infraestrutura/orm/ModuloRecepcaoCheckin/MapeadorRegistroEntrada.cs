@@ -9,10 +9,13 @@ public class MapeadorRegistroEntrada : IEntityTypeConfiguration<RegistroEntrada>
 {
     public void Configure(EntityTypeBuilder<RegistroEntrada> builder)
     {
-        builder.HasKey(h => h.Id);
+        builder.HasKey(r => r.Id);
 
         builder.Property(r => r.Id)
             .ValueGeneratedNever()
+            .IsRequired();
+
+        builder.Property(r => r.TenantId)
             .IsRequired();
 
         builder.Property(r => r.DataEntradaEmUtc)
@@ -45,6 +48,6 @@ public class MapeadorRegistroEntrada : IEntityTypeConfiguration<RegistroEntrada>
 
         builder.HasIndex(r => r.DataEntradaEmUtc);
 
-        builder.HasIndex(r => new { r.UsuarioId, r.TicketId }).IsUnique();
+        builder.HasIndex(r => new { r.TenantId, r.TicketId }).IsUnique();
     }
 }
