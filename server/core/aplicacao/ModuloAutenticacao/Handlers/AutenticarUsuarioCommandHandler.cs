@@ -4,6 +4,7 @@ using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 
@@ -12,7 +13,8 @@ public class AutenticarUsuarioCommandHandler(
     UserManager<Usuario> userManager,
     IRepositorioUsuarioTenant repositorioUsuarioTenant,
     ITenantProvider tenantProvider,
-    ITokenProvider tokenProvider
+    ITokenProvider tokenProvider,
+    ILogger<AutenticarUsuarioCommand> logger
 ) : IRequestHandler<AutenticarUsuarioCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(
@@ -27,48 +29,61 @@ public class AutenticarUsuarioCommandHandler(
         if (usuarioEncontrado is null)
             return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro("Não foi possível encontrar o usuário requisitado."));
 
-        IList<string> rolesDoUsuario = await userManager.GetRolesAsync(usuarioEncontrado);
-        bool isPlatformAdmin = rolesDoUsuario.Contains("PlataformaAdmin");
-
-        if (!isPlatformAdmin)
+        try
         {
-            bool pertenceViaTenant = await repositorioUsuarioTenant.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.TenantId!.Value, cancellationToken);
-            bool pertenceViaSlug = await repositorioUsuarioTenant.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.Slug!, cancellationToken);
+            IList<string> rolesDoUsuario = await userManager.GetRolesAsync(usuarioEncontrado);
+            bool isPlatformAdmin = rolesDoUsuario.Contains("PlataformaAdmin");
 
-            if (!pertenceViaTenant || !pertenceViaSlug)
-                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Você não pertence a esta empresa. Confira o Tenant e o Slug."));
-        }
+            if (!isPlatformAdmin)
+            {
+                bool pertenceViaTenant = await repositorioUsuarioTenant.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.TenantId!.Value, cancellationToken);
+                bool pertenceViaSlug = await repositorioUsuarioTenant.UsuarioPertenceAoTenantAsync(usuarioEncontrado.Id, command.Slug!, cancellationToken);
 
-        SignInResult resultadoLogin = await signInManager.PasswordSignInAsync(
-            usuarioEncontrado.UserName!,
-            command.Senha,
-            isPersistent: true,
-            lockoutOnFailure: false
-        );
+                if (!pertenceViaTenant && !pertenceViaSlug)
+                    return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Você não pertence a esta empresa. Confira o Tenant e o Slug."));
+            }
 
-        if (resultadoLogin.Succeeded)
-        {
-            AccessToken tokenAcesso = await tokenProvider.GerarAccessToken(
-                usuarioEncontrado,
-                command.TenantId!.Value
+            SignInResult resultadoLogin = await signInManager.PasswordSignInAsync(
+                usuarioEncontrado.UserName!,
+                command.Senha,
+                isPersistent: true,
+                lockoutOnFailure: false
             );
 
-            return Result.Ok(tokenAcesso);
+            if (resultadoLogin.Succeeded)
+            {
+                AccessToken tokenAcesso = await tokenProvider.GerarAccessToken(
+                    usuarioEncontrado,
+                    command.TenantId!.Value
+                );
+
+                return Result.Ok(tokenAcesso);
+            }
+
+            if (resultadoLogin.IsLockedOut)
+                return Result.Fail(ResultadosErro
+                    .RequisicaoInvalidaErro("Sua conta foi bloqueada temporariamente devido a muitas tentativas inválidas."));
+
+            if (resultadoLogin.IsNotAllowed)
+                return Result.Fail(ResultadosErro
+                    .RequisicaoInvalidaErro("Não é permitido efetuar login. Verifique se sua conta está confirmada."));
+
+            if (resultadoLogin.RequiresTwoFactor)
+                return Result.Fail(ResultadosErro
+                    .RequisicaoInvalidaErro("É necessário confirmar o login com autenticação de dois fatores."));
+
+            return Result.Fail(ResultadosErro
+                .RequisicaoInvalidaErro("Login ou senha incorretos."));
         }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Ocorreu um erro durante a autenticação. {@Command}.",
+                command
+            );
 
-        if (resultadoLogin.IsLockedOut)
-            return Result.Fail(ResultadosErro
-                .RequisicaoInvalidaErro("Sua conta foi bloqueada temporariamente devido a muitas tentativas inválidas."));
-
-        if (resultadoLogin.IsNotAllowed)
-            return Result.Fail(ResultadosErro
-                .RequisicaoInvalidaErro("Não é permitido efetuar login. Verifique se sua conta está confirmada."));
-
-        if (resultadoLogin.RequiresTwoFactor)
-            return Result.Fail(ResultadosErro
-                .RequisicaoInvalidaErro("É necessário confirmar o login com autenticação de dois fatores."));
-
-        return Result.Fail(ResultadosErro
-            .RequisicaoInvalidaErro("Login ou senha incorretos."));
+            return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
+        }
     }
 }

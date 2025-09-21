@@ -47,7 +47,8 @@ public class JwtProvider : ITokenProvider
             new("sub", usuario.Id.ToString()),
             new("unique_name", usuario.UserName ?? usuario.Email ?? usuario.Id.ToString()),
             new("email", usuario.Email ?? string.Empty),
-            new("tenant_id", tenantId.ToString() ?? string.Empty)
+            new("tenant_id", tenantId.ToString() ?? string.Empty),
+            new ("atv", usuario.AccessTokenVersionId.ToString())
         };
 
         foreach (string role in userRoles)

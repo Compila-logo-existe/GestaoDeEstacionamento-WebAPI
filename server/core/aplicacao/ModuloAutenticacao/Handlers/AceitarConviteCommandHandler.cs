@@ -11,7 +11,6 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 
 public class AceitarConviteCommandHandler(
     IRepositorioConvite repositorioConvite,
-    ITenantProvider tenantProvider,
     IRepositorioTenant repositorioTenant,
     IRepositorioUsuarioTenant repositorioUsuarioTenant,
     UserManager<Usuario> userManager,
