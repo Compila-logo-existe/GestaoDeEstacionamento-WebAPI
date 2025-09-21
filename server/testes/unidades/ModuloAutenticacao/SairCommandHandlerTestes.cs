@@ -3,6 +3,7 @@ using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Immutable;
 
 namespace GestaoDeEstacionamento.Testes.Unidades.ModuloAutenticacao;
 
@@ -164,5 +165,37 @@ public class SairCommandHandlerTestes
         unitOfWorkMock.Verify(p => p.CommitAsync(), Times.Never);
 
         Assert.IsTrue(resultado.IsFailed);
+    }
+
+    [TestMethod]
+    public async Task Handle_Deve_Retornar_Falha_Quando_Ocorrer_Excecao_Durante_Saida()
+    {
+        // Arrange
+        SairCommand command = new();
+        Guid usuarioAutenticadoId = Guid.NewGuid();
+
+        tenantProviderMock.SetupGet(p => p.UsuarioId).Returns(usuarioAutenticadoId);
+
+        signInManagerMock
+            .Setup(s => s.SignOutAsync())
+            .ThrowsAsync(new Exception("Ocorreu um erro."));
+
+        // Act
+        Result resultado = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        refreshTokenProviderMock.Verify(r => r.RevogarTokensUsuarioAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        userManagerMock.Verify(u => u.FindByIdAsync(It.IsAny<string>()), Times.Never);
+        userManagerMock.Verify(u => u.UpdateAsync(It.IsAny<Usuario>()), Times.Never);
+        unitOfWorkMock.Verify(u => u.CommitAsync(), Times.Never);
+
+        ImmutableList<string> mensagensDoResult = resultado.Errors
+            .SelectMany(e => e.Reasons.OfType<Error>())
+            .Select(r => r.Message)
+            .ToImmutableList();
+
+        Assert.IsNotNull(resultado);
+        Assert.IsTrue(resultado.IsFailed);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
     }
 }

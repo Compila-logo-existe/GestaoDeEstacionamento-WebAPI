@@ -2,6 +2,8 @@ namespace GestaoDeEstacionamento.Testes.Unidades.ModuloAutenticacao;
 
 public static class MensagensErroAutenticacao
 {
+    public const string TenantNaoInformado = "Tenant não informado. Envie o header 'X-Tenant-Id'.";
+    public const string TenantNaoEncontrado = "Empresa (tenant) não encontrada.";
     public const string UsuarioJaExiste = "Já existe um usuário com esse nome.";
     public const string EmailJaExiste = "Já existe um usuário com esse e-mail.";
     public const string SenhaMuitoCurta = "A senha é muito curta.";

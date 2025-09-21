@@ -91,12 +91,17 @@ public class RegistrarUsuarioCommandHandler(
             );
 
             if (tokenAcesso is null)
-                return Result.Fail(ResultadosErro.ExcecaoInternaErro(new Exception("Falha ao gerar token de acesso.")));
+            {
+                await unitOfWork.RollbackAsync();
 
+                return Result.Fail(ResultadosErro.ExcecaoInternaErro(new Exception("Falha ao gerar token de acesso.")));
+            }
             return Result.Ok(tokenAcesso);
         }
         catch (Exception ex)
         {
+            await unitOfWork.RollbackAsync();
+
             logger.LogError(
                 ex,
                 "Ocorreu um erro durante o registro. {@Command}.",
