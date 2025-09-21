@@ -65,7 +65,7 @@ public class RegistrarUsuarioCommandHandler(
             {
                 command = command with
                 {
-                    TenantId = repositorioTenant.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken).Result
+                    TenantId = await repositorioTenant.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken)
                 };
             }
 
