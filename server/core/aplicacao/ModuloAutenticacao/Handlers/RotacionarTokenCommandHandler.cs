@@ -6,7 +6,9 @@ using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-public sealed class RotacionarTokenCommandHandler(
+namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
+
+public class RotacionarTokenCommandHandler(
     IUnitOfWork unitOfWork,
     ITokenProvider jwtProvider,
     IRefreshTokenProvider refreshTokenProvider,
@@ -16,15 +18,17 @@ public sealed class RotacionarTokenCommandHandler(
     public async Task<Result<(AccessToken, string)>> Handle(
         RotacionarTokenCommand command, CancellationToken cancellationToken)
     {
-        Result<(Usuario Usuario, Guid TenantId, string NovoRefreshToken)> rotacao = await refreshTokenProvider.RotacionarRefreshTokenAsync(command.RefreshTokenString, cancellationToken);
-        if (rotacao.IsFailed) return Result.Fail(rotacao.Errors);
+        Result<(Usuario Usuario, Guid TenantId, string NovoRefreshToken)> rotacao =
+            await refreshTokenProvider.RotacionarRefreshTokenAsync(command.RefreshTokenString, cancellationToken);
+
+        if (rotacao.IsFailed)
+            return Result.Fail(rotacao.Errors);
 
         try
         {
             Usuario usuario = rotacao.Value.Usuario;
             Guid tenantId = rotacao.Value.TenantId;
 
-            // invalida todos os JWTs anteriores
             usuario.AccessTokenVersionId = Guid.NewGuid();
 
             AccessToken novoAccessToken = await jwtProvider.GerarAccessToken(usuario, tenantId);

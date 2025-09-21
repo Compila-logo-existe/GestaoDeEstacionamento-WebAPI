@@ -5,7 +5,7 @@ namespace GestaoDeEstacionamento.Core.Aplicacao.Compartilhado;
 
 public static class DistribuidorDeVagas
 {
-    public sealed record PosicaoDaVaga(ZonaEstacionamento Zona, int Numero);
+    public record PosicaoDaVaga(ZonaEstacionamento Zona, int Numero);
 
     public static Result<IReadOnlyList<PosicaoDaVaga>> TentarGerarEsquemaDeVagas(
         int quantidadeDeVagas,

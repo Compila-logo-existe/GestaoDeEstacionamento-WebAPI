@@ -4,5 +4,5 @@ using MediatR;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 
-public sealed record RotacionarTokenCommand(string RefreshTokenString)
+public record RotacionarTokenCommand(string RefreshTokenString)
     : IRequest<Result<(AccessToken AccessToken, string RefreshToken)>>;

@@ -106,6 +106,7 @@ public class RefreshTokenProvider : IRefreshTokenProvider
         }
 
         await unitOfWork.CommitAsync();
+
         return Result.Ok();
     }
 

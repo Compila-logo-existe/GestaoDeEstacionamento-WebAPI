@@ -18,7 +18,7 @@ public class CriarConviteCommandHandler(
     public async Task<Result<(string, DateTime)>> Handle(
         CriarConviteCommand command, CancellationToken ct)
     {
-        Guid? tenantId = tenantProvider.TenantId;
+        Guid? tenantId = command.TenantId;
         if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
 
@@ -33,6 +33,7 @@ public class CriarConviteCommandHandler(
 
             ConviteRegistro convite = new()
             {
+                UsuarioEmissorId = usuarioId.Value,
                 EmailConvidado = command.EmailConvidado,
                 NomeCargo = command.NomeCargo,
                 TokenConvite = tokenConvite,

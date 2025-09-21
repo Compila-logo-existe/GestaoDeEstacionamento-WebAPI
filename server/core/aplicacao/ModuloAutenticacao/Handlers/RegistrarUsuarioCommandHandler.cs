@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
+
 public class RegistrarUsuarioCommandHandler(
     UserManager<Usuario> userManager,
     IRepositorioUsuarioTenant repositorioUsuarioTenant,
