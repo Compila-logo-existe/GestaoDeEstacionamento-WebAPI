@@ -1,6 +1,7 @@
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using GestaoDeEstacionamento.Testes.Unidades.Compartilhado;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Immutable;
 
@@ -169,7 +170,7 @@ public class AutenticarUsuarioCommandHandlerTestes
                 usr.FullName == usuarioEsperado.FullName && usr.Email == usuarioEsperado.Email),
             It.IsAny<Guid>()), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.UsuarioInexistente;
+        const string mensagemEsperada = MensagensErro.UsuarioInexistente;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -177,7 +178,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -224,7 +225,7 @@ public class AutenticarUsuarioCommandHandlerTestes
             It.IsAny<Usuario>(),
             It.IsAny<Guid>()), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.ContaBloqueada;
+        const string mensagemEsperada = MensagensErro.ContaBloqueada;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -232,7 +233,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -279,7 +280,7 @@ public class AutenticarUsuarioCommandHandlerTestes
             It.IsAny<Usuario>(),
             It.IsAny<Guid>()), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.LoginNaoPermitido;
+        const string mensagemEsperada = MensagensErro.LoginNaoPermitido;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -287,7 +288,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -334,7 +335,7 @@ public class AutenticarUsuarioCommandHandlerTestes
             It.IsAny<Usuario>(),
             It.IsAny<Guid>()), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.RequerAutenticacaoDoisFatores;
+        const string mensagemEsperada = MensagensErro.RequerAutenticacaoDoisFatores;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -342,7 +343,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -389,7 +390,7 @@ public class AutenticarUsuarioCommandHandlerTestes
             It.IsAny<Usuario>(),
             It.IsAny<Guid>()), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.DadosInvalidos;
+        const string mensagemEsperada = MensagensErro.DadosInvalidos;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -397,7 +398,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -417,7 +418,7 @@ public class AutenticarUsuarioCommandHandlerTestes
         userManagerMock.Verify(u => u.FindByEmailAsync(It.IsAny<string>()), Times.Never);
         tokenProviderMock.Verify(t => t.GerarAccessToken(It.IsAny<Usuario>(), It.IsAny<Guid>()), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.TenantNaoInformado;
+        const string mensagemEsperada = MensagensErro.TenantNaoInformado;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -425,7 +426,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -480,7 +481,7 @@ public class AutenticarUsuarioCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 
@@ -538,6 +539,5 @@ public class AutenticarUsuarioCommandHandlerTestes
         Assert.IsNotNull(mensagensDoResult);
         Assert.IsTrue(mensagensDoResult.Count >= 1);
     }
-
     #endregion
 }

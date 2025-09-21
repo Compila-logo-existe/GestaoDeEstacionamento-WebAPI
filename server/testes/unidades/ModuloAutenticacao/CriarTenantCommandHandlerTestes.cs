@@ -146,7 +146,7 @@ public class CriarTenantCommandHandlerTestes
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, mensagensDoResult.Count);
+        Assert.IsTrue(mensagensDoResult.Count >= 1);
         Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 

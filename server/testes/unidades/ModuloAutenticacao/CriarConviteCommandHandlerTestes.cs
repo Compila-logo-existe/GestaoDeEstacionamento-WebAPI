@@ -2,6 +2,7 @@ using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using GestaoDeEstacionamento.Testes.Unidades.Compartilhado;
 using System.Collections.Immutable;
 
 namespace GestaoDeEstacionamento.Testes.Unidades.ModuloAutenticacao;
@@ -100,7 +101,7 @@ public class CriarConviteCommandHandlerTestes
         repositorioConvite.Verify(p => p.CriarAsync(It.IsAny<ConviteRegistro>(), It.IsAny<CancellationToken>()), Times.Never);
         unitOfWorkMock.Verify(p => p.CommitAsync(), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.TenantNaoInformado;
+        const string mensagemEsperada = MensagensErro.TenantNaoInformado;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -129,7 +130,7 @@ public class CriarConviteCommandHandlerTestes
         repositorioConvite.Verify(p => p.CriarAsync(It.IsAny<ConviteRegistro>(), It.IsAny<CancellationToken>()), Times.Never);
         unitOfWorkMock.Verify(p => p.CommitAsync(), Times.Never);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.UsuarioNaoIdentificado;
+        const string mensagemEsperada = MensagensErro.UsuarioNaoIdentificado;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
@@ -181,7 +182,7 @@ public class CriarConviteCommandHandlerTestes
         unitOfWorkMock.Verify(p => p.CommitAsync(), Times.Never);
         unitOfWorkMock.Verify(p => p.RollbackAsync(), Times.Once);
 
-        const string mensagemEsperada = MensagensErroAutenticacao.MensagemExcecao;
+        const string mensagemEsperada = MensagensErro.MensagemExcecao;
         ImmutableList<string> mensagensDoResult = resultado.Errors
             .SelectMany(e => e.Reasons.OfType<Error>())
             .Select(r => r.Message)
