@@ -1,6 +1,6 @@
-namespace GestaoDeEstacionamento.Testes.Unidades.ModuloAutenticacao;
+namespace GestaoDeEstacionamento.Testes.Unidades.Compartilhado;
 
-public static class MensagensErroAutenticacao
+public static class MensagensErro
 {
     public const string TenantNaoInformado = "Tenant não informado. Envie o header 'X-Tenant-Id'.";
     public const string TenantNaoEncontrado = "Empresa (tenant) não encontrada.";
