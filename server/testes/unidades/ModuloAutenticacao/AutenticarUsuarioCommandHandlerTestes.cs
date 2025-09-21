@@ -21,7 +21,6 @@ public class AutenticarUsuarioCommandHandlerTestes
     private Mock<SignInManager<Usuario>> signInManagerMock = null!;
     private Mock<UserManager<Usuario>> userManagerMock = null!;
     private Mock<IRepositorioUsuarioTenant> repositorioUsuarioTenantMock = null!;
-    private Mock<IRepositorioTenant> repositorioTenantMock = null!;
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<ITokenProvider> tokenProviderMock = null!;
     private Mock<ILogger<AutenticarUsuarioCommand>> loggerMock = null!;
@@ -45,7 +44,6 @@ public class AutenticarUsuarioCommandHandlerTestes
         );
 
         repositorioUsuarioTenantMock = new Mock<IRepositorioUsuarioTenant>();
-        repositorioTenantMock = new Mock<IRepositorioTenant>();
         tenantProviderMock = new Mock<ITenantProvider>();
         tokenProviderMock = new Mock<ITokenProvider>();
         loggerMock = new Mock<ILogger<AutenticarUsuarioCommand>>();
