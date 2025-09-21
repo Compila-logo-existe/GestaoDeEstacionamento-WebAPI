@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IRepositorioTenant, RepositorioTenant>();
         services.AddScoped<IRepositorioUsuarioTenant, RepositorioUsuarioTenant>();
         services.AddScoped<IRepositorioConvite, RepositorioConviteRegistro>();
+        services.AddScoped<IRepositorioRefreshToken, RepositorioRefreshToken>();
 
         services.AddEntityFrameworkConfig(configuration);
 

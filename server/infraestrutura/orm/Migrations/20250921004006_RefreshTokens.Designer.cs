@@ -3,6 +3,7 @@ using System;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250921004006_RefreshTokens")]
+    partial class RefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,7 +92,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 
                     b.HasIndex("EmailConvidado", "TenantId");
 
-                    b.ToTable("ConvitesRegistro", (string)null);
+                    b.ToTable("ConvitesRegistro");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.RefreshToken", b =>
@@ -134,7 +137,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 
                     b.HasIndex("UsuarioAutenticadoId", "UsuarioId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.Tenant", b =>
@@ -180,7 +183,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("SlugSubdominio")
                         .IsUnique();
 
-                    b.ToTable("Tenants", (string)null);
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.Usuario", b =>
@@ -281,7 +284,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "TenantId")
                         .IsUnique();
 
-                    b.ToTable("VinculosUsuarioTenant", (string)null);
+                    b.ToTable("VinculosUsuarioTenant");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento.Estacionamento", b =>
@@ -301,7 +304,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "Nome")
                         .IsUnique();
 
-                    b.ToTable("Estacionamentos", (string)null);
+                    b.ToTable("Estacionamentos");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento.Vaga", b =>
@@ -335,7 +338,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("EstacionamentoId", "Zona", "Numero")
                         .IsUnique();
 
-                    b.ToTable("Vagas", (string)null);
+                    b.ToTable("Vagas");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento.Faturamento", b =>
@@ -379,7 +382,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "RegistroSaidaId")
                         .IsUnique();
 
-                    b.ToTable("Faturamentos", (string)null);
+                    b.ToTable("Faturamentos");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloHospede.Hospede", b =>
@@ -409,7 +412,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "CPF")
                         .IsUnique();
 
-                    b.ToTable("Hospedes", (string)null);
+                    b.ToTable("Hospedes");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroEntrada", b =>
@@ -455,7 +458,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "TicketId")
                         .IsUnique();
 
-                    b.ToTable("RegistrosEntrada", (string)null);
+                    b.ToTable("RegistrosEntrada");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.RegistroSaida", b =>
@@ -498,7 +501,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "TicketId")
                         .IsUnique();
 
-                    b.ToTable("RegistrosSaida", (string)null);
+                    b.ToTable("RegistrosSaida");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.Ticket", b =>
@@ -524,7 +527,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("NumeroSequencial")
                         .IsUnique();
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin.Veiculo", b =>
@@ -563,7 +566,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("UsuarioId", "Placa")
                         .IsUnique();
 
-                    b.ToTable("Veiculos", (string)null);
+                    b.ToTable("Veiculos");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
