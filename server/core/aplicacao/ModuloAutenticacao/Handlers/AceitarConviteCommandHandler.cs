@@ -5,7 +5,6 @@ using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
@@ -92,12 +91,6 @@ public class AceitarConviteCommandHandler(
             AccessToken token = await tokenProvider.GerarAccessToken(usuario, convite.TenantId);
 
             return Result.Ok(token);
-        }
-        catch (DbUpdateException)
-        {
-            await unitOfWork.RollbackAsync();
-
-            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Usuário já está vinculado a este tenant."));
         }
         catch (Exception ex)
         {

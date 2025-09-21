@@ -12,9 +12,7 @@ public class CriarConviteCommandHandlerTestes
 {
     private CriarConviteCommandHandler handler = null!;
 
-    private const string fullNamePadrao = "Tester Segundo";
     private const string emailPadrao = "emailTeste@teste.com";
-    private const string senhaPadrao = "Teste123!";
     private const string cargoPadrao = "Admin";
     private const string slug = "eTeste";
     private Tenant tenantPadrao = null!;
