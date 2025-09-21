@@ -38,7 +38,7 @@ public class CriarConviteCommandHandler(
                 TokenConvite = tokenConvite,
                 DataExpiracaoUtc = expira
             };
-            convite.VincularTenant(tenantId);
+            convite.VincularTenant(tenantId.Value);
 
             await repositorioConvite.CriarAsync(convite, ct);
 
