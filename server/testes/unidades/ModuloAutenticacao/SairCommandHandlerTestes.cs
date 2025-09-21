@@ -54,7 +54,7 @@ public class SairCommandHandlerTestes
     public async Task Handle_Deve_Retornar_Sucesso_Quando_Usuario_Sair()
     {
         // Arrange
-        SairCommand comando = new();
+        SairCommand command = new();
         Guid usuarioAutenticadoId = Guid.NewGuid();
 
         tenantProviderMock
@@ -81,7 +81,7 @@ public class SairCommandHandlerTestes
             .Returns(Task.CompletedTask);
 
         // Act
-        Result resultado = await handler.Handle(comando, CancellationToken.None);
+        Result resultado = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         signInManagerMock.Verify(p => p.SignOutAsync(), Times.Once);
@@ -97,14 +97,14 @@ public class SairCommandHandlerTestes
     public async Task Handle_Deve_Falhar_Quando_Usuario_Nao_Identificado()
     {
         // Arrange
-        SairCommand comando = new();
+        SairCommand command = new();
 
         tenantProviderMock
             .SetupGet(p => p.UsuarioId)
             .Returns((Guid?)null);
 
         // Act
-        Result resultado = await handler.Handle(comando, CancellationToken.None);
+        Result resultado = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         signInManagerMock.Verify(p => p.SignOutAsync(), Times.Never);
@@ -120,7 +120,7 @@ public class SairCommandHandlerTestes
     public async Task Handle_Deve_Falhar_Quando_Usuario_Nao_Encontrado()
     {
         // Arrange
-        SairCommand comando = new();
+        SairCommand command = new();
         Guid usuarioAutenticadoId = Guid.NewGuid();
 
         tenantProviderMock.SetupGet(p => p.UsuarioId).Returns(usuarioAutenticadoId);
@@ -133,7 +133,7 @@ public class SairCommandHandlerTestes
             .ReturnsAsync((Usuario?)null);
 
         // Act
-        Result resultado = await handler.Handle(comando, CancellationToken.None);
+        Result resultado = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         userManagerMock.Verify(p => p.UpdateAsync(It.IsAny<Usuario>()), Times.Never);
@@ -146,7 +146,7 @@ public class SairCommandHandlerTestes
     public async Task Handle_Deve_Falhar_Quando_Update_De_Token_De_Acesso_Falhar()
     {
         // Arrange
-        SairCommand comando = new();
+        SairCommand command = new();
         Guid usuarioAutenticadoId = Guid.NewGuid();
 
         tenantProviderMock.SetupGet(p => p.UsuarioId).Returns(usuarioAutenticadoId);
@@ -159,7 +159,7 @@ public class SairCommandHandlerTestes
         userManagerMock.Setup(p => p.UpdateAsync(usuario)).ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "erro" }));
 
         // Act
-        Result resultado = await handler.Handle(comando, CancellationToken.None);
+        Result resultado = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         unitOfWorkMock.Verify(p => p.CommitAsync(), Times.Never);

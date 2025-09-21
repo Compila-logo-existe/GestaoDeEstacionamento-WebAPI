@@ -4,6 +4,7 @@ public static class MensagensErroAutenticacao
 {
     public const string TenantNaoInformado = "Tenant não informado. Envie o header 'X-Tenant-Id'.";
     public const string TenantNaoEncontrado = "Empresa (tenant) não encontrada.";
+    public const string UsuarioNaoIdentificado = "Usuário autenticado não identificado.";
     public const string UsuarioJaExiste = "Já existe um usuário com esse nome.";
     public const string EmailJaExiste = "Já existe um usuário com esse e-mail.";
     public const string SenhaMuitoCurta = "A senha é muito curta.";
@@ -19,4 +20,5 @@ public static class MensagensErroAutenticacao
     public const string FalhaGerarToken = "Falha ao gerar token de acesso.";
     public const string ErroInesperadoCadastro = "Erro inesperado no cadastro.";
     public const string UsuarioInexistente = "Não foi possível obter o registro: Não foi possível encontrar o usuário requisitado.";
+    public const string MensagemExcecao = "Ocorreu um erro.";
 }
