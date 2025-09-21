@@ -66,6 +66,28 @@ public static class IdentityConfig
                 RoleClaimType = "roles",
                 NameClaimType = "unique_name"
             };
+            x.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = async ctx =>
+                {
+                    string? atvClaim = ctx.Principal?.FindFirst("atv")?.Value;
+                    string? userIdStr = ctx.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+                    if (!Guid.TryParse(userIdStr, out Guid usuarioId))
+                    {
+                        ctx.Fail("Usuário inválido."); return;
+                    }
+
+                    UserManager<Usuario> userManager = ctx.HttpContext.RequestServices.GetRequiredService<UserManager<Usuario>>();
+                    Usuario? usuario = await userManager.FindByIdAsync(usuarioId.ToString());
+
+                    if (usuario is null || string.IsNullOrWhiteSpace(atvClaim) ||
+                        !string.Equals(atvClaim, usuario.AccessTokenVersionId.ToString(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        ctx.Fail("Versão do Access Token inválida.");
+                    }
+                }
+            };
         });
 
         services.AddAuthorizationBuilder()

@@ -1,9 +1,13 @@
 using GestaoDeEstacionamento.Core.Aplicacao;
+using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao;
+using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using GestaoDeEstacionamento.Infraestrutura.ORM;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloAutenticacao;
 using GestaoDeEstacionamento.WebAPI.AutoMapper;
 using GestaoDeEstacionamento.WebAPI.Configuration;
 using GestaoDeEstacionamento.WebAPI.Extensions;
 using GestaoDeEstacionamento.WebAPI.Identity;
+using GestaoDeEstacionamento.WebAPI.Services;
 using System.Text.Json.Serialization;
 
 namespace GestaoDeEstacionamento.WebAPI;
@@ -24,6 +28,12 @@ public class Program
         builder.Services.AddIdentityProviders();
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddSwaggerConfig();
+
+        builder.Services.Configure<OpcoesRefreshToken>(builder.Configuration.GetSection("OpcoesRefreshToken"));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<IRefreshTokenCookieService, RefreshTokenCookieService>();
+        builder.Services.AddScoped<IRepositorioRefreshToken, RepositorioRefreshToken>();
+        builder.Services.AddScoped<IRefreshTokenProvider, RefreshTokenProvider>();
 
         // Controllers + enums como string
         builder.Services.AddControllers()
