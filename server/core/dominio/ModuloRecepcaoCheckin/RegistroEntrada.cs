@@ -20,8 +20,7 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
 
     [ExcludeFromCodeCoverage]
     public RegistroEntrada() { }
-    public RegistroEntrada(Hospede hospede, Veiculo veiculo,
-        string? observacao, List<string> observacoes) : this()
+    public RegistroEntrada(Hospede hospede, Veiculo veiculo, List<string> observacoes) : this()
     {
         Hospede = hospede;
         Veiculo = veiculo;
@@ -51,6 +50,9 @@ public class RegistroEntrada : EntidadeBase<RegistroEntrada>
 
     public override void AtualizarRegistro(RegistroEntrada registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         Observacoes = registroEditado.Observacoes;
     }
 }
