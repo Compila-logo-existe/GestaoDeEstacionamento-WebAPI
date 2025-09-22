@@ -36,7 +36,7 @@ public class SelecionarRegistrosDoVeiculoQueryHandler(
         if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
-        string cacheQueryQuantidade = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
+        string cacheQueryQuantidade = (query.Quantidade.HasValue && query.Quantidade >= 1) ? $"q={query.Quantidade.Value}" : "q=all";
 
         string cacheQueryVeiculo;
         if (query.VeiculoId.HasValue && query.VeiculoId.Value != Guid.Empty)
@@ -100,7 +100,7 @@ public class SelecionarRegistrosDoVeiculoQueryHandler(
                     return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro($"Veículo não encontrado. Placa: {query.Placa}"));
             }
 
-            List<RegistroEntrada> registros = query.Quantidade.HasValue ?
+            List<RegistroEntrada> registros = (query.Quantidade.HasValue && query.Quantidade >= 1) ?
                 await repositorioRegistroEntrada.SelecionarRegistrosDoVeiculoAsync(query.Quantidade.Value, veiculoSelecionado.Id, cancellationToken) :
                 await repositorioRegistroEntrada.SelecionarRegistrosDoVeiculoAsync(veiculoSelecionado.Id, cancellationToken);
 

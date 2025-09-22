@@ -47,7 +47,7 @@ public class ObterStatusVagasQueryHandler(
             Placa = Padronizador.PadronizarPlaca(query.Placa)
         };
 
-        string cacheQueryQuantidade = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
+        string cacheQueryQuantidade = (query.Quantidade.HasValue && query.Quantidade >= 1) ? $"q={query.Quantidade.Value}" : "q=all";
 
         string cacheQueryEstacionamento;
 
@@ -99,7 +99,7 @@ public class ObterStatusVagasQueryHandler(
 
             bool deveAplicarFiltroPorPlaca = !string.IsNullOrWhiteSpace(query.Placa);
 
-            List<Vaga> vagas = query.Quantidade.HasValue ?
+            List<Vaga> vagas = (query.Quantidade.HasValue && query.Quantidade >= 1) ?
                 await repositorioVaga.SelecionarRegistrosDoEstacionamentoAsync(query.Quantidade.Value, estacionamentoSelecionado.Id, zona, cancellationToken) :
                 await repositorioVaga.SelecionarRegistrosDoEstacionamentoAsync(estacionamentoSelecionado.Id, zona, cancellationToken);
 

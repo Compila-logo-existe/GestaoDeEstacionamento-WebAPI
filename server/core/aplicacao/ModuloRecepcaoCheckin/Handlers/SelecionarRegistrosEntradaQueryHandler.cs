@@ -30,8 +30,9 @@ public class SelecionarRegistrosEntradaQueryHandler(
         if (!usuarioId.HasValue || usuarioId.Value == Guid.Empty)
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Usuário autenticado não identificado."));
 
-        string cacheQuery = query.Quantidade.HasValue ? $"q={query.Quantidade.Value}" : "q=all";
-        string cacheKey = $"recepcao:t={tenantId}:{cacheQuery}";
+        string cacheQueryQuantidade = (query.Quantidade.HasValue && query.Quantidade >= 1) ? $"q={query.Quantidade.Value}" : "q=all";
+
+        string cacheKey = $"recepcao:t={tenantId}:{cacheQueryQuantidade}";
 
         string? jsonString = await cache.GetStringAsync(cacheKey, cancellationToken);
 
@@ -46,7 +47,7 @@ public class SelecionarRegistrosEntradaQueryHandler(
         try
         {
 
-            List<RegistroEntrada> registros = query.Quantidade.HasValue ?
+            List<RegistroEntrada> registros = (query.Quantidade.HasValue && query.Quantidade >= 1) ?
                 await repositorioRegistroEntrada.SelecionarRegistrosAsync(query.Quantidade.Value) :
                 await repositorioRegistroEntrada.SelecionarRegistrosAsync();
 
