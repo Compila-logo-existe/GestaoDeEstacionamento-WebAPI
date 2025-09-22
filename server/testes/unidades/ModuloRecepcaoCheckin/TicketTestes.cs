@@ -66,6 +66,45 @@ public class TicketTestes
     }
 
     [TestMethod]
+    public void Deve_Mudar_Status_Para_Expirado_Com_Sucesso()
+    {
+        // Arrange 
+        ticket = new(registroEntrada);
+
+        RegistroSaida registroSaida = Builder<RegistroSaida>
+            .CreateNew()
+            .WithFactory(() => new(hospede, veiculo, new List<string>()))
+            .Build();
+
+        registroEntrada.Ticket = ticket;
+        registroEntrada.GerarNovoFaturamento(5);
+
+        // Act;
+        registroSaida.AderirTicket(ticket);
+
+        // Assert
+        Assert.AreEqual(StatusTicket.Expirado, ticket.Status);
+    }
+
+    [TestMethod]
+    public void Deve_Mudar_Status_Com_Sucesso()
+    {
+        // Arrange 
+        ticket = new(registroEntrada);
+
+        RegistroSaida registroSaida = Builder<RegistroSaida>
+            .CreateNew()
+            .WithFactory(() => new(hospede, veiculo, new List<string>()))
+            .Build();
+
+        registroEntrada.Ticket = ticket;
+        registroEntrada.GerarNovoFaturamento(5);
+
+        // Assert
+        Assert.AreEqual(StatusTicket.Valido, ticket.Status);
+    }
+
+    [TestMethod]
     public void Deve_Atualizar_Veiculo_Com_Sucesso()
     {
         // Arrange
