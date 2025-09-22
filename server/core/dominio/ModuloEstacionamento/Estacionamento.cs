@@ -52,9 +52,8 @@ public class Estacionamento : EntidadeBase<Estacionamento>
         static ZonaEstacionamento ObterZona(int i)
         {
             char c = (char)('A' + i);
-            if (!Enum.TryParse<ZonaEstacionamento>(c.ToString(), out ZonaEstacionamento z))
-                throw new InvalidOperationException($"Zona '{c}' não suportada.");
-            return z;
+
+            return (ZonaEstacionamento)Enum.Parse(typeof(ZonaEstacionamento), c.ToString());
         }
     }
 
