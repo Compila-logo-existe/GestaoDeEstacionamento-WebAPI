@@ -38,6 +38,9 @@ public class Hospede : EntidadeBase<Hospede>
 
     public override void AtualizarRegistro(Hospede registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         NomeCompleto = registroEditado.NomeCompleto;
         CPF = registroEditado.CPF;
         Telefone = registroEditado.Telefone;
