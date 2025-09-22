@@ -42,8 +42,13 @@ public class Veiculo : EntidadeBase<Veiculo>
 
     public override void AtualizarRegistro(Veiculo registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
+        Hospede = registroEditado.Hospede;
         Placa = registroEditado.Placa;
         Modelo = registroEditado.Modelo;
         Cor = registroEditado.Cor;
+        Observacoes = registroEditado.Observacoes;
     }
 }
