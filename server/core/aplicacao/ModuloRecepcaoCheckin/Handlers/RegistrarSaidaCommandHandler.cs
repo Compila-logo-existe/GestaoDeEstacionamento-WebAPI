@@ -73,7 +73,7 @@ public class RegistrarSaidaCommandHandler(
 
             hospedeSelecionado.AderirVeiculo(veiculoSelecionado);
 
-            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(command.Placa, tenantId, cancellationToken);
+            bool possuiEntradaEmAberto = await repositorioRegistroEntrada.ExisteAberturaPorPlacaAsync(veiculoSelecionado.Placa, tenantId, cancellationToken);
             if (!possuiEntradaEmAberto)
                 return Result.Fail(ResultadosErro.ConflitoErro("Não existe check-in/ticket em aberto para esta placa."));
 

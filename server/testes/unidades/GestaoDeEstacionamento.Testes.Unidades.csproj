@@ -13,12 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ModuloRecepcaoCheckin\**" />
-    <EmbeddedResource Remove="ModuloRecepcaoCheckin\**" />
-    <None Remove="ModuloRecepcaoCheckin\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NBuilder" Version="6.1.0" />
   </ItemGroup>
