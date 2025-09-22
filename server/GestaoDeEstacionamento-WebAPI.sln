@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoDeEstacionamento.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoDeEstacionamento.Core.Dominio", "core\dominio\GestaoDeEstacionamento.Core.Dominio.csproj", "{A50D8BC2-8BA1-26B8-D6B1-72B5B854E3BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoDeEstacionamento.Testes.Integracao", "..\GestaoDeEstacionamento.Testes.Integracao\GestaoDeEstacionamento.Testes.Integracao.csproj", "{D963F3F0-630C-4AD8-A287-18971D1BD2C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{A50D8BC2-8BA1-26B8-D6B1-72B5B854E3BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A50D8BC2-8BA1-26B8-D6B1-72B5B854E3BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A50D8BC2-8BA1-26B8-D6B1-72B5B854E3BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D963F3F0-630C-4AD8-A287-18971D1BD2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D963F3F0-630C-4AD8-A287-18971D1BD2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D963F3F0-630C-4AD8-A287-18971D1BD2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D963F3F0-630C-4AD8-A287-18971D1BD2C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +78,7 @@ Global
 		{487FDED8-94B2-D7D4-06B6-EC39BA5D15DF} = {957FA345-C4EC-45D0-BF43-46E01D1B65B6}
 		{8FBB2FB8-9AD4-7224-1971-1ED34711CAB6} = {17925619-BC0D-4369-9BD5-711F8709EE29}
 		{A50D8BC2-8BA1-26B8-D6B1-72B5B854E3BD} = {C7B25C90-683E-405A-83FC-9AE9B0AA6E7F}
+		{D963F3F0-630C-4AD8-A287-18971D1BD2C9} = {17925619-BC0D-4369-9BD5-711F8709EE29}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2AC2FFD1-4FA6-4AB9-8220-3014A663AB9A}
