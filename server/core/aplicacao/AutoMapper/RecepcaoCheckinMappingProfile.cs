@@ -32,7 +32,7 @@ public class RecepcaoCheckinMappingProfile : Profile
             ));
         #endregion
 
-        #region ObterDetalhes
+        #region ObterDetalhesVeiculo
         CreateMap<Veiculo, ObterDetalhesVeiculoResult>()
             .ConvertUsing(src => new ObterDetalhesVeiculoResult(
                 src.Id,

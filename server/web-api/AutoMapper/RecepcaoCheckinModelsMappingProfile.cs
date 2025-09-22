@@ -19,7 +19,7 @@ public class RecepcaoCheckinModelsMappingProfile : Profile
         CreateMap<RegistrarSaidaResult, RegistrarSaidaResponse>();
         #endregion
 
-        #region ObterDetalhes
+        #region ObterDetalhesVeiculo
         CreateMap<ObterDetalhesVeiculoRequest, ObterDetalhesVeiculoQuery>();
         CreateMap<ObterDetalhesVeiculoResult, ObterDetalhesVeiculoResponse>();
         #endregion

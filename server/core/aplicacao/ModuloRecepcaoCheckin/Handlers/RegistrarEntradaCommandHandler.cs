@@ -105,6 +105,7 @@ public class RegistrarEntradaCommandHandler(
 
             novoHospede.VincularTenant(tenantId.Value);
             novoVeiculo.VincularTenant(tenantId.Value);
+            novoVeiculo.Observacoes = command.Observacoes;
 
             await unitOfWork.CommitAsync();
 

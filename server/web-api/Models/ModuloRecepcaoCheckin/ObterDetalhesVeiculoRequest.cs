@@ -10,6 +10,6 @@ public record ObterDetalhesVeiculoResponse(
     string Placa,
     string Modelo,
     string Cor,
-    string? Observacoes,
+    List<string> Observacoes,
     string Hospede
 );
