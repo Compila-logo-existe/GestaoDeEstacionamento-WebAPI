@@ -3,7 +3,7 @@ using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 
-namespace GestaoDeEstacionamento.Testes.Unidades.ModuloRecepcaoCheckin;
+namespace GestaoDeEstacionamento.Testes.Unidades.ModuloFaturamento;
 
 [TestClass]
 [TestCategory("Testes de Unidade de Faturamento (Domínio)")]
