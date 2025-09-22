@@ -1,5 +1,9 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
+using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
+using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
+using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -7,20 +11,49 @@ using System.Reflection;
 
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
 
-public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvider = null) : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
+public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvider = null)
+    : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
 {
-    // Area para os DbSets, exemplo: public DbSet<Exemplo> Exemplos { get; set; }
+    public DbSet<Hospede> Hospedes { get; set; }
+    public DbSet<Veiculo> Veiculos { get; set; }
+    public DbSet<RegistroEntrada> RegistrosEntrada { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<Estacionamento> Estacionamentos { get; set; }
+    public DbSet<Vaga> Vagas { get; set; }
+    public DbSet<RegistroSaida> RegistrosSaida { get; set; }
+    public DbSet<Faturamento> Faturamentos { get; set; }
+    public DbSet<Tenant> Tenants { get; set; }
+    public DbSet<VinculoUsuarioTenant> VinculosUsuarioTenant { get; set; }
+    public DbSet<ConviteRegistro> ConvitesRegistro { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         if (tenantProvider is not null)
         {
-            /*
-            Area para definir a seleção das queries via UsuarioId, exemplo: 
+            modelBuilder.Entity<Hospede>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
 
-            modelBuilder.Entity<Contato>()
-                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
-            */
+            modelBuilder.Entity<Veiculo>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
+
+            modelBuilder.Entity<RegistroEntrada>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
+
+            modelBuilder.Entity<Ticket>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
+
+            modelBuilder.Entity<Estacionamento>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
+
+            modelBuilder.Entity<Vaga>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
+
+            modelBuilder.Entity<RegistroSaida>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
+
+            modelBuilder.Entity<Faturamento>()
+                .HasQueryFilter(x => x.TenantId.Equals(tenantProvider.TenantId));
         }
 
         Assembly assembly = typeof(AppDbContext).Assembly;
@@ -29,6 +62,7 @@ public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvi
 
         base.OnModelCreating(modelBuilder);
     }
+
     public async Task CommitAsync()
     {
         await SaveChangesAsync();

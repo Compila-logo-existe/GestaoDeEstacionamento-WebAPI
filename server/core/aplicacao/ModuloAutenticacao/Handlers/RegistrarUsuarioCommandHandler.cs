@@ -1,19 +1,31 @@
 using FluentResults;
 using GestaoDeEstacionamento.Core.Aplicacao.Compartilhado;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Commands;
+using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace GestaoDeEstacionamento.Core.Aplicacao.ModuloAutenticacao.Handlers;
+
 public class RegistrarUsuarioCommandHandler(
     UserManager<Usuario> userManager,
-    ITokenProvider tokenProvider
+    IRepositorioUsuarioTenant repositorioUsuarioTenant,
+    IRepositorioTenant repositorioTenant,
+    ITenantProvider tenantProvider,
+    ITokenProvider tokenProvider,
+    IUnitOfWork unitOfWork,
+    ILogger<RegistrarUsuarioCommandHandler> logger
 ) : IRequestHandler<RegistrarUsuarioCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(
         RegistrarUsuarioCommand command, CancellationToken cancellationToken)
     {
+        Guid? tenantId = tenantProvider.TenantId;
+        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
+
         if (!command.Senha.Equals(command.ConfirmarSenha))
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("A confirmação de senha falhou."));
 
@@ -24,33 +36,79 @@ public class RegistrarUsuarioCommandHandler(
             Email = command.Email
         };
 
-        IdentityResult usuarioResult = await userManager.CreateAsync(usuario, command.Senha);
-
-        if (!usuarioResult.Succeeded)
+        try
         {
-            IEnumerable<string> erros = usuarioResult.Errors.Select(err =>
+            IdentityResult usuarioResult = await userManager.CreateAsync(usuario, command.Senha);
+
+            if (!usuarioResult.Succeeded)
             {
-                return err.Code switch
+                IEnumerable<string> erros = usuarioResult.Errors.Select(err =>
                 {
-                    "DuplicateUserName" => "Já existe um usuário com esse nome.",
-                    "DuplicateEmail" => "Já existe um usuário com esse e-mail.",
-                    "PasswordTooShort" => "A senha é muito curta.",
-                    "PasswordRequiresNonAlphanumeric" => "A senha deve conter pelo menos um caractere especial.",
-                    "PasswordRequiresDigit" => "A senha deve conter pelo menos um número.",
-                    "PasswordRequiresUpper" => "A senha deve conter pelo menos uma letra maiúscula.",
-                    "PasswordRequiresLower" => "A senha deve conter pelo menos uma letra minúscula.",
-                    _ => err.Description
+                    return err.Code switch
+                    {
+                        "DuplicateUserName" => "Já existe um usuário com esse nome.",
+                        "DuplicateEmail" => "Já existe um usuário com esse e-mail.",
+                        "PasswordTooShort" => "A senha é muito curta.",
+                        "PasswordRequiresNonAlphanumeric" => "A senha deve conter pelo menos um caractere especial.",
+                        "PasswordRequiresDigit" => "A senha deve conter pelo menos um número.",
+                        "PasswordRequiresUpper" => "A senha deve conter pelo menos uma letra maiúscula.",
+                        "PasswordRequiresLower" => "A senha deve conter pelo menos uma letra minúscula.",
+                        _ => err.Description
+                    };
+                });
+
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
+            }
+            await userManager.AddToRoleAsync(usuario, "User");
+
+            if (!string.IsNullOrWhiteSpace(command.Slug))
+            {
+                command = command with
+                {
+                    TenantId = await repositorioTenant.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken)
                 };
-            });
+            }
 
-            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
+            Tenant? tenant = await repositorioTenant.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
+
+            if (tenant is null)
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Empresa (tenant) não encontrada."));
+
+            VinculoUsuarioTenant vinculo = new(
+                usuario.Id,
+                tenant.Id,
+                "User",
+                tenant.SlugSubdominio!
+            );
+
+            await repositorioUsuarioTenant.CadastrarRegistroAsync(vinculo);
+
+            await unitOfWork.CommitAsync();
+
+            AccessToken? tokenAcesso = await tokenProvider.GerarAccessToken(
+                usuario,
+                tenant.Id
+            );
+
+            if (tokenAcesso is null)
+            {
+                await unitOfWork.RollbackAsync();
+
+                return Result.Fail(ResultadosErro.ExcecaoInternaErro(new Exception("Falha ao gerar token de acesso.")));
+            }
+            return Result.Ok(tokenAcesso);
         }
+        catch (Exception ex)
+        {
+            await unitOfWork.RollbackAsync();
 
-        AccessToken? tokenAcesso = tokenProvider.GerarAccessToken(usuario);
+            logger.LogError(
+                ex,
+                "Ocorreu um erro durante o registro. {@Command}.",
+                command
+            );
 
-        if (tokenAcesso is null)
-            return Result.Fail(ResultadosErro.ExcecaoInternaErro(new Exception("Falha ao gerar token de acesso.")));
-
-        return Result.Ok(tokenAcesso);
+            return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
+        }
     }
 }

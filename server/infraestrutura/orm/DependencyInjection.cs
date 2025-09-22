@@ -1,5 +1,15 @@
 using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
+using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
+using GestaoDeEstacionamento.Core.Dominio.ModuloFaturamento;
+using GestaoDeEstacionamento.Core.Dominio.ModuloHospede;
+using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using GestaoDeEstacionamento.Infraestrutura.ORM.Compartilhado;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloAutenticacao;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloEstacionamento;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloFaturamento;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloHospede;
+using GestaoDeEstacionamento.Infraestrutura.ORM.ModuloRecepcaoCheckin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +20,18 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddCamadaInfraestruturaOrm(this IServiceCollection services, IConfiguration configuration)
     {
-        // Area para adicionar os Scopeds, exemplo: services.AddScoped<IRepositorioExemplo, RepositorioExemploORM>();
+        services.AddScoped<IRepositorioHospede, RepositorioHospede>();
+        services.AddScoped<IRepositorioVeiculo, RepositorioVeiculo>();
+        services.AddScoped<IRepositorioEstacionamento, RepositorioEstacionamento>();
+        services.AddScoped<IRepositorioVaga, RepositorioVaga>();
+        services.AddScoped<IRepositorioRegistroEntrada, RepositorioRegistroEntrada>();
+        services.AddScoped<IRepositorioTicket, RepositorioTicket>();
+        services.AddScoped<IRepositorioRegistroSaida, RepositorioRegistroSaida>();
+        services.AddScoped<IRepositorioFaturamento, RepositorioFaturamento>();
+        services.AddScoped<IRepositorioTenant, RepositorioTenant>();
+        services.AddScoped<IRepositorioUsuarioTenant, RepositorioUsuarioTenant>();
+        services.AddScoped<IRepositorioConvite, RepositorioConviteRegistro>();
+        services.AddScoped<IRepositorioRefreshToken, RepositorioRefreshToken>();
 
         services.AddEntityFrameworkConfig(configuration);
 
