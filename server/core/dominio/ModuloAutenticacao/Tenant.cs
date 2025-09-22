@@ -28,6 +28,9 @@ public class Tenant : EntidadeBase<Tenant>
 
     public override void AtualizarRegistro(Tenant registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         Nome = registroEditado.Nome;
         CNPJ = registroEditado.CNPJ;
         SlugSubdominio = registroEditado.SlugSubdominio;

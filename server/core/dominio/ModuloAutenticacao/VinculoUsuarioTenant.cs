@@ -19,6 +19,9 @@ public class VinculoUsuarioTenant : EntidadeBase<VinculoUsuarioTenant>
 
     public override void AtualizarRegistro(VinculoUsuarioTenant registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         NomeCargo = registroEditado.NomeCargo;
     }
 }

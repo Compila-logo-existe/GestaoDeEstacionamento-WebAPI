@@ -19,6 +19,9 @@ public class RefreshToken : EntidadeBase<RefreshToken>
 
     public override void AtualizarRegistro(RefreshToken registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         EnderecoIpDeCriacao = registroEditado.EnderecoIpDeCriacao;
         UserAgentDeCriacao = registroEditado.UserAgentDeCriacao;
     }

@@ -28,6 +28,9 @@ public class ConviteRegistro : EntidadeBase<ConviteRegistro>
 
     public override void AtualizarRegistro(ConviteRegistro registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         NomeCargo = registroEditado.NomeCargo;
         DataExpiracaoUtc = registroEditado.DataExpiracaoUtc;
     }
