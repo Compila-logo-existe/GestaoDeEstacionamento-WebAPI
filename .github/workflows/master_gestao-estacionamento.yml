@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-    - 'server/**'
+      - 'server/**'
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build ./server --configuration Release
+        run: dotnet build ./server/GestaoDeEstacionamento-WebAPI.sln --configuration Release
   
   test:
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
           dotnet-version: '8.x'
     
       - name: Run tests
-        run: dotnet test ./server --configuration Release --verbosity normal
+        run: dotnet test ./server/GestaoDeEstacionamento-WebAPI.sln --configuration Release --verbosity normal
         env: 
           ASPNET_ENVIRONMENT: "GITHUB_ACTIONS"
           SQL_CONNECTION_STRING: ${{ secrets.SQL_CONNECTION_STRING }}
