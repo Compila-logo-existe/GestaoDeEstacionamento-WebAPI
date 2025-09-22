@@ -36,12 +36,16 @@ public class RegistroSaida : EntidadeBase<RegistroSaida>
 
     public void AderirTicket(Ticket ticket)
     {
+        TicketId = ticket.Id;
         Ticket = ticket;
         ticket.AderirRegistroSaida(this);
     }
 
     public override void AtualizarRegistro(RegistroSaida registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         DataSaidaEmUtc = registroEditado.DataSaidaEmUtc;
         Observacoes = registroEditado.Observacoes;
         HospedeId = registroEditado.HospedeId;
