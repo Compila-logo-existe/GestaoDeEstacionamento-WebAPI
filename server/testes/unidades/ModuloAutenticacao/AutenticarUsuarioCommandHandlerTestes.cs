@@ -24,7 +24,7 @@ public class AutenticarUsuarioCommandHandlerTestes
     private Mock<IRepositorioUsuarioTenant> repositorioUsuarioTenantMock = null!;
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<ITokenProvider> tokenProviderMock = null!;
-    private Mock<ILogger<AutenticarUsuarioCommand>> loggerMock = null!;
+    private Mock<ILogger<AutenticarUsuarioCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -47,7 +47,7 @@ public class AutenticarUsuarioCommandHandlerTestes
         repositorioUsuarioTenantMock = new Mock<IRepositorioUsuarioTenant>();
         tenantProviderMock = new Mock<ITenantProvider>();
         tokenProviderMock = new Mock<ITokenProvider>();
-        loggerMock = new Mock<ILogger<AutenticarUsuarioCommand>>();
+        loggerMock = new Mock<ILogger<AutenticarUsuarioCommandHandler>>();
 
         tenantProviderMock
             .SetupGet(p => p.TenantId)

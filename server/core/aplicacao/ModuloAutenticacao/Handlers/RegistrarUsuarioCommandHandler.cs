@@ -16,7 +16,7 @@ public class RegistrarUsuarioCommandHandler(
     ITenantProvider tenantProvider,
     ITokenProvider tokenProvider,
     IUnitOfWork unitOfWork,
-    ILogger<RegistrarUsuarioCommand> logger
+    ILogger<RegistrarUsuarioCommandHandler> logger
 ) : IRequestHandler<RegistrarUsuarioCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(

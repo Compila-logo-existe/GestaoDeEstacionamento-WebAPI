@@ -21,7 +21,7 @@ public class RotacionarTokenCommandHandlerTestes
     private Mock<IUnitOfWork> unitOfWorkMock = null!;
     private Mock<ITokenProvider> tokenProviderMock = null!;
     private Mock<IRefreshTokenProvider> refreshTokenProviderMock = null!;
-    private Mock<ILogger<RotacionarTokenCommand>> loggerMock = null!;
+    private Mock<ILogger<RotacionarTokenCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -29,7 +29,7 @@ public class RotacionarTokenCommandHandlerTestes
         unitOfWorkMock = new Mock<IUnitOfWork>();
         tokenProviderMock = new Mock<ITokenProvider>();
         refreshTokenProviderMock = new Mock<IRefreshTokenProvider>();
-        loggerMock = new Mock<ILogger<RotacionarTokenCommand>>();
+        loggerMock = new Mock<ILogger<RotacionarTokenCommandHandler>>();
 
         handler = new RotacionarTokenCommandHandler(
             unitOfWorkMock.Object,

@@ -12,7 +12,7 @@ public class RotacionarTokenCommandHandler(
     IUnitOfWork unitOfWork,
     ITokenProvider jwtProvider,
     IRefreshTokenProvider refreshTokenProvider,
-    ILogger<RotacionarTokenCommand> logger
+    ILogger<RotacionarTokenCommandHandler> logger
 ) : IRequestHandler<RotacionarTokenCommand, Result<(AccessToken, string)>>
 {
     public async Task<Result<(AccessToken, string)>> Handle(

@@ -12,7 +12,7 @@ public class CriarConviteCommandHandler(
     IRepositorioConvite repositorioConvite,
     ITenantProvider tenantProvider,
     IUnitOfWork unitOfWork,
-    ILogger<CriarConviteCommand> logger
+    ILogger<CriarConviteCommandHandler> logger
 ) : IRequestHandler<CriarConviteCommand, Result<(string, DateTime)>>
 {
     public async Task<Result<(string, DateTime)>> Handle(

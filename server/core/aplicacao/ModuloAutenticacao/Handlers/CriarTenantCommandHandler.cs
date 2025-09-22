@@ -12,7 +12,7 @@ public class CriarTenantCommandHandler(
     IRepositorioTenant repositorioTenant,
     ITenantProvider tenantProvider,
     IUnitOfWork unitOfWork,
-    ILogger<CriarTenantCommand> logger
+    ILogger<CriarTenantCommandHandler> logger
 ) : IRequestHandler<CriarTenantCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(

@@ -24,7 +24,7 @@ public class AceitarConviteCommandHandlerTestes
     private Mock<UserManager<Usuario>> userManagerMock = null!;
     private Mock<ITokenProvider> tokenProviderMock = null!;
     private Mock<IUnitOfWork> unitOfWorkMock = null!;
-    private Mock<ILogger<AceitarConviteCommand>> loggerMock = null!;
+    private Mock<ILogger<AceitarConviteCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -42,7 +42,7 @@ public class AceitarConviteCommandHandlerTestes
         repositorioTenantMock = new Mock<IRepositorioTenant>();
         tokenProviderMock = new Mock<ITokenProvider>();
         unitOfWorkMock = new Mock<IUnitOfWork>();
-        loggerMock = new Mock<ILogger<AceitarConviteCommand>>();
+        loggerMock = new Mock<ILogger<AceitarConviteCommandHandler>>();
 
         userManagerMock = new Mock<UserManager<Usuario>>(
             new Mock<IUserStore<Usuario>>().Object,

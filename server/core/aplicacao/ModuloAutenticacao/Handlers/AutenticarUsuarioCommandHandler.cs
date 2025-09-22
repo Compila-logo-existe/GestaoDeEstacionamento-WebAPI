@@ -14,7 +14,7 @@ public class AutenticarUsuarioCommandHandler(
     IRepositorioUsuarioTenant repositorioUsuarioTenant,
     ITenantProvider tenantProvider,
     ITokenProvider tokenProvider,
-    ILogger<AutenticarUsuarioCommand> logger
+    ILogger<AutenticarUsuarioCommandHandler> logger
 ) : IRequestHandler<AutenticarUsuarioCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(

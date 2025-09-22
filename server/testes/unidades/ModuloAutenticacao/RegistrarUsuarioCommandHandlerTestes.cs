@@ -25,7 +25,7 @@ public class RegistrarUsuarioCommandHandlerTestes
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<ITokenProvider> tokenProviderMock = null!;
     private Mock<IUnitOfWork> unitOfWorkMock = null!;
-    private Mock<ILogger<RegistrarUsuarioCommand>> loggerMock = null!;
+    private Mock<ILogger<RegistrarUsuarioCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -43,7 +43,7 @@ public class RegistrarUsuarioCommandHandlerTestes
         tenantProviderMock = new Mock<ITenantProvider>();
         tokenProviderMock = new Mock<ITokenProvider>();
         unitOfWorkMock = new Mock<IUnitOfWork>();
-        loggerMock = new Mock<ILogger<RegistrarUsuarioCommand>>();
+        loggerMock = new Mock<ILogger<RegistrarUsuarioCommandHandler>>();
 
         tenantProviderMock
             .SetupGet(p => p.TenantId)

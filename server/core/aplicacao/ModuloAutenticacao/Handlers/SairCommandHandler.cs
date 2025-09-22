@@ -15,7 +15,7 @@ public class SairCommandHandler(
     ITenantProvider tenantProvider,
     IRefreshTokenProvider refreshTokenProvider,
     IUnitOfWork unitOfWork,
-    ILogger<SairCommand> logger
+    ILogger<SairCommandHandler> logger
 ) : IRequestHandler<SairCommand, Result>
 {
     public async Task<Result> Handle(

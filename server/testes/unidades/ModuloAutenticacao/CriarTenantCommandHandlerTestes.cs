@@ -21,7 +21,7 @@ public class CriarTenantCommandHandlerTestes
     private Mock<IRepositorioTenant> repositorioTenantMock = null!;
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<IUnitOfWork> unitOfWorkMock = null!;
-    private Mock<ILogger<CriarTenantCommand>> loggerMock = null!;
+    private Mock<ILogger<CriarTenantCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -29,7 +29,7 @@ public class CriarTenantCommandHandlerTestes
         repositorioTenantMock = new Mock<IRepositorioTenant>();
         tenantProviderMock = new Mock<ITenantProvider>();
         unitOfWorkMock = new Mock<IUnitOfWork>();
-        loggerMock = new Mock<ILogger<CriarTenantCommand>>();
+        loggerMock = new Mock<ILogger<CriarTenantCommandHandler>>();
 
         tenantProviderMock
             .SetupGet(p => p.UsuarioId)

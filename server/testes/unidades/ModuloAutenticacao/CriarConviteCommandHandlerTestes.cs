@@ -21,7 +21,7 @@ public class CriarConviteCommandHandlerTestes
     private Mock<IRepositorioConvite> repositorioConvite = null!;
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<IUnitOfWork> unitOfWorkMock = null!;
-    private Mock<ILogger<CriarConviteCommand>> loggerMock = null!;
+    private Mock<ILogger<CriarConviteCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -32,7 +32,7 @@ public class CriarConviteCommandHandlerTestes
         repositorioConvite = new Mock<IRepositorioConvite>();
         tenantProviderMock = new Mock<ITenantProvider>();
         unitOfWorkMock = new Mock<IUnitOfWork>();
-        loggerMock = new Mock<ILogger<CriarConviteCommand>>();
+        loggerMock = new Mock<ILogger<CriarConviteCommandHandler>>();
 
         handler = new CriarConviteCommandHandler(
             repositorioConvite.Object,

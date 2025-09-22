@@ -18,7 +18,7 @@ public class SairCommandHandlerTestes
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<IRefreshTokenProvider> refreshTokenProviderMock = null!;
     private Mock<IUnitOfWork> unitOfWorkMock = null!;
-    private Mock<ILogger<SairCommand>> loggerMock = null!;
+    private Mock<ILogger<SairCommandHandler>> loggerMock = null!;
 
     [TestInitialize]
     public void Setup()
@@ -38,7 +38,7 @@ public class SairCommandHandlerTestes
         tenantProviderMock = new Mock<ITenantProvider>();
         refreshTokenProviderMock = new Mock<IRefreshTokenProvider>();
         unitOfWorkMock = new Mock<IUnitOfWork>();
-        loggerMock = new Mock<ILogger<SairCommand>>();
+        loggerMock = new Mock<ILogger<SairCommandHandler>>();
 
         handler = new SairCommandHandler(
             userManagerMock.Object,

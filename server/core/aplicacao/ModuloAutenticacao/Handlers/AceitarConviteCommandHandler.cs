@@ -16,7 +16,7 @@ public class AceitarConviteCommandHandler(
     UserManager<Usuario> userManager,
     ITokenProvider tokenProvider,
     IUnitOfWork unitOfWork,
-    ILogger<AceitarConviteCommand> logger
+    ILogger<AceitarConviteCommandHandler> logger
 ) : IRequestHandler<AceitarConviteCommand, Result<AccessToken>>
 {
     public async Task<Result<AccessToken>> Handle(

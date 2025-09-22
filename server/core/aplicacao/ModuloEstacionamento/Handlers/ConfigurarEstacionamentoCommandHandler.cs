@@ -132,6 +132,5 @@ public class ConfigurarEstacionamentoCommandHandler(
 
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
-        throw new NotImplementedException();
     }
 }
