@@ -71,6 +71,9 @@ public class Faturamento : EntidadeBase<Faturamento>
 
     public override void AtualizarRegistro(Faturamento registroEditado)
     {
+        if (registroEditado is null)
+            return;
+
         ValorDaDiaria = registroEditado.ValorDaDiaria;
         NumeroDeDiarias = registroEditado.NumeroDeDiarias;
         ValorTotal = registroEditado.ValorTotal;
