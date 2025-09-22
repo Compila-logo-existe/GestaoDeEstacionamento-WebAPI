@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\server\core\aplicacao\GestaoDeEstacionamento.Core.Aplicacao.csproj" />
     <ProjectReference Include="..\server\infraestrutura\orm\GestaoDeEstacionamento.Infraestrutura.ORM.csproj" />
   </ItemGroup>
 

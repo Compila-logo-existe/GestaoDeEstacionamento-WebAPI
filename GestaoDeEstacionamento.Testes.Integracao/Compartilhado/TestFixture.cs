@@ -79,37 +79,37 @@ public abstract class TestFixture
         repositorioRefreshToken = new(dbContext);
 
         BuilderSetup.SetCreatePersistenceMethod<Hospede>(h => repositorioHospede.CadastrarRegistroAsync(h).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<Hospede>>(h => repositorioHospede.CadastrarEntidades(h).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<Hospede>>(h => repositorioHospede.CadastrarEntidadesAsync(h).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<Veiculo>(v => repositorioVeiculo.CadastrarRegistroAsync(v).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<Veiculo>>(v => repositorioVeiculo.CadastrarEntidades(v).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<Veiculo>>(v => repositorioVeiculo.CadastrarEntidadesAsync(v).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<Estacionamento>(e => repositorioEstacionamento.CadastrarRegistroAsync(e).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<Estacionamento>>(e => repositorioEstacionamento.CadastrarEntidades(e).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<Estacionamento>>(e => repositorioEstacionamento.CadastrarEntidadesAsync(e).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<Vaga>(v => repositorioVaga.CadastrarRegistroAsync(v).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<Vaga>>(v => repositorioVaga.CadastrarEntidades(v).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<Vaga>>(v => repositorioVaga.CadastrarEntidadesAsync(v).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<RegistroEntrada>(r => repositorioRegistroEntrada.CadastrarRegistroAsync(r).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<RegistroEntrada>>(r => repositorioRegistroEntrada.CadastrarEntidades(r).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<RegistroEntrada>>(r => repositorioRegistroEntrada.CadastrarEntidadesAsync(r).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<RegistroSaida>(r => repositorioRegistroSaida.CadastrarRegistroAsync(r).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<RegistroSaida>>(r => repositorioRegistroSaida.CadastrarEntidades(r).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<RegistroSaida>>(r => repositorioRegistroSaida.CadastrarEntidadesAsync(r).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<Faturamento>(f => repositorioFaturamento.CadastrarRegistroAsync(f).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<Faturamento>>(f => repositorioFaturamento.CadastrarEntidades(f).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<Faturamento>>(f => repositorioFaturamento.CadastrarEntidadesAsync(f).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<Tenant>(t => repositorioTenant.CadastrarRegistroAsync(t).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<Tenant>>(t => repositorioTenant.CadastrarEntidades(t).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<Tenant>>(t => repositorioTenant.CadastrarEntidadesAsync(t).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<VinculoUsuarioTenant>(v => repositorioUsuarioTenant.CadastrarRegistroAsync(v).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<VinculoUsuarioTenant>>(v => repositorioUsuarioTenant.CadastrarEntidades(v).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<VinculoUsuarioTenant>>(v => repositorioUsuarioTenant.CadastrarEntidadesAsync(v).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<ConviteRegistro>(c => repositorioConviteRegistro.CadastrarRegistroAsync(c).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<ConviteRegistro>>(c => repositorioConviteRegistro.CadastrarEntidades(c).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<ConviteRegistro>>(c => repositorioConviteRegistro.CadastrarEntidadesAsync(c).GetAwaiter().GetResult());
 
         BuilderSetup.SetCreatePersistenceMethod<RefreshToken>(r => repositorioRefreshToken.CadastrarRegistroAsync(r).GetAwaiter().GetResult());
-        BuilderSetup.SetCreatePersistenceMethod<IList<RefreshToken>>(r => repositorioRefreshToken.CadastrarEntidades(r).GetAwaiter().GetResult());
+        BuilderSetup.SetCreatePersistenceMethod<IList<RefreshToken>>(r => repositorioRefreshToken.CadastrarEntidadesAsync(r).GetAwaiter().GetResult());
 
     }
 

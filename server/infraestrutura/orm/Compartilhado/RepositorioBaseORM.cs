@@ -12,7 +12,7 @@ public class RepositorioBaseORM<T>(AppDbContext contexto) where T : EntidadeBase
         await registros.AddAsync(novoRegistro);
     }
 
-    public async Task CadastrarEntidades(IList<T> entidades)
+    public async Task CadastrarEntidadesAsync(IList<T> entidades)
     {
         await registros.AddRangeAsync(entidades);
     }
