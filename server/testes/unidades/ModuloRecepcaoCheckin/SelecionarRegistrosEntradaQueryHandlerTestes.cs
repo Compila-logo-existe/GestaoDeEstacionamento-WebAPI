@@ -1,6 +1,5 @@
 using AutoMapper;
 using FizzWare.NBuilder;
-using FluentValidation;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Commands;
 using GestaoDeEstacionamento.Core.Aplicacao.ModuloRecepcaoCheckin.Handlers;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
@@ -26,11 +25,8 @@ public class SelecionarRegistrosEntradaQueryHandlerTestes
     private readonly Guid usuarioIdPadrao = Guid.NewGuid();
     private readonly Guid estacionamentoIdPadrao = Guid.NewGuid();
     private readonly Guid veiculoIdPadrao = Guid.NewGuid();
-    private readonly Guid registroIdPadrao = Guid.NewGuid();
 
-    private Mock<IValidator<SelecionarRegistrosEntradaQuery>> validatorMock = null!;
     private Mock<IMapper> mapperMock = null!;
-    private Mock<IRepositorioVeiculo> repositorioVeiculoMock = null!;
     private Mock<IRepositorioRegistroEntrada> repositorioRegistroEntradaMock = null!;
     private Mock<ITenantProvider> tenantProviderMock = null!;
     private Mock<IDistributedCache> cacheMock = null!;
@@ -39,9 +35,7 @@ public class SelecionarRegistrosEntradaQueryHandlerTestes
     [TestInitialize]
     public void Setup()
     {
-        validatorMock = new Mock<IValidator<SelecionarRegistrosEntradaQuery>>();
         mapperMock = new Mock<IMapper>();
-        repositorioVeiculoMock = new Mock<IRepositorioVeiculo>();
         repositorioRegistroEntradaMock = new Mock<IRepositorioRegistroEntrada>();
         tenantProviderMock = new Mock<ITenantProvider>();
         cacheMock = new Mock<IDistributedCache>();

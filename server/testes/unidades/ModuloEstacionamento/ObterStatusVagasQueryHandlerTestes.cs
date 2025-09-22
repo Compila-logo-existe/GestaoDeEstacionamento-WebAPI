@@ -17,7 +17,6 @@ public class ObterStatusVagasQueryHandlerTestes
     private ObterStatusVagasQueryHandler handler = null!;
 
     private const string nomeEstacionamentoPadrao = "Estacionamento Central";
-    private const string placaPadrao = "ABC1D23";
     private const string zonaPadrao = "A";
     private const int numeroVagaPadrao = 10;
 

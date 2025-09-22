@@ -15,8 +15,6 @@ public class ObterVagaPorIdQueryHandlerTestes
     private ObterVagaPorIdQueryHandler handler = null!;
 
     private const string nomeEstacionamentoPadrao = "Estacionamento Central";
-    private const string placaPadrao = "ABC1D23";
-    private const string zonaPadrao = "A";
     private const int numeroVagaPadrao = 10;
 
     private readonly Guid tenantIdPadrao = Guid.NewGuid();

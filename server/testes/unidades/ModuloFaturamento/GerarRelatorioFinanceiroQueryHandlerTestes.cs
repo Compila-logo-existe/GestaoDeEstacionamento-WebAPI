@@ -18,18 +18,10 @@ public class GerarRelatorioFinanceiroQueryHandlerTestes
 
     private DateTime dataInicialPadrao = DateTime.UtcNow.AddDays(-14);
     private DateTime dataFinalPadrao = DateTime.UtcNow.AddDays(1);
-    private const string nomeEstacionamentoPadrao = "Estacionamento Central";
-    private const string placaPadrao = "ABC1D23";
-    private const int numeroVagaPadrao = 10;
-    private const int numeroTicketPadrao = 22;
     private const decimal valorDiariaPadrao = 50.0m;
 
     private readonly Guid tenantIdPadrao = Guid.NewGuid();
     private readonly Guid usuarioIdPadrao = Guid.NewGuid();
-    private readonly Guid estacionamentoIdPadrao = Guid.NewGuid();
-    private readonly Guid vagaIdPadrao = Guid.NewGuid();
-    private readonly Guid registroIdPadrao = Guid.NewGuid();
-    private readonly Guid veiculoIdPadrao = Guid.NewGuid();
 
     private Mock<IValidator<GerarRelatorioFinanceiroQuery>> validatorMock = null!;
     private Mock<IMapper> mapperMock = null!;

@@ -14,8 +14,6 @@ public class ObterDetalhesVeiculoQueryHandlerTestes
 {
     private ObterDetalhesVeiculoQueryHandler handler = null!;
 
-    private const string nomeEstacionamentoPadrao = "Estacionamento Central";
-    private const int numeroTicketPadrao = 22;
     private const string placaPadrao = "ABC1D23";
     private const string modeloPadrao = "Aquele";
     private const string corPadrao = "Roxo";
@@ -23,9 +21,7 @@ public class ObterDetalhesVeiculoQueryHandlerTestes
 
     private readonly Guid tenantIdPadrao = Guid.NewGuid();
     private readonly Guid usuarioIdPadrao = Guid.NewGuid();
-    private readonly Guid estacionamentoIdPadrao = Guid.NewGuid();
     private readonly Guid veiculoIdPadrao = Guid.NewGuid();
-    private readonly Guid registroIdPadrao = Guid.NewGuid();
 
     private Mock<IValidator<ObterDetalhesVeiculoQuery>> validatorMock = null!;
     private Mock<IMapper> mapperMock = null!;
