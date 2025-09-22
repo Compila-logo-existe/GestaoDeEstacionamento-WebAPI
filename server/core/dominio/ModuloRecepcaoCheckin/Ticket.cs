@@ -24,6 +24,9 @@ public class Ticket : EntidadeBase<Ticket>
 
     public override void AtualizarRegistro(Ticket registroEditado)
     {
-        throw new NotImplementedException();
+        if (registroEditado is null)
+            return;
+
+        NumeroSequencial = registroEditado.NumeroSequencial;
     }
 }
