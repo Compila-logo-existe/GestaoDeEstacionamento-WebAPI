@@ -67,39 +67,29 @@ public class SelecionarRegistrosEntradaQueryHandlerTestes
         List<RegistroEntrada> registrosEntrada = Builder<RegistroEntrada>.CreateListOfSize(3).Build().ToList();
 
         repositorioRegistroEntradaMock
-            .Setup(r => r.SelecionarRegistrosAsync(quantidade))
+            .Setup(r => r.SelecionarRegistrosAsync())
             .ReturnsAsync(registrosEntrada);
 
         ImmutableList<SelecionarRegistrosEntradaDto> registrosDto = registrosEntrada.ConvertAll(r =>
-        new SelecionarRegistrosEntradaDto(
-            r.Id,
-            r.DataEntradaEmUtc,
-            r.Observacoes,
-            r.HospedeId,
-            nomeCompletoPadrao,
-            veiculoIdPadrao,
-            placaPadrao,
-            numeroTicketPadrao
-        )).ToImmutableList();
+            new SelecionarRegistrosEntradaDto(r.Id, r.DataEntradaEmUtc, r.Observacoes, r.HospedeId,
+                nomeCompletoPadrao, veiculoIdPadrao, placaPadrao, numeroTicketPadrao
+            )).ToImmutableList();
 
         SelecionarRegistrosEntradaResult resultadoMapeado = new(registrosDto);
+
         mapperMock
             .Setup(m => m.Map<SelecionarRegistrosEntradaResult>(It.IsAny<List<RegistroEntrada>>()))
             .Returns(resultadoMapeado);
-
-        string chaveCacheEsperada = $"recepcao:t={tenantIdPadrao}:q={quantidade}";
-        // Setup para simular que o cache não possui o resultado
 
         // Act
         Result<SelecionarRegistrosEntradaResult> resultado = await handler.Handle(query, CancellationToken.None);
 
         // Assert
-        repositorioRegistroEntradaMock.Verify(r => r.SelecionarRegistrosAsync(quantidade), Times.Once);
-        // Verifica se o cache foi consultado
+        repositorioRegistroEntradaMock.Verify(r => r.SelecionarRegistrosAsync(), Times.Once);
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
-        CollectionAssert.AreEquivalent(resultado.Value.RegistrosEntrada, resultadoMapeado.RegistrosEntrada);
+        CollectionAssert.AreEquivalent(resultadoMapeado.RegistrosEntrada, resultado.Value.RegistrosEntrada);
     }
 
     [TestMethod]
@@ -118,35 +108,25 @@ public class SelecionarRegistrosEntradaQueryHandlerTestes
             .ReturnsAsync(registrosEntrada.Take(quantidade).ToList());
 
         ImmutableList<SelecionarRegistrosEntradaDto> registrosDto = registrosEntrada.ConvertAll(r =>
-        new SelecionarRegistrosEntradaDto(
-            r.Id,
-            r.DataEntradaEmUtc,
-            r.Observacoes,
-            r.HospedeId,
-            nomeCompletoPadrao,
-            veiculoIdPadrao,
-            placaPadrao,
-            numeroTicketPadrao
-        )).Take(quantidade).ToImmutableList();
+            new SelecionarRegistrosEntradaDto(r.Id, r.DataEntradaEmUtc, r.Observacoes, r.HospedeId,
+                nomeCompletoPadrao, veiculoIdPadrao, placaPadrao, numeroTicketPadrao
+            )).Take(quantidade).ToImmutableList();
 
         SelecionarRegistrosEntradaResult resultadoMapeado = new(registrosDto);
+
         mapperMock
             .Setup(m => m.Map<SelecionarRegistrosEntradaResult>(It.IsAny<List<RegistroEntrada>>()))
             .Returns(resultadoMapeado);
-
-        string chaveCacheEsperada = $"recepcao:t={tenantIdPadrao}:q={quantidade}";
-        // Setup para simular que o cache não possui o resultado
 
         // Act
         Result<SelecionarRegistrosEntradaResult> resultado = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         repositorioRegistroEntradaMock.Verify(r => r.SelecionarRegistrosAsync(quantidade), Times.Once);
-        // Verifica se o cache foi consultado
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
-        Assert.IsTrue(resultado.Value.RegistrosEntrada.Count == 2);
-        CollectionAssert.AreEquivalent(resultado.Value.RegistrosEntrada, resultadoMapeado.RegistrosEntrada);
+        Assert.AreEqual(2, resultado.Value.RegistrosEntrada.Count);
+        CollectionAssert.AreEquivalent(resultadoMapeado.RegistrosEntrada, resultado.Value.RegistrosEntrada);
     }
 }

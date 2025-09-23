@@ -9,8 +9,6 @@ using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Immutable;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace GestaoDeEstacionamento.Testes.Unidades.ModuloRecepcaoCheckin;
 
@@ -77,64 +75,48 @@ public class SelecionarRegistrosDoVeiculoQueryHandlerTestes
             .Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
 
-        string placaPadronizadaParaCache = Padronizador.PadronizarPlaca(query.Placa);
-        string placaHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(placaPadronizadaParaCache)));
-
         Estacionamento estacionamento = new() { Id = estacionamentoIdPadrao, Nome = nomeEstacionamentoPadrao };
 
-        validatorMock
-            .Setup(v => v.ValidateAsync(It.IsAny<SelecionarRegistrosDoVeiculoQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult());
+        string placaPadronizada = Padronizador.PadronizarPlaca(placaPadrao);
 
         Veiculo veiculoExistente = new() { Id = veiculoIdPadrao };
+
         repositorioVeiculoMock
-            .Setup(r => r.SelecionarRegistroPorPlacaAsync(placaPadrao, tenantIdPadrao, It.IsAny<CancellationToken>()))
+            .Setup(r => r.SelecionarRegistroPorPlacaAsync(placaPadronizada, tenantIdPadrao, It.IsAny<CancellationToken>()))
             .ReturnsAsync(veiculoExistente);
 
-        RegistroEntrada registroEntradaMapeado = new() { Id = registroIdPadrao };
-        RegistroEntrada registroEntradaMapeado2 = new() { Id = registroIdPadrao };
-        List<RegistroEntrada> registrosEntrada = new() { registroEntradaMapeado, registroEntradaMapeado2 };
+        RegistroEntrada registroEntrada1 = new() { Id = registroIdPadrao };
+        RegistroEntrada registroEntrada2 = new() { Id = Guid.NewGuid() };
+        List<RegistroEntrada> registrosEntrada = new() { registroEntrada1, registroEntrada2 };
 
         repositorioRegistroEntradaMock
-            .Setup(r => r.SelecionarRegistrosDoVeiculoAsync(quantidade, veiculoExistente.Id, It.IsAny<CancellationToken>()))
+            .Setup(r => r.SelecionarRegistrosDoVeiculoAsync(veiculoExistente.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(registrosEntrada);
 
         ImmutableList<SelecionarRegistrosEntradaDto> registrosDto = registrosEntrada.ConvertAll(r =>
-        new SelecionarRegistrosEntradaDto(
-            r.Id,
-            r.DataEntradaEmUtc,
-            r.Observacoes,
-            r.HospedeId,
-            nomeCompletoPadrao,
-            veiculoIdPadrao,
-            placaPadrao,
-            numeroTicketPadrao
-        )).ToImmutableList();
+            new SelecionarRegistrosEntradaDto(r.Id, r.DataEntradaEmUtc, r.Observacoes, r.HospedeId,
+                nomeCompletoPadrao, veiculoIdPadrao, placaPadrao, numeroTicketPadrao
+            )).ToImmutableList();
 
         SelecionarRegistrosDoVeiculoResult resultadoMapeado = new(registrosDto);
+
         mapperMock
             .Setup(m => m.Map<SelecionarRegistrosDoVeiculoResult>(It.IsAny<List<RegistroEntrada>>()))
             .Returns(resultadoMapeado);
-
-        string chaveCacheEsperada = $"recepcao:t={tenantIdPadrao}:q={quantidade}:v={placaHash}";
-        // Setup para simular que o cache não possui o resultado
 
         // Act
         Result<SelecionarRegistrosDoVeiculoResult> resultado = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         validatorMock.Verify(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()), Times.Once);
-        repositorioVeiculoMock.Verify(r => r.SelecionarRegistroPorPlacaAsync(placaPadrao, tenantIdPadrao,
-            It.IsAny<CancellationToken>()), Times.Once
-        );
-        repositorioRegistroEntradaMock.Verify(r => r.SelecionarRegistrosDoVeiculoAsync(quantidade, veiculoExistente.Id,
-            It.IsAny<CancellationToken>()), Times.Once
-        );
-        // Verifica se o cache foi consultado
+        repositorioVeiculoMock.Verify(r =>
+            r.SelecionarRegistroPorPlacaAsync(placaPadronizada, tenantIdPadrao, It.IsAny<CancellationToken>()), Times.Once);
+        repositorioRegistroEntradaMock.Verify(r =>
+            r.SelecionarRegistrosDoVeiculoAsync(veiculoExistente.Id, It.IsAny<CancellationToken>()), Times.Once);
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
-        CollectionAssert.AreEquivalent(resultado.Value.RegistrosEntrada, resultadoMapeado.RegistrosEntrada);
+        CollectionAssert.AreEquivalent(resultadoMapeado.RegistrosEntrada, resultado.Value.RegistrosEntrada);
     }
 
     [TestMethod]
@@ -150,42 +132,29 @@ public class SelecionarRegistrosDoVeiculoQueryHandlerTestes
 
         Estacionamento estacionamento = new() { Id = estacionamentoIdPadrao, Nome = nomeEstacionamentoPadrao };
 
-        validatorMock
-            .Setup(v => v.ValidateAsync(It.IsAny<SelecionarRegistrosDoVeiculoQuery>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult());
-
         Veiculo veiculoExistente = new() { Id = veiculoIdPadrao };
         repositorioVeiculoMock
             .Setup(r => r.SelecionarRegistroPorIdAsync(veiculoIdPadrao))
             .ReturnsAsync(veiculoExistente);
 
-        RegistroEntrada registroEntradaMapeado = new() { Id = registroIdPadrao };
-        RegistroEntrada registroEntradaMapeado2 = new() { Id = registroIdPadrao };
-        List<RegistroEntrada> registrosEntrada = new() { registroEntradaMapeado, registroEntradaMapeado2 };
+        RegistroEntrada registroEntrada1 = new() { Id = registroIdPadrao };
+        RegistroEntrada registroEntrada2 = new() { Id = Guid.NewGuid() };
+        List<RegistroEntrada> registrosEntrada = new() { registroEntrada1, registroEntrada2 };
 
         repositorioRegistroEntradaMock
-            .Setup(r => r.SelecionarRegistrosDoVeiculoAsync(quantidade, veiculoExistente.Id, It.IsAny<CancellationToken>()))
+            .Setup(r => r.SelecionarRegistrosDoVeiculoAsync(veiculoExistente.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(registrosEntrada);
 
         ImmutableList<SelecionarRegistrosEntradaDto> registrosDto = registrosEntrada.ConvertAll(r =>
-        new SelecionarRegistrosEntradaDto(
-            r.Id,
-            r.DataEntradaEmUtc,
-            r.Observacoes,
-            r.HospedeId,
-            nomeCompletoPadrao,
-            veiculoIdPadrao,
-            placaPadrao,
-            numeroTicketPadrao
-        )).ToImmutableList();
+            new SelecionarRegistrosEntradaDto(r.Id, r.DataEntradaEmUtc, r.Observacoes, r.HospedeId,
+                nomeCompletoPadrao, veiculoIdPadrao, placaPadrao, numeroTicketPadrao
+            )).ToImmutableList();
 
         SelecionarRegistrosDoVeiculoResult resultadoMapeado = new(registrosDto);
+
         mapperMock
             .Setup(m => m.Map<SelecionarRegistrosDoVeiculoResult>(It.IsAny<List<RegistroEntrada>>()))
             .Returns(resultadoMapeado);
-
-        string chaveCacheEsperada = $"recepcao:t={tenantIdPadrao}:q={quantidade}:v={veiculoIdPadrao}";
-        // Setup para simular que o cache não possui o resultado
 
         // Act
         Result<SelecionarRegistrosDoVeiculoResult> resultado = await handler.Handle(query, CancellationToken.None);
@@ -193,13 +162,11 @@ public class SelecionarRegistrosDoVeiculoQueryHandlerTestes
         // Assert
         validatorMock.Verify(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()), Times.Once);
         repositorioVeiculoMock.Verify(r => r.SelecionarRegistroPorIdAsync(veiculoIdPadrao), Times.Once);
-        repositorioRegistroEntradaMock.Verify(r => r.SelecionarRegistrosDoVeiculoAsync(quantidade, veiculoExistente.Id,
-            It.IsAny<CancellationToken>()), Times.Once
-        );
-        // Verifica se o cache foi consultado
+        repositorioRegistroEntradaMock.Verify(r =>
+        r.SelecionarRegistrosDoVeiculoAsync(veiculoExistente.Id, It.IsAny<CancellationToken>()), Times.Once);
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
-        CollectionAssert.AreEquivalent(resultado.Value.RegistrosEntrada, resultadoMapeado.RegistrosEntrada);
+        CollectionAssert.AreEquivalent(resultadoMapeado.RegistrosEntrada, resultado.Value.RegistrosEntrada);
     }
 }

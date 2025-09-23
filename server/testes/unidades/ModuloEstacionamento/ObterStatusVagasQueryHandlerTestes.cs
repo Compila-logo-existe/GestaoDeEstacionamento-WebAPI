@@ -17,7 +17,6 @@ public class ObterStatusVagasQueryHandlerTestes
     private ObterStatusVagasQueryHandler handler = null!;
 
     private const string nomeEstacionamentoPadrao = "Estacionamento Central";
-    private const string zonaPadrao = "A";
     private const int numeroVagaPadrao = 10;
 
     private readonly Guid tenantIdPadrao = Guid.NewGuid();
@@ -44,8 +43,10 @@ public class ObterStatusVagasQueryHandlerTestes
         cacheMock = new Mock<IDistributedCache>();
         loggerMock = new Mock<ILogger<ObterStatusVagasQueryHandler>>();
 
-        tenantProviderMock.SetupGet(p => p.TenantId).Returns(tenantIdPadrao);
-        tenantProviderMock.SetupGet(p => p.UsuarioId).Returns(usuarioIdPadrao);
+        tenantProviderMock.SetupGet(p => p.TenantId)
+            .Returns(tenantIdPadrao);
+        tenantProviderMock.SetupGet(p => p.UsuarioId)
+            .Returns(usuarioIdPadrao);
 
         handler = new ObterStatusVagasQueryHandler(
             validatorMock.Object,
@@ -63,8 +64,7 @@ public class ObterStatusVagasQueryHandlerTestes
     {
         // Arrange
         const int quantidade = 0;
-        ObterStatusVagasQuery query = new(quantidade, null,
-            nomeEstacionamentoPadrao, null, null);
+        ObterStatusVagasQuery query = new(quantidade, null, nomeEstacionamentoPadrao, null, null);
 
         validatorMock
             .Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
@@ -76,31 +76,18 @@ public class ObterStatusVagasQueryHandlerTestes
         List<Vaga> vagasExistentes = new() { vaga1, vaga2 };
 
         repositorioEstacionamentoMock
-            .Setup(r => r.SelecionarRegistroPorNome(nomeEstacionamentoPadrao, tenantIdPadrao,
-            It.IsAny<CancellationToken>()))
+            .Setup(r => r.SelecionarRegistroPorNome(nomeEstacionamentoPadrao, tenantIdPadrao, It.IsAny<CancellationToken>()))
             .ReturnsAsync(estacionamento);
 
         repositorioVagaMock
-            .Setup(r => r.SelecionarRegistrosDoEstacionamentoAsync(
-                quantidade,
-                estacionamentoIdPadrao,
-                null!,
-                It.IsAny<CancellationToken>()))
+            .Setup(r => r.SelecionarRegistrosDoEstacionamentoAsync(estacionamentoIdPadrao, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(vagasExistentes);
 
-        string chaveCacheEsperada = $"estacionamento:t={tenantIdPadrao}:q={quantidade}:e={nomeEstacionamentoPadrao}:z={zonaPadrao}";
-        // Setup para simular que o cache não possui o resultado
-
         ImmutableList<ObterStatusVagasDto> vagasDto = vagasExistentes.ConvertAll(vaga =>
-        new ObterStatusVagasDto(
-            vaga.Id,
-            vaga.Numero,
-            vaga.Zona,
-            vaga.Status,
-            vaga.Veiculo?.Placa
-        )).ToImmutableList();
+            new ObterStatusVagasDto(vaga.Id, vaga.Numero, vaga.Zona, vaga.Status, vaga.Veiculo?.Placa)).ToImmutableList();
 
         ObterStatusVagasResult resultadoMapeado = new(vagasDto);
+
         mapperMock
             .Setup(m => m.Map<ObterStatusVagasResult>(It.IsAny<List<Vaga>>()))
             .Returns(resultadoMapeado);
@@ -111,19 +98,9 @@ public class ObterStatusVagasQueryHandlerTestes
         // Assert
         validatorMock.Verify(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()), Times.Once);
         repositorioEstacionamentoMock.Verify(r =>
-            r.SelecionarRegistroPorNome(nomeEstacionamentoPadrao, tenantIdPadrao, It.IsAny<CancellationToken>()),
-            Times.Once
-        );
-
+            r.SelecionarRegistroPorNome(nomeEstacionamentoPadrao, tenantIdPadrao, It.IsAny<CancellationToken>()), Times.Once);
         repositorioVagaMock.Verify(r =>
-            r.SelecionarRegistrosDoEstacionamentoAsync(
-                quantidade,
-                estacionamentoIdPadrao,
-                null,
-                It.IsAny<CancellationToken>()
-            ), Times.Once
-        );
-        // Verifica se o cache foi consultado
+            r.SelecionarRegistrosDoEstacionamentoAsync(estacionamentoIdPadrao, null, It.IsAny<CancellationToken>()), Times.Once);
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
@@ -135,8 +112,7 @@ public class ObterStatusVagasQueryHandlerTestes
     {
         // Arrange
         const int quantidade = 0;
-        ObterStatusVagasQuery query = new(quantidade, estacionamentoIdPadrao,
-            null, null, null);
+        ObterStatusVagasQuery query = new(quantidade, estacionamentoIdPadrao, null, null, null);
 
         validatorMock
             .Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
@@ -145,33 +121,22 @@ public class ObterStatusVagasQueryHandlerTestes
         Estacionamento estacionamento = new() { Id = estacionamentoIdPadrao, Nome = nomeEstacionamentoPadrao };
         Vaga vaga1 = new() { Id = vagaIdPadrao, Estacionamento = estacionamento, Numero = numeroVagaPadrao, Zona = ZonaEstacionamento.A };
         Vaga vaga2 = new() { Id = Guid.NewGuid(), Estacionamento = estacionamento, Numero = numeroVagaPadrao + 1, Zona = ZonaEstacionamento.A };
-        List<Vaga> vagasExistentes = new() { vaga1, vaga2 };
+        List<Vaga> vagasExistentes = new()
+        { vaga1, vaga2 };
 
         repositorioEstacionamentoMock
             .Setup(r => r.SelecionarRegistroPorIdAsync(estacionamentoIdPadrao))
             .ReturnsAsync(estacionamento);
 
         repositorioVagaMock
-            .Setup(r => r.SelecionarRegistrosDoEstacionamentoAsync(
-                quantidade,
-                estacionamentoIdPadrao,
-                null!,
-                It.IsAny<CancellationToken>()))
+            .Setup(r => r.SelecionarRegistrosDoEstacionamentoAsync(estacionamentoIdPadrao, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(vagasExistentes);
 
-        string chaveCacheEsperada = $"estacionamento:t={tenantIdPadrao}:q={quantidade}:e={nomeEstacionamentoPadrao}:z={zonaPadrao}";
-        // Setup para simular que o cache não possui o resultado
-
         ImmutableList<ObterStatusVagasDto> vagasDto = vagasExistentes.ConvertAll(vaga =>
-        new ObterStatusVagasDto(
-            vaga.Id,
-            vaga.Numero,
-            vaga.Zona,
-            vaga.Status,
-            vaga.Veiculo?.Placa
-        )).ToImmutableList();
+            new ObterStatusVagasDto(vaga.Id, vaga.Numero, vaga.Zona, vaga.Status, vaga.Veiculo?.Placa)).ToImmutableList();
 
         ObterStatusVagasResult resultadoMapeado = new(vagasDto);
+
         mapperMock
             .Setup(m => m.Map<ObterStatusVagasResult>(It.IsAny<List<Vaga>>()))
             .Returns(resultadoMapeado);
@@ -181,18 +146,9 @@ public class ObterStatusVagasQueryHandlerTestes
 
         // Assert
         validatorMock.Verify(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()), Times.Once);
-        repositorioEstacionamentoMock.Verify(r =>
-            r.SelecionarRegistroPorIdAsync(estacionamentoIdPadrao), Times.Once);
-
+        repositorioEstacionamentoMock.Verify(r => r.SelecionarRegistroPorIdAsync(estacionamentoIdPadrao), Times.Once);
         repositorioVagaMock.Verify(r =>
-            r.SelecionarRegistrosDoEstacionamentoAsync(
-                quantidade,
-                estacionamentoIdPadrao,
-                null,
-                It.IsAny<CancellationToken>()
-            ), Times.Once
-        );
-        // Verifica se o cache foi consultado
+            r.SelecionarRegistrosDoEstacionamentoAsync(estacionamentoIdPadrao, null, It.IsAny<CancellationToken>()), Times.Once);
 
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsSuccess);
