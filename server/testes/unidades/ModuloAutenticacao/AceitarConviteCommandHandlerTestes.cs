@@ -239,6 +239,10 @@ public class AceitarConviteCommandHandlerTestes
             .Setup(u => u.CreateAsync(It.IsAny<Usuario>(), senhaPadrao))
             .ReturnsAsync(IdentityResult.Success);
 
+        userManagerMock
+            .Setup(u => u.GetRolesAsync(It.Is<Usuario>(usr => usr.Email == emailPadrao)))
+            .ReturnsAsync(new List<string>());
+
         repositorioTenantMock
             .Setup(r => r.ObterPorIdAsync(tenantPadrao.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Tenant?)null);
@@ -343,6 +347,106 @@ public class AceitarConviteCommandHandlerTestes
         tokenProviderMock.Verify(p => p.GerarAccessToken(It.IsAny<Usuario>(), It.IsAny<Guid>()), Times.Never);
 
         Assert.IsTrue(resultado.IsFailed);
+    }
+
+    [TestMethod]
+    public async Task Handle_Deve_Atualizar_Usuario_Quando_Nome_Completo_Diferir_De_Usuario_Existente()
+    {
+        // Arrange
+        string tokenConvite = Convert.ToHexString(Guid.NewGuid().ToByteArray());
+        AceitarConviteCommand command = new(tokenConvite, fullNamePadrao, senhaPadrao, senhaPadrao);
+
+        ConviteRegistro convite = new()
+        {
+            UsuarioEmissorId = Guid.NewGuid(),
+            EmailConvidado = emailPadrao,
+            NomeCargo = cargoPadrao,
+            TokenConvite = tokenConvite,
+            DataExpiracaoUtc = DateTime.UtcNow.AddDays(4)
+        };
+        convite.VincularTenant(tenantPadrao.Id);
+
+        Usuario usuarioExistente = new()
+        {
+            Id = Guid.NewGuid(),
+            Email = emailPadrao,
+            UserName = emailPadrao,
+            EmailConfirmed = true,
+            FullName = "",
+            AccessTokenVersionId = Guid.NewGuid()
+        };
+
+        repositorioConvite
+            .Setup(p => p.ObterAtivoPorTokenAsync(tokenConvite, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(convite);
+
+        userManagerMock
+            .Setup(u => u.FindByEmailAsync(emailPadrao))
+            .ReturnsAsync(usuarioExistente);
+
+        userManagerMock
+            .Setup(u => u.CheckPasswordAsync(usuarioExistente, senhaPadrao))
+            .ReturnsAsync(true);
+
+        userManagerMock
+            .Setup(u => u.UpdateAsync(It.IsAny<Usuario>()))
+            .ReturnsAsync(IdentityResult.Success);
+
+        userManagerMock
+            .Setup(u => u.GetRolesAsync(It.Is<Usuario>(usr => usr.Email == emailPadrao)))
+            .ReturnsAsync(new List<string>());
+
+        userManagerMock
+            .Setup(u => u.AddToRoleAsync(
+                It.Is<Usuario>(usr => usr.Email == emailPadrao),
+                It.Is<string>(r => r == cargoPadrao)))
+            .ReturnsAsync(IdentityResult.Success);
+
+        repositorioTenantMock
+            .Setup(r => r.ObterPorIdAsync(It.Is<Guid>(g => g == tenantPadrao.Id), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(tenantPadrao);
+
+        repositorioUsuarioTenantMock
+            .Setup(r => r.UsuarioPertenceAoTenantAsync(It.IsAny<Guid>(), It.Is<Guid>(g => g == tenantPadrao.Id), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        VinculoUsuarioTenant? vinculoCapturado = null;
+        repositorioUsuarioTenantMock
+            .Setup(r => r.CadastrarRegistroAsync(It.IsAny<VinculoUsuarioTenant>()))
+            .Callback<VinculoUsuarioTenant>(v => vinculoCapturado = v)
+            .Returns(Task.CompletedTask);
+
+        repositorioConvite
+            .Setup(r => r.MarcarComoUtilizadoAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        unitOfWorkMock
+            .Setup(u => u.CommitAsync())
+            .Returns(Task.CompletedTask);
+
+        // Act
+        Result<AccessToken> resultado = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        repositorioConvite.Verify(p => p.ObterAtivoPorTokenAsync(tokenConvite, It.IsAny<CancellationToken>()), Times.Once);
+        userManagerMock.Verify(u => u.FindByEmailAsync(emailPadrao), Times.Once);
+        userManagerMock.Verify(u => u.CheckPasswordAsync(It.IsAny<Usuario>(), senhaPadrao), Times.Once);
+        userManagerMock.Verify(u => u.UpdateAsync(It.IsAny<Usuario>()), Times.Once);
+        userManagerMock.Verify(u => u.GetRolesAsync(It.IsAny<Usuario>()), Times.Once);
+        userManagerMock.Verify(u => u.AddToRoleAsync(It.IsAny<Usuario>(), cargoPadrao), Times.Once);
+        repositorioTenantMock.Verify(r => r.ObterPorIdAsync(tenantPadrao.Id, It.IsAny<CancellationToken>()), Times.Once);
+        repositorioUsuarioTenantMock.Verify(r => r.UsuarioPertenceAoTenantAsync(It.IsAny<Guid>(), tenantPadrao.Id, It.IsAny<CancellationToken>()), Times.Once);
+        repositorioUsuarioTenantMock.Verify(r => r.CadastrarRegistroAsync(It.IsAny<VinculoUsuarioTenant>()), Times.Once);
+        repositorioConvite.Verify(r => r.MarcarComoUtilizadoAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
+        unitOfWorkMock.Verify(u => u.CommitAsync(), Times.Once);
+        tokenProviderMock.Verify(p => p.GerarAccessToken(It.IsAny<Usuario>(), tenantPadrao.Id), Times.Once);
+
+        Assert.IsNotNull(resultado);
+        Assert.IsTrue(resultado.IsSuccess);
+        Assert.IsNotNull(vinculoCapturado);
+        Assert.AreEqual(cargoPadrao, vinculoCapturado!.NomeCargo);
+        Assert.AreEqual(slug, vinculoCapturado.Slug);
+        Assert.AreEqual(tenantPadrao.Id, vinculoCapturado.TenantId);
     }
 
     [TestMethod]
