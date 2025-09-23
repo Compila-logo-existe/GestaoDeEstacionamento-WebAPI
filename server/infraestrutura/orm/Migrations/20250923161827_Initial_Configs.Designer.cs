@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250921004006_RefreshTokens")]
-    partial class RefreshTokens
+    [Migration("20250923161827_Initial_Configs")]
+    partial class Initial_Configs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,6 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.ConviteRegistro", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("DataExpiracaoUtc")
@@ -79,7 +78,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("UsuarioEmissorId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UtilizadoEmUtc")
@@ -98,7 +97,6 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CriadoEmUtc")
@@ -121,13 +119,13 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Property<string>("SubstituidoPorHashDoToken")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("UserAgentDeCriacao")
                         .HasColumnType("text");
 
                     b.Property<Guid>("UsuarioAutenticadoId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UsuarioId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -135,7 +133,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("HashDoToken")
                         .IsUnique();
 
-                    b.HasIndex("UsuarioAutenticadoId", "UsuarioId");
+                    b.HasIndex("UsuarioAutenticadoId", "TenantId");
 
                     b.ToTable("RefreshTokens");
                 });
@@ -143,7 +141,6 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.Tenant", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<bool>("Ativo")
@@ -170,7 +167,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .HasMaxLength(63)
                         .HasColumnType("character varying(63)");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("UsuarioCriadorId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -261,7 +258,6 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
             modelBuilder.Entity("GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao.VinculoUsuarioTenant", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("NomeCargo")
@@ -276,12 +272,12 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("UsuarioVinculadoId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UsuarioId", "TenantId")
+                    b.HasIndex("UsuarioVinculadoId", "TenantId")
                         .IsUnique();
 
                     b.ToTable("VinculosUsuarioTenant");
@@ -296,12 +292,12 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UsuarioId", "Nome")
+                    b.HasIndex("TenantId", "Nome")
                         .IsUnique();
 
                     b.ToTable("Estacionamentos");
@@ -318,7 +314,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Property<int>("Numero")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("VeiculoId")
@@ -332,7 +328,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("VeiculoId")
                         .IsUnique();
 
-                    b.HasIndex("UsuarioId", "VeiculoId")
+                    b.HasIndex("TenantId", "VeiculoId")
                         .IsUnique();
 
                     b.HasIndex("EstacionamentoId", "Zona", "Numero")
@@ -358,7 +354,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.Property<Guid?>("RegistroSaidaId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("ValorDaDiaria")
@@ -379,7 +375,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     b.HasIndex("RegistroSaidaId")
                         .IsUnique();
 
-                    b.HasIndex("UsuarioId", "RegistroSaidaId")
+                    b.HasIndex("TenantId", "RegistroSaidaId")
                         .IsUnique();
 
                     b.ToTable("Faturamentos");
@@ -404,12 +400,12 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UsuarioId", "CPF")
+                    b.HasIndex("TenantId", "CPF")
                         .IsUnique();
 
                     b.ToTable("Hospedes");
@@ -435,10 +431,10 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .HasColumnType("text")
                         .HasDefaultValueSql("'[]'");
 
-                    b.Property<Guid>("TicketId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("VeiculoId")
@@ -455,7 +451,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 
                     b.HasIndex("VeiculoId");
 
-                    b.HasIndex("UsuarioId", "TicketId")
+                    b.HasIndex("TenantId", "TicketId")
                         .IsUnique();
 
                     b.ToTable("RegistrosEntrada");
@@ -478,10 +474,10 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .HasColumnType("text")
                         .HasDefaultValueSql("'[]'");
 
-                    b.Property<Guid>("TicketId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("VeiculoId")
@@ -498,7 +494,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 
                     b.HasIndex("VeiculoId");
 
-                    b.HasIndex("UsuarioId", "TicketId")
+                    b.HasIndex("TenantId", "TicketId")
                         .IsUnique();
 
                     b.ToTable("RegistrosSaida");
@@ -519,7 +515,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NumeroSequencial"));
                     NpgsqlPropertyBuilderExtensions.HasIdentityOptions(b.Property<int>("NumeroSequencial"), 1L, null, null, null, null, null);
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -556,14 +552,14 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UsuarioId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HospedeId");
 
-                    b.HasIndex("UsuarioId", "Placa")
+                    b.HasIndex("TenantId", "Placa")
                         .IsUnique();
 
                     b.ToTable("Veiculos");

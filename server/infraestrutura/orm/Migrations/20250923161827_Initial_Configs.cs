@@ -32,6 +32,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: false),
+                    AccessTokenVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -57,13 +58,13 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioEmissorId = table.Column<Guid>(type: "uuid", nullable: false),
                     EmailConvidado = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     NomeCargo = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     TokenConvite = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     DataExpiracaoUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UtilizadoEmUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,7 +77,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Nome = table.Column<string>(type: "text", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,7 +92,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     NomeCompleto = table.Column<string>(type: "text", nullable: false),
                     CPF = table.Column<string>(type: "character varying(14)", maxLength: 14, nullable: false),
                     Telefone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -99,17 +100,37 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioAutenticadoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    HashDoToken = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    CriadoEmUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExpiraEmUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RevogadoEmUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    SubstituidoPorHashDoToken = table.Column<string>(type: "text", nullable: true),
+                    EnderecoIpDeCriacao = table.Column<string>(type: "text", nullable: true),
+                    UserAgentDeCriacao = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tenants",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioCriadorId = table.Column<Guid>(type: "uuid", nullable: false),
                     Nome = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     CNPJ = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     SlugSubdominio = table.Column<string>(type: "character varying(63)", maxLength: 63, nullable: false),
                     DominioPersonalizado = table.Column<string>(type: "character varying(253)", maxLength: 253, nullable: true),
                     CriadoEmUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,7 +146,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     NumeroSequencial = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:IdentitySequenceOptions", "'1', '1', '', '', 'False', '1'")
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -137,10 +158,10 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsuarioVinculadoId = table.Column<Guid>(type: "uuid", nullable: false),
                     NomeCargo = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Slug = table.Column<string>(type: "text", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -263,7 +284,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     Cor = table.Column<string>(type: "text", nullable: false),
                     HospedeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Observacoes = table.Column<string>(type: "text", nullable: false, defaultValueSql: "'[]'"),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -287,7 +308,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
                     VeiculoId = table.Column<Guid>(type: "uuid", nullable: false),
                     Observacoes = table.Column<string>(type: "text", nullable: false, defaultValueSql: "'[]'"),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -322,7 +343,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
                     VeiculoId = table.Column<Guid>(type: "uuid", nullable: false),
                     Observacoes = table.Column<string>(type: "text", nullable: false, defaultValueSql: "'[]'"),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -356,7 +377,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     Zona = table.Column<int>(type: "integer", nullable: false),
                     VeiculoId = table.Column<Guid>(type: "uuid", nullable: true),
                     EstacionamentoId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -386,7 +407,7 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                     NumeroDeDiarias = table.Column<int>(type: "integer", nullable: false),
                     ValorTotal = table.Column<decimal>(type: "numeric(14,2)", precision: 14, scale: 2, nullable: false),
                     DataEntradaEmUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UsuarioId = table.Column<Guid>(type: "uuid", nullable: false)
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -454,9 +475,9 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Estacionamentos_UsuarioId_Nome",
+                name: "IX_Estacionamentos_TenantId_Nome",
                 table: "Estacionamentos",
-                columns: new[] { "UsuarioId", "Nome" },
+                columns: new[] { "TenantId", "Nome" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -477,16 +498,27 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Faturamentos_UsuarioId_RegistroSaidaId",
+                name: "IX_Faturamentos_TenantId_RegistroSaidaId",
                 table: "Faturamentos",
-                columns: new[] { "UsuarioId", "RegistroSaidaId" },
+                columns: new[] { "TenantId", "RegistroSaidaId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Hospedes_UsuarioId_CPF",
+                name: "IX_Hospedes_TenantId_CPF",
                 table: "Hospedes",
-                columns: new[] { "UsuarioId", "CPF" },
+                columns: new[] { "TenantId", "CPF" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_HashDoToken",
+                table: "RefreshTokens",
+                column: "HashDoToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UsuarioAutenticadoId_TenantId",
+                table: "RefreshTokens",
+                columns: new[] { "UsuarioAutenticadoId", "TenantId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_RegistrosEntrada_DataEntradaEmUtc",
@@ -499,15 +531,15 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 column: "HospedeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegistrosEntrada_TicketId",
+                name: "IX_RegistrosEntrada_TenantId_TicketId",
                 table: "RegistrosEntrada",
-                column: "TicketId",
+                columns: new[] { "TenantId", "TicketId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegistrosEntrada_UsuarioId_TicketId",
+                name: "IX_RegistrosEntrada_TicketId",
                 table: "RegistrosEntrada",
-                columns: new[] { "UsuarioId", "TicketId" },
+                column: "TicketId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -526,15 +558,15 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 column: "HospedeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegistrosSaida_TicketId",
+                name: "IX_RegistrosSaida_TenantId_TicketId",
                 table: "RegistrosSaida",
-                column: "TicketId",
+                columns: new[] { "TenantId", "TicketId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RegistrosSaida_UsuarioId_TicketId",
+                name: "IX_RegistrosSaida_TicketId",
                 table: "RegistrosSaida",
-                columns: new[] { "UsuarioId", "TicketId" },
+                column: "TicketId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -572,9 +604,9 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vagas_UsuarioId_VeiculoId",
+                name: "IX_Vagas_TenantId_VeiculoId",
                 table: "Vagas",
-                columns: new[] { "UsuarioId", "VeiculoId" },
+                columns: new[] { "TenantId", "VeiculoId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -589,15 +621,15 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
                 column: "HospedeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Veiculos_UsuarioId_Placa",
+                name: "IX_Veiculos_TenantId_Placa",
                 table: "Veiculos",
-                columns: new[] { "UsuarioId", "Placa" },
+                columns: new[] { "TenantId", "Placa" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_VinculosUsuarioTenant_UsuarioId_TenantId",
+                name: "IX_VinculosUsuarioTenant_UsuarioVinculadoId_TenantId",
                 table: "VinculosUsuarioTenant",
-                columns: new[] { "UsuarioId", "TenantId" },
+                columns: new[] { "UsuarioVinculadoId", "TenantId" },
                 unique: true);
         }
 
@@ -624,6 +656,9 @@ namespace GestaoDeEstacionamento.Infraestrutura.ORM.Migrations
 
             migrationBuilder.DropTable(
                 name: "Faturamentos");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "Tenants");
