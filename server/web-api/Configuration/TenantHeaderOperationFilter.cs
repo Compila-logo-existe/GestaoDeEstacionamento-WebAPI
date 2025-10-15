@@ -27,7 +27,7 @@ public sealed class TenantHeaderOperationFilter : IOperationFilter
             Required = false,
             Description = "GUID do tenant (alternativa ao slug; só no login/registro).",
             Schema = new OpenApiSchema { Type = "string", Format = "uuid" },
-            Example = new OpenApiString("11111111-1111-1111-1111-111111111111")
+            Example = new OpenApiString("00000000-0000-0000-0000-000000000000")
         });
 
         op.Parameters.Add(new OpenApiParameter

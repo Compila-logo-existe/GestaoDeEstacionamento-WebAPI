@@ -23,7 +23,7 @@ public class RegistrarUsuarioCommandHandler(
         RegistrarUsuarioCommand command, CancellationToken cancellationToken)
     {
         Guid? tenantId = tenantProvider.TenantId;
-        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+        if ((!tenantId.HasValue || tenantId.Value == Guid.Empty) && string.IsNullOrWhiteSpace(tenantProvider.Slug))
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
 
         if (!command.Senha.Equals(command.ConfirmarSenha))
@@ -38,6 +38,11 @@ public class RegistrarUsuarioCommandHandler(
 
         try
         {
+            Tenant? tenant = await repositorioTenant.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
+
+            if (tenant is null)
+                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Empresa (tenant) não encontrada."));
+
             IdentityResult usuarioResult = await userManager.CreateAsync(usuario, command.Senha);
 
             if (!usuarioResult.Succeeded)
@@ -69,21 +74,12 @@ public class RegistrarUsuarioCommandHandler(
                 };
             }
 
-            Tenant? tenant = await repositorioTenant.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
-
-            if (tenant is null)
-                return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Empresa (tenant) não encontrada."));
-
             VinculoUsuarioTenant vinculo = new(
                 usuario.Id,
                 tenant.Id,
                 "User",
                 tenant.SlugSubdominio!
             );
-
-            await repositorioUsuarioTenant.CadastrarRegistroAsync(vinculo);
-
-            await unitOfWork.CommitAsync();
 
             AccessToken? tokenAcesso = await tokenProvider.GerarAccessToken(
                 usuario,
@@ -96,6 +92,11 @@ public class RegistrarUsuarioCommandHandler(
 
                 return Result.Fail(ResultadosErro.ExcecaoInternaErro(new Exception("Falha ao gerar token de acesso.")));
             }
+
+            await repositorioUsuarioTenant.CadastrarRegistroAsync(vinculo);
+
+            await unitOfWork.CommitAsync();
+
             return Result.Ok(tokenAcesso);
         }
         catch (Exception ex)
