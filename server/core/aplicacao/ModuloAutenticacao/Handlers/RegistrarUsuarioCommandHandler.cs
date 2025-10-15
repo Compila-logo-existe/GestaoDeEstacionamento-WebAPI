@@ -38,6 +38,14 @@ public class RegistrarUsuarioCommandHandler(
 
         try
         {
+            if (!string.IsNullOrWhiteSpace(command.Slug))
+            {
+                command = command with
+                {
+                    TenantId = await repositorioTenant.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken)
+                };
+            }
+
             Tenant? tenant = await repositorioTenant.ObterPorIdAsync(command.TenantId!.Value, cancellationToken);
 
             if (tenant is null)
@@ -65,14 +73,6 @@ public class RegistrarUsuarioCommandHandler(
                 return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
             }
             await userManager.AddToRoleAsync(usuario, "User");
-
-            if (!string.IsNullOrWhiteSpace(command.Slug))
-            {
-                command = command with
-                {
-                    TenantId = await repositorioTenant.ObterTenantIdPorSubdominioAsync(command.Slug, cancellationToken)
-                };
-            }
 
             VinculoUsuarioTenant vinculo = new(
                 usuario.Id,

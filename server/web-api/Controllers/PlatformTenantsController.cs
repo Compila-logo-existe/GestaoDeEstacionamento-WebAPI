@@ -16,11 +16,11 @@ public class PlatformTenantsController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Criar([FromBody] CriarTenantRequest request)
     {
-        Result<Guid> result = await mediator.Send(new CriarTenantCommand(request.Nome, request.CNPJ, request.SlugSubdominio, request.DominioPersonalizado));
+        Result<TenantResult> result = await mediator.Send(new CriarTenantCommand(request.Nome, request.CNPJ, request.SlugSubdominio, request.DominioPersonalizado));
 
         if (result.IsFailed)
             return this.MapearFalha(result.ToResult());
 
-        return Ok(new { tenantId = result.Value });
+        return Ok(result.Value);
     }
 }
