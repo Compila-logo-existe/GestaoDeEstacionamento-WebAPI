@@ -1,5 +1,5 @@
-// Middlewares/HostTenantResolutionMiddleware.cs
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
+using Microsoft.Extensions.Primitives;
 
 public sealed class HostTenantResolutionMiddleware
 {
@@ -22,7 +22,7 @@ public sealed class HostTenantResolutionMiddleware
         }
 
         // 1) Header X-Tenant-Id (GUID)
-        if (ctx.Request.Headers.TryGetValue("X-Tenant-Id", out Microsoft.Extensions.Primitives.StringValues idHeader) &&
+        if (ctx.Request.Headers.TryGetValue("X-Tenant-Id", out StringValues idHeader) &&
             Guid.TryParse(idHeader.ToString(), out Guid parsed))
         {
             ctx.Items["ResolvedTenantId"] = parsed;
@@ -31,7 +31,7 @@ public sealed class HostTenantResolutionMiddleware
         }
 
         // 2) Header X-Tenant-Slug (string legível)
-        if (ctx.Request.Headers.TryGetValue("X-Tenant-Slug", out Microsoft.Extensions.Primitives.StringValues slugHeader))
+        if (ctx.Request.Headers.TryGetValue("X-Tenant-Slug", out StringValues slugHeader))
         {
             string slug = slugHeader.ToString().Trim().ToLower();
             if (!string.IsNullOrWhiteSpace(slug))

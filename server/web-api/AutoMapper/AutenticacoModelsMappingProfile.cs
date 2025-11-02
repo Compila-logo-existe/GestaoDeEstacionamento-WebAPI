@@ -15,14 +15,14 @@ public class AutenticacaoModelsMappingProfile : Profile
                 src.r.Email,
                 src.r.Senha,
                 src.r.ConfirmarSenha,
-                src.t.TenantId!.Value,
+                src.t.TenantId.HasValue ? src.t.TenantId : Guid.Empty,
                 src.t.Slug
             ));
         CreateMap<(AutenticarUsuarioRequest a, ITenantProvider t), AutenticarUsuarioCommand>()
             .ConvertUsing(src => new AutenticarUsuarioCommand(
                 src.a.Email,
                 src.a.Senha,
-                src.t.TenantId!.Value,
+                src.t.TenantId.HasValue ? src.t.TenantId : Guid.Empty,
                 src.t.Slug
             ));
     }

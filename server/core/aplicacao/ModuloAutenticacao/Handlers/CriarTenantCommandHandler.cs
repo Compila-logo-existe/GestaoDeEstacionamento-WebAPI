@@ -13,9 +13,9 @@ public class CriarTenantCommandHandler(
     ITenantProvider tenantProvider,
     IUnitOfWork unitOfWork,
     ILogger<CriarTenantCommandHandler> logger
-) : IRequestHandler<CriarTenantCommand, Result<Guid>>
+) : IRequestHandler<CriarTenantCommand, Result<TenantResult>>
 {
-    public async Task<Result<Guid>> Handle(
+    public async Task<Result<TenantResult>> Handle(
         CriarTenantCommand command, CancellationToken ct)
     {
         Guid? usuarioId = tenantProvider.UsuarioId;
@@ -33,7 +33,9 @@ public class CriarTenantCommandHandler(
             await repositorioTenant.CriarAsync(tenant, ct);
             await unitOfWork.CommitAsync();
 
-            return Result.Ok(tenant.Id);
+            TenantResult result = new(tenant.Id, tenant.SlugSubdominio);
+
+            return Result.Ok(result);
         }
         catch (Exception ex)
         {

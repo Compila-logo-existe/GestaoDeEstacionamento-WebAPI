@@ -8,4 +8,9 @@ public record CriarTenantCommand(
     string? CNPJ,
     string SlugSubdominio,
     string? DominioPersonalizado
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<TenantResult>>;
+
+public record TenantResult(
+    Guid TenantId,
+    string TenantSlug
+);

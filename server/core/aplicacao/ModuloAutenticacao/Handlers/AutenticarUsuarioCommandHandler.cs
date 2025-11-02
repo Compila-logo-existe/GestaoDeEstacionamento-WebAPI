@@ -21,7 +21,7 @@ public class AutenticarUsuarioCommandHandler(
         AutenticarUsuarioCommand command, CancellationToken cancellationToken)
     {
         Guid? tenantId = tenantProvider.TenantId;
-        if (!tenantId.HasValue || tenantId.Value == Guid.Empty)
+        if ((!tenantId.HasValue || tenantId.Value == Guid.Empty) && string.IsNullOrWhiteSpace(tenantProvider.Slug))
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro("Tenant não informado. Envie o header 'X-Tenant-Id'."));
 
         Usuario? usuarioEncontrado = await userManager.FindByEmailAsync(command.Email);
