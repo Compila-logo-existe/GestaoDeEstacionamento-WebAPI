@@ -7,7 +7,9 @@ using GestaoDeEstacionamento.Core.Dominio.Compartilhado;
 using GestaoDeEstacionamento.Core.Dominio.ModuloAutenticacao;
 using GestaoDeEstacionamento.Core.Dominio.ModuloEstacionamento;
 using GestaoDeEstacionamento.Core.Dominio.ModuloRecepcaoCheckin;
+using GestaoDeEstacionamento.Testes.Unidades.Compartilhado;
 using Microsoft.Extensions.Caching.Distributed;
+using System.Collections.Immutable;
 
 namespace GestaoDeEstacionamento.Testes.Unidades.ModuloEstacionamento;
 
@@ -200,5 +202,101 @@ public class LiberarVagaCommandHandlerTestes
         Assert.IsTrue(resultado.Value.Vaga.Desocupou);
         Assert.AreEqual(nomeEstacionamentoPadrao, resultado.Value.Vaga.EstacionamentoNome);
         Assert.AreEqual($"{zonaPadrao}-{numeroVagaPadrao}", resultado.Value.Vaga.IdentificacaoVaga);
+    }
+
+    [TestMethod]
+    public async Task Liberar_Deve_Falhar_Quando_Tenant_Nao_Informado()
+    {
+        // Arrange
+        LiberarVagaCommand command = new(estacionamentoIdPadrao, null, vagaIdPadrao,
+            null, null, null
+        );
+        tenantProviderMock.SetupGet(p => p.TenantId)
+            .Returns((Guid?)null);
+
+        // Act
+        Result<LiberarVagaResult> resultado = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        repositorioEstacionamentoMock.Verify(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()), Times.Never);
+        repositorioVagaMock.Verify(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()), Times.Never);
+        repositorioRegistroEntradaMock.Verify(r => r.ExisteAberturaPorPlacaAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        unitOfWorkMock.Verify(u => u.CommitAsync(), Times.Never);
+
+        const string mensagemEsperada = MensagensErro.TenantNaoInformado;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
+            .SelectMany(e => e.Reasons.OfType<Error>())
+            .Select(r => r.Message)
+            .ToImmutableList();
+
+        Assert.IsNotNull(resultado);
+        Assert.IsTrue(resultado.IsFailed);
+        Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
+    }
+
+    [TestMethod]
+    public async Task Liberar_Deve_Falhar_Quando_Usuario_Nao_Identificado()
+    {
+        // Arrange
+        LiberarVagaCommand command = new(estacionamentoIdPadrao, null, vagaIdPadrao,
+            null, null, null
+        );
+
+        tenantProviderMock.SetupGet(p => p.UsuarioId);
+
+        // Act
+        Result<LiberarVagaResult> resultado = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        repositorioEstacionamentoMock.Verify(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()), Times.Never);
+        repositorioVagaMock.Verify(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()), Times.Never);
+        repositorioRegistroEntradaMock.Verify(r => r.ExisteAberturaPorPlacaAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        unitOfWorkMock.Verify(u => u.CommitAsync(), Times.Never);
+
+        const string mensagemEsperada = MensagensErro.UsuarioNaoIdentificado;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
+            .SelectMany(e => e.Reasons.OfType<Error>())
+            .Select(r => r.Message)
+            .ToImmutableList();
+
+        Assert.IsNotNull(resultado);
+        Assert.IsTrue(resultado.IsFailed);
+        Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
+    }
+
+    [TestMethod]
+    public async Task Liberar_Deve_Falhar_Quando_Validacao_Falhar()
+    {
+        // Arrange
+        LiberarVagaCommand command = new(estacionamentoIdPadrao, null, vagaIdPadrao,
+            null, null, null
+        );
+
+        validatorMock
+            .Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+
+        repositorioEstacionamentoMock
+            .Setup(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((Estacionamento?)null);
+
+        // Act
+        Result<LiberarVagaResult> resultado = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        repositorioEstacionamentoMock.Verify(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()), Times.Once);
+        repositorioVagaMock.Verify(r => r.SelecionarRegistroPorIdAsync(It.IsAny<Guid>()), Times.Never);
+        repositorioRegistroEntradaMock.Verify(r => r.ExisteAberturaPorPlacaAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        unitOfWorkMock.Verify(u => u.CommitAsync(), Times.Never);
+
+        const string mensagemEsperada = MensagensErro.TenantNaoInformado;
+        ImmutableList<string> mensagensDoResult = resultado.Errors
+            .SelectMany(e => e.Reasons.OfType<Error>())
+            .Select(r => r.Message)
+            .ToImmutableList();
+
+        Assert.IsNotNull(resultado);
+        Assert.IsTrue(resultado.IsFailed);
+        Assert.AreEqual(mensagemEsperada, mensagensDoResult[0]);
     }
 }
